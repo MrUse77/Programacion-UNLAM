@@ -1,0 +1,4 @@
+G:/Proyectos en c/Programacion Estructurada Basica/cmake-build-debug/CMakeFiles/Programacion_Estructurada_Basica.dir
+G:/Proyectos en c/Programacion Estructurada Basica/cmake-build-debug/CMakeFiles/Ejercicios.dir
+G:/Proyectos en c/Programacion Estructurada Basica/cmake-build-debug/CMakeFiles/edit_cache.dir
+G:/Proyectos en c/Programacion Estructurada Basica/cmake-build-debug/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.26)
+project(Programacion_Estructurada_Basica C)
+
+set(CMAKE_C_STANDARD 17)
+
+add_executable(Programacion_Estructurada_Basica main.c)
+add_executable(Ejercicios Ejercicios.c)

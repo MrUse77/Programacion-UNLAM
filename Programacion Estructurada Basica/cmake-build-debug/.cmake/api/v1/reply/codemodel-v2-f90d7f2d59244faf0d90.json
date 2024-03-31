@@ -1,0 +1,69 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.26"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Programacion_Estructurada_Basica",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "Ejercicios::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Ejercicios-Debug-73a0f2008993ef95e598.json",
+					"name" : "Ejercicios",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Programacion_Estructurada_Basica::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Programacion_Estructurada_Basica-Debug-c61881e924360f419f81.json",
+					"name" : "Programacion_Estructurada_Basica",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "G:/Proyectos en c/Programacion Estructurada Basica/cmake-build-debug",
+		"source" : "G:/Proyectos en c/Programacion Estructurada Basica"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

@@ -11,6 +11,10 @@ int ej1();
 
 int ej2();
 
+int ej3();
+
+int ej4();
+
 int Min(const int[], int);
 
 int Max(const int[], int);
@@ -25,13 +29,19 @@ void BuscarMayorCantidad(int[], int[], int);
 
 void BuscarMenorCantidad(int[], int[], int);
 
+int BuscarRepetido(int[], int, int);
+
 
 int main() {
     printf("EJERCICIOS:\n");
-    printf("EJ 1:\n");
-    ej1();
-    /*   printf("EJ 2:\n");
-       ej2();*/
+    /* printf("EJ 1:\n");
+     ej1();
+       printf("EJ 2:\n");
+        ej2();
+    printf("EJ 3:\n");
+    ej3();*/
+    printf("EJ 4:\n");
+    ej4();
     return 0;
 }
 
@@ -138,8 +148,6 @@ int Buscar(int v[], int datoABuscar, int cantElem) {
 
 int IngresarCantidades(int v[], int c) {
     int aux = 0;
-
-
     do {
         printf("Ingrese la cantidad de unidades solicitadas(con 0 terminan las solicitudes del producto): ");
         scanf("%d", &aux);
@@ -183,3 +191,82 @@ void BuscarMenorCantidad(int v[], int c[], int N) {
 //de un tema dado. El curso está formado por 5 grupos. Se pide realizar un programa para sortear el orden de
 //exposición de dichos grupos. Cada vez que se ejecute el programa deberá mostrar un orden de exposición
 //distinto para cada uno de los 5 grupos.
+
+int ej3() {
+    int grupos[5] = {1, 2, 3, 4, 5};
+    int j, aux, num;
+    srand(time(NULL));
+    for (j = 0; j < 5; j++) {
+        num = rand() % 5;
+        aux = grupos[j];
+        grupos[j] = grupos[num];
+        grupos[num] = aux;
+    }
+    printf("Orden de exposicion de los grupos: \n");
+    for (j = 0; j < 5; j++) {
+        printf("%d ", grupos[j]);
+        printf("\n");
+    }
+    return 0;
+}
+//Ejercicio 1.4: Se ingresan DNI y nota de un parcial de los alumnos de un curso. El ingreso de datos finaliza con un DNI
+//negativo. Se sabe que como máximo pueden presentarse a rendir 60 alumnos. Tenga en cuenta que no
+//pueden existir 2 o más alumnos con el mismo DNI.
+//Mostrar el Listado de alumnos con su correspondiente DNI y la nota obtenida (en forma de listado), ordenado
+//de mayor a menor por nota.
+
+int ej4() {
+    int DNI[6] = {123, 124, 125, 126, 127, 128};
+    int nota[6] = {2, 1, 7, 10, 9, 1};
+    int i;
+    int aux;
+    int aux2;
+    int cant = 6;
+    do {
+        do {
+            printf("Ingrese el DNI del alumno: ");
+            scanf("%d", &aux);
+
+            if (BuscarRepetido(DNI, aux, cant) != -1) printf("DNI incorrecto\n");
+        } while (BuscarRepetido(DNI, aux, cant) != -1);
+        if (aux > 0) {
+            DNI[cant] = aux;
+            do {
+                printf("Ingrese la nota del alumno: ");
+                scanf("%d", &aux2);
+                if (aux2 < 0 || aux2 > 10) printf("Nota incorrecta\n");
+            } while (aux2 < 0 || aux2 > 10);
+            nota[cant] = aux2;
+            cant++;
+        }
+    } while (aux > 0 && cant < 6);
+
+    for (i = 0; i < cant; i++) {
+
+        for (int j = 0; j < cant - 1; j++) {
+            if (nota[j] < nota[j + 1]) {
+                aux = nota[j];
+                nota[j] = nota[j + 1];
+                nota[j + 1] = aux;
+                aux = DNI[j];
+                DNI[j] = DNI[j + 1];
+                DNI[j + 1] = aux;
+            }
+        }
+
+    }
+    for (i = 0; i < cant; i++) {
+        printf("DNI: %d, Nota: %d\n", DNI[i], nota[i]);
+    }
+    return 0;
+}
+
+int BuscarRepetido(int v[], int datoABuscar, int cantElem) {
+    int i = 0, pos = -1;
+    while (pos == -1 && i < cantElem) {
+        if (v[i] == datoABuscar) {
+            pos = i;
+        } else i++;
+    }
+    return pos;
+}

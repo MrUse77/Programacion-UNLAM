@@ -1,4 +1,4 @@
-# Install script for directory: G:/Proyectos en c/Programacion Estructurada Basica
+# Install script for directory: G:/Documentos/Unlam/Ejercicios y ejemplos de programacion/Programacion Estructurada Basica
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "G:/Proyectos en c/Programacion Estructurada Basica/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "G:/Documentos/Unlam/Ejercicios y ejemplos de programacion/Programacion Estructurada Basica/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

@@ -19,6 +19,8 @@ void ej25();
 
 void ej29();
 
+void ej210();
+
 int Min(const int[], int);
 
 int Max(const int[], int);
@@ -43,7 +45,7 @@ int HacerReserva(int, int, char [12][9]);
 
 void FilasVacias(char [12][9], int);
 
-void MaxSpec(int[2][9], char [12][9]);
+void MaxSpec(int [2][9], char [12][9]);
 
 int Verificacion(int, int);
 
@@ -52,6 +54,12 @@ int mapButaca(int);
 void IngresoVotos(int, int, int, int[11][16], int[10], int[15], int);
 
 void MostrarVotos(int[11][16]);
+
+int BuscarMatrizRepetidas(int[11][16], int, int);
+
+void MostrarTablero(char [3][3]);
+
+int BusquedaGanador(char [3][3]);
 
 int main() {
     int ej;
@@ -82,6 +90,10 @@ int main() {
         case 29:
             printf("EJ 2.9:\n");
             ej29();
+            break;
+        case 210:
+            printf("EJ 2.10:\n");
+            ej210();
             break;
     }
     return 0;
@@ -511,7 +523,7 @@ a. Cantidad de votos recibidos por cada candidato en cada sede.
 LISTA SEDE1 SEDE2 SEDE3… SEDE15
 873 36 78 99… XX
 735 XX XX XXX… XX
-        b. Listado ordenado por cantidad de votos totales en formar decreciente, con el siguiente formato:
+b. Listado ordenado por cantidad de votos totales en formar decreciente, con el siguiente formato:
 TOTAL DE VOTOS PORCENTAJE LISTA
 800 80% 873
 200 20% 735
@@ -519,21 +531,26 @@ c. Candidatos que NO recibieron votos en la sede 5*/
 void ej29() {
     int votos[11][16] = {0};
     int i, j;
-    int lista, sede, voto;
+    int lista, sede, voto,rep=0;
     int totalVotos[10] = {0};
     int totalVotosSede[15] = {0};
     int totalVotosTotal = 0;
     for (i = 0; i < 16; i++) {
         votos[0][i] = i;
     }
+    i=1;
     do {
         do {
             printf("Ingrese el numero de lista: ");
             scanf("%d", &lista);
+            rep=BuscarMatrizRepetidas(votos, lista, 11);
         } while (lista != 0 && (lista < 100 || lista > 999));
-        if (lista != 0) {
-            IngresoVotos(lista, sede, voto, votos, totalVotos, totalVotosSede, totalVotosTotal);
+        if(rep=-1) votos[i][0] =lista;
+        if (lista!=0) {
+          IngresoVotos(lista, sede, voto, votos, totalVotos, totalVotosSede, totalVotosTotal);
+          i++;
         }
+
     } while (lista != 0);
     MostrarVotos(votos);
     for (i = 1; i < 11; i++) {
@@ -544,7 +561,7 @@ void ej29() {
     printf("Candidatos que NO recibieron votos en la sede 5\n");
     for (i = 1; i < 11; i++) {
         if (votos[i][5] == 0) {
-            printf("LISTA\n");
+            printf("LISTA: ");
             printf("%d\n", votos[i][0]);
         }
     }
@@ -552,35 +569,133 @@ void ej29() {
 
 void IngresoVotos(int lista, int sede, int voto, int votos[11][16], int totalVotos[10], int totalVotosSede[15],
                   int totalVotosTotal) {
-    int i;
+    int i,j;
     do {
         printf("Ingrese el numero de sede: ");
         scanf("%d", &sede);
     } while (sede < 1 || sede > 15);
     printf("Ingrese la cantidad de votos: ");
     scanf("%d", &voto);
-    for (i = 1; i < 11; i++) {
-        if (votos[i][0] == lista) {
-            votos[i][sede] += voto;
-            totalVotos[i] += voto;
-            totalVotosSede[sede] += voto;
-            totalVotosTotal += voto;
-        }
+    for(i=1;i<11;i++){
+          printf("\n%d %d",votos[i][0],lista);
+          if(votos[i][0]==lista){
+            votos[i][sede]=voto;
+            totalVotos[i]+=voto;
+            totalVotosSede[sede]+=voto;
+            totalVotosTotal+=voto;
+          }
+        
     }
+    
 }
 
 void MostrarVotos(int votos[11][16]) {
     int i, j;
     printf("LISTA ");
     for (i = 1; i < 16; i++) {
-        printf("SEDE%d ", votos[0][i]);
+        printf("\tSEDE %d", votos[0][i]);
     }
     printf("\n");
     for (i = 1; i < 11; i++) {
         printf("%d ", votos[i][0]);
         for (j = 1; j < 16; j++) {
-            printf("%d ", votos[i][j]);
+            printf("\t%d", votos[i][j]);
         }
         printf("\n");
     }
+}
+int BuscarMatrizRepetidas(int v[11][16], int datoABuscar, int cantElem) {
+    int i = 0, pos = -1;
+    while (pos == -1 && i < cantElem) {
+        if (v[i][0] == datoABuscar) {
+            pos = i;
+        } else i++;
+    }
+    return pos;
+}
+
+/*Ej: 2.10 Realizar el juego del Tateti. El jugador 1 utilizara la letra X
+y el jugador 2 la letra O para maracar sus elecciones. el tablero armarlo con
+una matriz de 3x3 que debe ser visualizada en pantalla en cada jugada marcando
+la ubicacion elegida por cada jugador. Luego de cada jugada se debe llamar a una funcion
+para verificar si el jugador gano o no la partida. Si se llega a la ultima jugada y nadie
+gana, se debe informar del empate
+*/
+void ej210(){
+  char tablero[3][3]={0};
+  int i,j,x,y,ganador=0;
+  for(i=0;i<3;i++){
+    for(j=0;j<3;j++){
+      tablero[i][j]=' ';
+    }
+  }
+  MostrarTablero(tablero);
+  i=0;
+  do{
+    if(i%2==0){ 
+      printf("Jugador 1: ");
+      scanf("%d %d",&x,&y);
+      tablero[x-1][y-1]='X';
+    }else{
+      printf("Jugador 2: ");
+      scanf("%d %d",&x,&y);
+      tablero[x-1][y-1]='O';
+    }
+    MostrarTablero(tablero);
+    ganador=BusquedaGanador(tablero);
+    i++;
+    printf("ganador: %c\n",ganador);
+    printf("i: %d\n",i);
+  }while(i<9 && !ganador); 
+  if(ganador==1){
+    printf("El ganador es: X");
+  }else if(ganador==2){
+    printf("El ganador es: O");
+  }else{
+    printf("Empate");
+  
+  }
+}
+void MostrarTablero(char tablero[3][3]){
+  int i,j;
+  for(i=0;i<3;i++){
+    for(j=0;j<3;j++){
+      printf("| %c |",tablero[i][j]);
+    }
+    printf("\n");
+  }
+}
+int BusquedaGanador(char tablero[3][3]){
+  int i;
+  for(i=0;i<3;i++){
+    if(tablero[i][0]==tablero[i][1] && tablero[i][1]==tablero[i][2]){
+      if(tablero[i][0]=='X'){
+        return 1;
+      }else if(tablero[i][0]=='O'){
+        return 2;
+      }
+    }else if(tablero[0][i]==tablero[1][i] && tablero[1][i]==tablero[2][i]){
+      if(tablero[0][i]=='X'){
+        return 1;
+      }else if(tablero[0][i]=='O'){
+        return 2;
+      }
+    }
+  }
+  if(tablero[0][0]==tablero[1][1] && tablero[1][1]==tablero[2][2]){
+    if(tablero[0][0]=='X'){
+        return 1;
+      }else if(tablero[0][0]=='O'){
+        return 2;
+      }
+  }else if(tablero[0][2]==tablero[1][1] && tablero[1][1]==tablero[2][0]){
+    if(tablero[0][2]=='X'){
+        return 1;
+      }else if(tablero[0][2]=='O'){
+        return 2;
+      }
+  }
+    return 0;
+  
+
 }

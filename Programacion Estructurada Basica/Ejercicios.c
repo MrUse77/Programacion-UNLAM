@@ -17,6 +17,8 @@ int ej4();
 
 void ej25();
 
+void ej29();
+
 int Min(const int[], int);
 
 int Max(const int[], int);
@@ -47,18 +49,41 @@ int Verificacion(int, int);
 
 int mapButaca(int);
 
+void IngresoVotos(int, int, int, int[11][16], int[10], int[15], int);
+
+void MostrarVotos(int[11][16]);
+
 int main() {
+    int ej;
     printf("EJERCICIOS:\n");
-    /* printf("EJ 1:\n");
-     ej1();
-       printf("EJ 2:\n");
-        ej2();
-    printf("EJ 3:\n");
-    ej3();
-    printf("EJ 4:\n");
-    ej4();*/
-    printf("EJ 2.5:\n");
-    ej25();
+    printf("Elija el ejercicio sin puntos (ej: ejercicio 2.5 = 25): ");
+    scanf("%d", &ej);
+    switch (ej) {
+        case 1:
+            printf("EJ 1:\n");
+            ej1();
+            break;
+        case 2:
+            printf("EJ 2:\n");
+            ej2();
+            break;
+        case 3:
+            printf("EJ 3:\n");
+            ej3();
+            break;
+        case 4:
+            printf("EJ 4:\n");
+            ej4();
+            break;
+        case 25:
+            printf("EJ 2.5:\n");
+            ej25();
+            break;
+        case 29:
+            printf("EJ 2.9:\n");
+            ej29();
+            break;
+    }
     return 0;
 }
 
@@ -469,5 +494,93 @@ int mapButaca(int butaca) {
             return 7;
         case 9:
             return 8;
+    }
+}
+
+/*Ej:2.9 Se desea contabilizar los votos recibidos en las elecciones de un club de fútbol. Existen 10 candidatos cada
+uno representado por un número de lista diferente (número de 3 cifras no correlativo). La votación se realiza
+en 15 sedes distintas codificadas del 1 al 15. Se ingresan los votos registrados en cada una de las sedes
+        registrando:
+• Número de lista
+• Número de sede
+• Cantidad de votos
+(Solo se informan candidatos que recibieron votos).
+La carga de votos finaliza con un número de lista igual a 0
+Mostrar:
+a. Cantidad de votos recibidos por cada candidato en cada sede.
+LISTA SEDE1 SEDE2 SEDE3… SEDE15
+873 36 78 99… XX
+735 XX XX XXX… XX
+        b. Listado ordenado por cantidad de votos totales en formar decreciente, con el siguiente formato:
+TOTAL DE VOTOS PORCENTAJE LISTA
+800 80% 873
+200 20% 735
+c. Candidatos que NO recibieron votos en la sede 5*/
+void ej29() {
+    int votos[11][16] = {0};
+    int i, j;
+    int lista, sede, voto;
+    int totalVotos[10] = {0};
+    int totalVotosSede[15] = {0};
+    int totalVotosTotal = 0;
+    for (i = 0; i < 16; i++) {
+        votos[0][i] = i;
+    }
+    do {
+        do {
+            printf("Ingrese el numero de lista: ");
+            scanf("%d", &lista);
+        } while (lista != 0 && (lista < 100 || lista > 999));
+        if (lista != 0) {
+            IngresoVotos(lista, sede, voto, votos, totalVotos, totalVotosSede, totalVotosTotal);
+        }
+    } while (lista != 0);
+    MostrarVotos(votos);
+    for (i = 1; i < 11; i++) {
+        printf("TOTAL DE VOTOS PORCENTAJE LISTA\n");
+        printf("     %d            %d       %d\n", totalVotos[i], totalVotos[i] * 100 / totalVotosTotal,
+               votos[i][0]);
+    }
+    printf("Candidatos que NO recibieron votos en la sede 5\n");
+    for (i = 1; i < 11; i++) {
+        if (votos[i][5] == 0) {
+            printf("LISTA\n");
+            printf("%d\n", votos[i][0]);
+        }
+    }
+}
+
+void IngresoVotos(int lista, int sede, int voto, int votos[11][16], int totalVotos[10], int totalVotosSede[15],
+                  int totalVotosTotal) {
+    int i;
+    do {
+        printf("Ingrese el numero de sede: ");
+        scanf("%d", &sede);
+    } while (sede < 1 || sede > 15);
+    printf("Ingrese la cantidad de votos: ");
+    scanf("%d", &voto);
+    for (i = 1; i < 11; i++) {
+        if (votos[i][0] == lista) {
+            votos[i][sede] += voto;
+            totalVotos[i] += voto;
+            totalVotosSede[sede] += voto;
+            totalVotosTotal += voto;
+        }
+    }
+}
+
+void MostrarVotos(int votos[11][16]) {
+    int i, j;
+    printf("LISTA ");
+    for (i = 1; i < 16; i++) {
+        printf("SEDE%d ", votos[0][i]);
+    }
+    printf("\n");
+    for (i = 1; i < 11; i++) {
+        printf("%d ", votos[i][0]);
+        for (j = 1; j < 16; j++) {
+            printf("%d ", votos[i][j]);
+        }
+        printf("\n");
     }
 }

@@ -1,4 +1,0 @@
-G:/Documentos/Unlam/Ejercicios y ejemplos de programacion/Programacion Estructurada Basica/cmake-build-debug/CMakeFiles/Programacion_Estructurada_Basica.dir
-G:/Documentos/Unlam/Ejercicios y ejemplos de programacion/Programacion Estructurada Basica/cmake-build-debug/CMakeFiles/Ejercicios.dir
-G:/Documentos/Unlam/Ejercicios y ejemplos de programacion/Programacion Estructurada Basica/cmake-build-debug/CMakeFiles/edit_cache.dir
-G:/Documentos/Unlam/Ejercicios y ejemplos de programacion/Programacion Estructurada Basica/cmake-build-debug/CMakeFiles/rebuild_cache.dir

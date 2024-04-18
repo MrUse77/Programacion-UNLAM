@@ -14,6 +14,7 @@ int ej4();
 
 void ej5(int [], int);
 
+
 void CargaAleatoria(int [], int, int);
 
 void Mostrar(int [], int);
@@ -26,13 +27,14 @@ void MostrarMaximo(int [], int, int);
 
 int Buscar(int [], int, int);
 
+
 int main() {
     int v[10];
     //ej1();
     //ej2();
     //ej3();
     //ej4();
-    ej5(v, 10);
+    //ej5(v, 10);
     return 0;
 }
 
@@ -145,3 +147,4 @@ void ej5(int v[], int ce) {
     printf("Vector cargado\n");
     Mostrar(v, ce);
 }
+

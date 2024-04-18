@@ -15,6 +15,8 @@ int ej3();
 
 int ej4();
 
+void ej25();
+
 int Min(const int[], int);
 
 int Max(const int[], int);
@@ -31,6 +33,19 @@ void BuscarMenorCantidad(int[], int[], int);
 
 int BuscarRepetido(int[], int, int);
 
+void LlenarSala(char [12][9]);
+
+void MostrarSala(char [12][9]);
+
+int HacerReserva(int, int, char [12][9]);
+
+void FilasVacias(char [12][9], int);
+
+void MaxSpec(int[2][9], char [12][9]);
+
+int Verificacion(int, int);
+
+int mapButaca(int);
 
 int main() {
     printf("EJERCICIOS:\n");
@@ -39,9 +54,11 @@ int main() {
        printf("EJ 2:\n");
         ej2();
     printf("EJ 3:\n");
-    ej3();*/
+    ej3();
     printf("EJ 4:\n");
-    ej4();
+    ej4();*/
+    printf("EJ 2.5:\n");
+    ej25();
     return 0;
 }
 
@@ -269,4 +286,188 @@ int BuscarRepetido(int v[], int datoABuscar, int cantElem) {
         } else i++;
     }
     return pos;
+}
+
+/*Ej 2.5:
+Se desea desarrollar un sistema de reservas de entradas para un cine. La sala consta de 12 filas numeradas de
+la 1 a la 12 y cada fila tiene 9 butacas numeradas a partir de la columna central, con las butacas impares a la
+y las pares a la izquierda, como en el siguiente esquema:
+        8 6 4 2 1 3 5 7 9
+Para la carga, se debe mostrar al usuario un esquema con las butacas disponibles y reservadas, marcando
+con la letra D las disponibles y con la letra R las reservadas.
+Por cada reserva se debe solicitar la fila y número de butaca a reservar. Cada vez que se realice una
+reserva se deberá actualizar el esquema que muestra las butacas. Si la butaca seleccionada ya estaba
+ocupada se debe informar al usuario para que seleccione otra. El proceso de reserva finaliza con una fila
+con un número negativo. Al finalizar mostrar:
+a. la cantidad de asientos disponibles y la cantidad de asientos reservados.
+b. los números de filas que quedaron vacías.
+c. la o las filas con mayor cantidad de espectadores.
+d. un listado con la cantidad de personas que se sentaron en los mismos números de butacas en todo el cine ordenado de mayor a menor.
+*/
+void ej25() {
+    char sala[12][9] = {0};
+    int i, fila, butaca, cantReservadas = 0, cantDisponibles = 12 * 9, cantVacias = 0, cant[2][9] = {0};
+    LlenarSala(sala);
+    do {
+        do {
+            printf("\n");
+            MostrarSala(sala);
+            printf("Ingrese la fila y la butaca a reservar: ");
+            scanf("%d", &fila);
+            scanf("%d", &butaca);
+        } while (HacerReserva(fila, butaca, sala) == -1 && Verificacion(fila, butaca) == -1);
+        if (fila > 0) {
+            cantReservadas++;
+            cantDisponibles--;
+        }
+    } while (fila > 0);
+
+
+    printf("Cantidad de asientos disponibles: %d\n", cantDisponibles);
+    printf("Cantidad de asientos reservados: %d\n", cantReservadas);
+    FilasVacias(sala, cantVacias);
+    MaxSpec(cant, sala);
+}
+
+void LlenarSala(char sala[12][9]) {
+    int i, j;
+    for (i = 0; i < 12; i++) {
+        for (j = 0; j < 9; j++) {
+            sala[i][j] = 'D';
+        }
+    }
+}
+
+void MostrarSala(char sala[12][9]) {
+    int i, j;
+    printf("      ");
+    for (i = 8; i >= 1; i -= 2) {
+        printf("  %d  ", i);
+    }
+    for (i = 1; i <= 9; i += 2) {
+        printf("  %d  ", i);
+    }
+    for (i = 0; i < 13; i++) {
+        for (j = 0; j < 10; j++) {
+            if (j == 0 && i > 0) {
+                if (i < 10) printf("  0%d  ", i);
+                else printf("  %d  ", i);
+            } else printf("  %c  ", sala[i - 1][j - 1]);
+
+        }
+        printf("\n");
+    }
+}
+
+int Verificacion(int fila, int butaca) {
+    if (fila < 0) return 0;
+    else if (fila == 0 || fila > 12 || butaca < 1 || butaca > 9) {
+        printf("Fila o butaca incorrecta\n");
+        return -1;
+    }
+}
+
+int HacerReserva(int fila, int butaca, char sala[12][9]) {
+    int posButaca = mapButaca(butaca);
+    if (sala[fila - 1][posButaca] == 'D') {
+        sala[fila - 1][posButaca] = 'R';
+        return 0;
+    } else {
+        printf("Butaca ocupada, seleccione otra\n");
+        return -1;
+    }
+}
+
+void FilasVacias(char sala[12][9], int cantVacias) {
+    int i, j, vacia = 0;
+    for (i = 0; i < 12; i++) {
+        vacia = 1;
+        for (j = 0; j < 9; j++) {
+            if (sala[i][j] == 'R') {
+                vacia = 0;
+                break;
+            }
+        }
+        if (vacia == 1) {
+            cantVacias++;
+        }
+    }
+    printf("Filas vacias: %d\n", cantVacias);
+}
+
+void MaxSpec(int cant[2][9], char sala[12][9]) {
+    int i, j, filas[12] = {0}, max[2] = {0}, butacas[9] = {0};
+    for (i = 0; i < 9; i++) {
+        for (j = 0; j < 12; j++) {
+            if (sala[j][i] == 'R') {
+                filas[j]++;
+            }
+        }
+    }
+    for (i = 0; i < 12; i++) {
+        for (j = 0; j < 9; j++) {
+            if (sala[i][j] == 'R') {
+                butacas[j]++;
+            }
+        }
+    }
+    for (i = 0; i < 8; i++) {
+        for (j = 0; j < 8 - i; j++) {
+            if (butacas[j] < butacas[j + 1]) {
+                max[0] = butacas[j];
+                butacas[j] = butacas[j + 1];
+                butacas[j + 1] = max[0];
+            }
+        }
+    }
+    for (i = 0; i < 11; i++) {
+        for (j = 0; j < 11 - i; j++) {
+            if (filas[j] < filas[j + 1]) {
+                max[1] = filas[j];
+                filas[j] = filas[j + 1];
+                filas[j + 1] = max[1];
+            }
+        }
+    }
+    max[1] = filas[0];
+    i = 0;
+    i = 0;
+    while (filas[i] == max[1]) {
+        cant[0][i] = i + 1;
+        i++;
+    }
+    printf("Filas con mayor cantidad de espectadores: ");
+    for (i = 0; i < 9; i++) {
+        if (cant[0][i] != 0) {
+            printf("%d ", cant[0][i]);
+        }
+    }
+    printf("\n");
+    printf("Cantidad de personas que se sentaron en los mismos numeros de butacas en todo el cine ordenado de mayor a menor: ");
+    for (i = 0; i < 9; i++) {
+        if (butacas[i] != 0)printf("%d ", butacas[i]);
+    }
+}
+
+int mapButaca(int butaca) {
+    switch (butaca) {
+        case 8:
+            return 0;
+        case 6:
+            return 1;
+        case 4:
+            return 2;
+        case 2:
+            return 3;
+        case 1:
+            return 4;
+        case 3:
+            return 5;
+        case 5:
+            return 6;
+        case 7:
+            return 7;
+        case 9:
+            return 8;
+    }
 }

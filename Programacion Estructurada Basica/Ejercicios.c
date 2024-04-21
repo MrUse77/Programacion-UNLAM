@@ -15,6 +15,8 @@ int ej3();
 
 int ej4();
 
+void ej24();
+
 void ej25();
 
 void ej29();
@@ -61,6 +63,15 @@ void MostrarTablero(char [3][3]);
 
 int BusquedaGanador(char [3][3]);
 
+void Maximos(int[15]);
+
+void jugadaComputadora(char [3][3]);
+
+int esPosicionLibre(char [3][3], int, int);
+
+int PosibleGanador(char [3][3], int, int);
+
+
 int main() {
     int ej;
     printf("EJERCICIOS:\n");
@@ -82,6 +93,10 @@ int main() {
         case 4:
             printf("EJ 4:\n");
             ej4();
+            break;
+        case 24:
+            printf("EJ 2.4:\n");
+            ej24();
             break;
         case 25:
             printf("EJ 2.5:\n");
@@ -325,6 +340,79 @@ int BuscarRepetido(int v[], int datoABuscar, int cantElem) {
     return pos;
 }
 
+/*Ej 2.4:
+La empresa de turismo GUADALAJARA VIAJES comercializa 10 diferentes tours a través de 15 agencias en todo
+        el país. Diariamente cada agencia envía la cantidad de ventas efectuadas de cada tour, indicando agencia,
+tours y la cantidad de pasajes. Algunas agencias envían 0 en la cantidad cuando no existen pasajes para un
+        tour determinado, pero no en todas.
+La información que se envía tiene los siguientes datos que se ingresan en forma desordenada:
+• Código de agencia (de 1 a 15)
+• Código de tour (1 a 10)
+• Cantidad de pasajes (0 a 20)
+Informar:
+a. El total de pasajes vendidos por tour en cada agencia.
+b. El número de agencia que obtuvo la máxima cantidad de pasajes vendidos. (puede repetirse)*/
+
+void ej24() {
+    int tours[10][15] = {0};
+    int i, j, agencia, tour, pasajes, max[15] = {0};
+    char fin;
+    for (i = 0; i < 15; i++) {
+        for (j = 0; j < 10; j++) {
+            tours[j][i] = 0;
+        }
+    }
+    do {
+        do {
+            printf("Ingrese el codigo de la agencia: ");
+            scanf("%d", &agencia);
+            if (agencia < 1 || agencia > 15) printf("Agencia incorrecta\n");
+        } while (agencia < 1 || agencia > 15);
+        do {
+            printf("Ingrese el codigo del tour: ");
+            scanf("%d", &tour);
+            if (tour < 1 || tour > 10) printf("Tour incorrecto\n");
+        } while (tour < 1 || tour > 10);
+        do {
+            printf("Ingrese la cantidad de pasajes: ");
+            scanf("%d", &pasajes);
+            if (pasajes < 0 || pasajes > 20) printf("Cantidad incorrecta\n");
+        } while (pasajes < 0 || pasajes > 20);
+        tours[tour - 1][agencia - 1] += pasajes;
+        printf("Desea ingresar otro tour? (S para Si o N para no): ");
+        scanf(" %c", &fin);
+    } while (fin == 'S' || fin == 's');
+
+    for (i = 0; i < 10; i++) {
+        printf("Tour %d\n", i + 1);
+        for (j = 0; j < 15; j++) {
+            printf("Agencia %d: %d\n", j + 1, tours[i][j]);
+        }
+    }
+    for (i = 0; i < 15; i++) {
+        for (j = 0; j < 10; j++) {
+            max[i] += tours[j][i];
+        }
+    }
+    Maximos(max);
+}
+
+void Maximos(int max[15]) {
+    int i, maximo = max[0];
+    for (i = 1; i < 15; i++) {
+        if (max[i] > maximo) {
+            maximo = max[i];
+        }
+    }
+    printf("Las agencias con la maxima cantidad de pasajes vendidos son: ");
+    for (i = 0; i < 15; i++) {
+        if (max[i] == maximo) {
+            printf("%d ", i + 1);
+        }
+    }
+    printf("\n");
+}
+
 /*Ej 2.5:
 Se desea desarrollar un sistema de reservas de entradas para un cine. La sala consta de 12 filas numeradas de
 la 1 a la 12 y cada fila tiene 9 butacas numeradas a partir de la columna central, con las butacas impares a la
@@ -531,24 +619,24 @@ c. Candidatos que NO recibieron votos en la sede 5*/
 void ej29() {
     int votos[11][16] = {0};
     int i, j;
-    int lista, sede, voto,rep=0;
+    int lista, sede, voto, rep = 0;
     int totalVotos[10] = {0};
     int totalVotosSede[15] = {0};
     int totalVotosTotal = 0;
     for (i = 0; i < 16; i++) {
         votos[0][i] = i;
     }
-    i=1;
+    i = 1;
     do {
         do {
             printf("Ingrese el numero de lista: ");
             scanf("%d", &lista);
-            rep=BuscarMatrizRepetidas(votos, lista, 11);
+            rep = BuscarMatrizRepetidas(votos, lista, 11);
         } while (lista != 0 && (lista < 100 || lista > 999));
-        if(rep=-1) votos[i][0] =lista;
-        if (lista!=0) {
-          IngresoVotos(lista, sede, voto, votos, totalVotos, totalVotosSede, totalVotosTotal);
-          i++;
+        if (rep = -1) votos[i][0] = lista;
+        if (lista != 0) {
+            IngresoVotos(lista, sede, voto, votos, totalVotos, totalVotosSede, totalVotosTotal);
+            i++;
         }
 
     } while (lista != 0);
@@ -569,24 +657,24 @@ void ej29() {
 
 void IngresoVotos(int lista, int sede, int voto, int votos[11][16], int totalVotos[10], int totalVotosSede[15],
                   int totalVotosTotal) {
-    int i,j;
+    int i, j;
     do {
         printf("Ingrese el numero de sede: ");
         scanf("%d", &sede);
     } while (sede < 1 || sede > 15);
     printf("Ingrese la cantidad de votos: ");
     scanf("%d", &voto);
-    for(i=1;i<11;i++){
-          printf("\n%d %d",votos[i][0],lista);
-          if(votos[i][0]==lista){
-            votos[i][sede]=voto;
-            totalVotos[i]+=voto;
-            totalVotosSede[sede]+=voto;
-            totalVotosTotal+=voto;
-          }
-        
+    for (i = 1; i < 11; i++) {
+        printf("\n%d %d", votos[i][0], lista);
+        if (votos[i][0] == lista) {
+            votos[i][sede] = voto;
+            totalVotos[i] += voto;
+            totalVotosSede[sede] += voto;
+            totalVotosTotal += voto;
+        }
+
     }
-    
+
 }
 
 void MostrarVotos(int votos[11][16]) {
@@ -604,6 +692,7 @@ void MostrarVotos(int votos[11][16]) {
         printf("\n");
     }
 }
+
 int BuscarMatrizRepetidas(int v[11][16], int datoABuscar, int cantElem) {
     int i = 0, pos = -1;
     while (pos == -1 && i < cantElem) {
@@ -620,82 +709,143 @@ una matriz de 3x3 que debe ser visualizada en pantalla en cada jugada marcando
 la ubicacion elegida por cada jugador. Luego de cada jugada se debe llamar a una funcion
 para verificar si el jugador gano o no la partida. Si se llega a la ultima jugada y nadie
 gana, se debe informar del empate
+ Complemento: Modificar el juego para que sea de un solo jugador. Deberá programar la inteligencia
+artificial para que la computadora elija donde realizar la jugada para intentar ganar la partida y no perder
+completando el espacio correspondiente cuando haga falta
 */
-void ej210(){
-  char tablero[3][3]={0};
-  int i,j,x,y,ganador=0;
-  for(i=0;i<3;i++){
-    for(j=0;j<3;j++){
-      tablero[i][j]=' ';
-    }
-  }
-  MostrarTablero(tablero);
-  i=0;
-  do{
-    if(i%2==0){ 
-      printf("Jugador 1: ");
-      scanf("%d %d",&x,&y);
-      tablero[x-1][y-1]='X';
-    }else{
-      printf("Jugador 2: ");
-      scanf("%d %d",&x,&y);
-      tablero[x-1][y-1]='O';
+void ej210() {
+    char tablero[3][3] = {0};
+    int i, j, x, y, ganador = 0;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            tablero[i][j] = ' ';
+        }
     }
     MostrarTablero(tablero);
-    ganador=BusquedaGanador(tablero);
-    i++;
-    printf("ganador: %c\n",ganador);
-    printf("i: %d\n",i);
-  }while(i<9 && !ganador); 
-  if(ganador==1){
-    printf("El ganador es: X");
-  }else if(ganador==2){
-    printf("El ganador es: O");
-  }else{
-    printf("Empate");
-  
-  }
-}
-void MostrarTablero(char tablero[3][3]){
-  int i,j;
-  for(i=0;i<3;i++){
-    for(j=0;j<3;j++){
-      printf("| %c |",tablero[i][j]);
-    }
-    printf("\n");
-  }
-}
-int BusquedaGanador(char tablero[3][3]){
-  int i;
-  for(i=0;i<3;i++){
-    if(tablero[i][0]==tablero[i][1] && tablero[i][1]==tablero[i][2]){
-      if(tablero[i][0]=='X'){
-        return 1;
-      }else if(tablero[i][0]=='O'){
-        return 2;
-      }
-    }else if(tablero[0][i]==tablero[1][i] && tablero[1][i]==tablero[2][i]){
-      if(tablero[0][i]=='X'){
-        return 1;
-      }else if(tablero[0][i]=='O'){
-        return 2;
-      }
-    }
-  }
-  if(tablero[0][0]==tablero[1][1] && tablero[1][1]==tablero[2][2]){
-    if(tablero[0][0]=='X'){
-        return 1;
-      }else if(tablero[0][0]=='O'){
-        return 2;
-      }
-  }else if(tablero[0][2]==tablero[1][1] && tablero[1][1]==tablero[2][0]){
-    if(tablero[0][2]=='X'){
-        return 1;
-      }else if(tablero[0][2]=='O'){
-        return 2;
-      }
-  }
-    return 0;
-  
+    i = 0;
+    do {
+        if (i % 2 == 0) {
+            printf("Jugador 1: ");
+            scanf("%d %d", &x, &y);
+            tablero[x - 1][y - 1] = 'X';
+        } else {
+            //automatizar jugada
+            jugadaComputadora(tablero);
+        }
+        MostrarTablero(tablero);
+        ganador = BusquedaGanador(tablero);
+        i++;
+        printf("ganador: %c\n", ganador);
+        printf("i: %d\n", i);
+    } while (i < 9 && !ganador);
+    if (ganador == 1) {
+        printf("El ganador es: X");
+    } else if (ganador == 2) {
+        printf("El ganador es: O");
+    } else {
+        printf("Empate");
 
+    }
+}
+
+void MostrarTablero(char tablero[3][3]) {
+    int i, j;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            printf("| %c |", tablero[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int BusquedaGanador(char tablero[3][3]) {
+    int i;
+    for (i = 0; i < 3; i++) {
+        if (tablero[i][0] == tablero[i][1] && tablero[i][1] == tablero[i][2]) {
+            if (tablero[i][0] == 'X') {
+                return 1;
+            } else if (tablero[i][0] == 'O') {
+                return 2;
+            }
+        } else if (tablero[0][i] == tablero[1][i] && tablero[1][i] == tablero[2][i]) {
+            if (tablero[0][i] == 'X') {
+                return 1;
+            } else if (tablero[0][i] == 'O') {
+                return 2;
+            }
+        }
+    }
+    if (tablero[0][0] == tablero[1][1] && tablero[1][1] == tablero[2][2]) {
+        if (tablero[0][0] == 'X') {
+            return 1;
+        } else if (tablero[0][0] == 'O') {
+            return 2;
+        }
+    } else if (tablero[0][2] == tablero[1][1] && tablero[1][1] == tablero[2][0]) {
+        if (tablero[0][2] == 'X') {
+            return 1;
+        } else if (tablero[0][2] == 'O') {
+            return 2;
+        }
+    }
+    return 0;
+}
+
+int esPosicionLibre(char tablero[3][3], int fila, int columna) {
+    return tablero[fila][columna] == ' ';
+}
+
+int PosibleGanador(char tablero[3][3], int fila, int columna) {
+    //realizar copia del tablero
+    char aux[3][3];
+    int i, j;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            aux[i][j] = tablero[i][j];
+        }
+    }
+    if (esPosicionLibre(aux, fila, columna)) {
+        aux[fila][columna] = 'X';
+        if (BusquedaGanador(aux) == 1) {
+            return 1;
+        } else {
+            aux[fila][columna] = 'O';
+            if (BusquedaGanador(aux) == 2) {
+                return 2;
+            }
+        }
+    }
+    return 0;
+}
+
+
+void jugadaComputadora(char tablero[3][3]) {
+    srand(time(NULL));
+    int fila, columna, pos;
+
+    if (esPosicionLibre(tablero, 1, 1)) {
+        tablero[1][1] = 'O';
+        return;
+    }
+    for (fila = 0; fila < 3; fila++) {210
+
+        for (columna = 0; columna < 3; columna++) {
+            pos = PosibleGanador(tablero, fila, columna);
+            if (pos == 1) {
+                tablero[fila][columna] = 'O';
+                return;
+            } else if (PosibleGanador(tablero, fila, columna) == 2) {
+                tablero[fila][columna] = 'O';
+                return;
+            }
+        }
+    }
+    do {
+        fila = rand() % 3;
+        columna = rand() % 3;
+        if (esPosicionLibre(tablero, fila, columna)) {
+            tablero[fila][columna] = 'O';
+            return;
+        }
+    } while (!esPosicionLibre(tablero, fila, columna));
 }

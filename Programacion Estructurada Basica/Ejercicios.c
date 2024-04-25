@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
-
+#include <string.h>
 #define TAM 20
 
 int ej1();
@@ -22,6 +22,8 @@ void ej25();
 void ej29();
 
 void ej210();
+
+void ej32();
 
 int Min(const int[], int);
 
@@ -71,6 +73,7 @@ int esPosicionLibre(char [3][3], int, int);
 
 int PosibleGanador(char [3][3], int, int);
 
+void quitarSalto(char[],int);
 
 int main() {
     int ej;
@@ -109,6 +112,10 @@ int main() {
         case 210:
             printf("EJ 2.10:\n");
             ej210();
+            break;
+        case 32:
+            printf("EJ 3.2:\n");
+            ej32();
             break;
     }
     return 0;
@@ -820,15 +827,14 @@ int PosibleGanador(char tablero[3][3], int fila, int columna) {
 
 
 void jugadaComputadora(char tablero[3][3]) {
-    srand(time(NULL));
+  //  srand(time(NULL));
     int fila, columna, pos;
 
     if (esPosicionLibre(tablero, 1, 1)) {
         tablero[1][1] = 'O';
         return;
     }
-    for (fila = 0; fila < 3; fila++) {210
-
+    for (fila = 0; fila < 3; fila++) {
         for (columna = 0; columna < 3; columna++) {
             pos = PosibleGanador(tablero, fila, columna);
             if (pos == 1) {
@@ -848,4 +854,47 @@ void jugadaComputadora(char tablero[3][3]) {
             return;
         }
     } while (!esPosicionLibre(tablero, fila, columna));
+}
+//Ejercicio 3.2
+void ej32(){
+  char nombre[10], apellido[10],copyName[10], apellido2[10],persona[20],persona2[25];
+  int c;
+  do{
+    c=getchar();
+  }while(c != EOF && c!='\n');
+  printf("Ingrese su nombre: ");
+  quitarSalto(nombre,10);
+  printf("Ingrese su apellido: ");
+  quitarSalto(apellido,10);
+    strcpy(copyName,nombre);
+  do{
+    printf("Ingrese de vuelta el apellido: ");
+    quitarSalto(apellido2,10);
+  }while(strcmp(apellido,apellido2)!=0);
+  fflush(stdin);
+  strcat(persona,nombre);
+  strcat(persona," ");
+  strcat(persona,apellido);
+  strcat(persona2,copyName);
+  strcat(persona2,", ");
+  strcat(persona2,apellido);
+  fflush(stdin);
+  printf("Nombre: %s\n",nombre);
+  printf("Apellido: %s\n",apellido);
+  printf("Nombre copiado: %s\n",copyName);
+  printf("Apellido igual: %s\n",apellido2);
+  printf("Nombre completo: %s\n",persona);
+  printf("Nombre completo: %s\n",persona2);
+}
+
+void quitarSalto(char texto[], int largo){
+  int i=0;
+  fgets(texto,largo,stdin);
+  while(texto[i]!='\0'){
+    if(texto[i]=='\n'){
+      texto[i]='\0';
+    }else{
+      i++;
+    }
+  }
 }

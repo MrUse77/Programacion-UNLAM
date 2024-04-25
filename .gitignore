@@ -1,3 +1,8 @@
 Programacion Estructurada Basica/.idea
 Programacion Estructurada Basica/cmake-build-debug
 Programacion Estructurada Basica/cmake-build-debug/*
+Programacion Estructurada Basica/build
+Programacion Estructurada Basica/build/*
+Programacion Estructurada Basica/cmake_install.cmake
+.vscode/*
+Programacion Estructurada Basica/CMakeLists.txt

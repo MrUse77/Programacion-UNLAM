@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define TAM 10
 
@@ -14,6 +15,7 @@ int ej4();
 
 void ej5(int [], int);
 
+void ej6();
 
 void CargaAleatoria(int [], int, int);
 
@@ -35,6 +37,7 @@ int main() {
     //ej3();
     //ej4();
     //ej5(v, 10);
+    ej6();
     return 0;
 }
 
@@ -148,3 +151,21 @@ void ej5(int v[], int ce) {
     Mostrar(v, ce);
 }
 
+void ej6(){
+  char cadena[]="hola";//vector de  5 elementos, siempre hay un \0 al final
+  char cadena2[20];
+  printf("%s\n",cadena);
+  printf("ingrese texto:");
+  fgets(cadena2,20,stdin);//Permite espacios, scanf no permite espacios se usa %s), gets y scanf no evaluan limites, por eso se usa fgets
+  printf("%s\n",cadena2);
+  printf("Longitud de la cadena: %d\n",strlen(cadena2));
+  int tam = strlen("apellido");
+  printf("%d\n",tam);
+  char copy[20] ;
+  strcpy(copy,cadena);
+  printf("%s\n",copy);
+  strcat(copy," mundo");
+  printf("%s\n",copy);
+  strcmp("hola","hola");//0 si son iguales, -1 si la primera es menor, 1 si la primera es mayor
+
+}

@@ -5,4 +5,7 @@ Programacion Estructurada Basica/build
 Programacion Estructurada Basica/build/*
 Programacion Estructurada Basica/cmake_install.cmake
 .vscode/*
+.vscode/*.*
+.vscode/settings.json
+Programacion Estructurada Basica/.vscode
 Programacion Estructurada Basica/CMakeLists.txt

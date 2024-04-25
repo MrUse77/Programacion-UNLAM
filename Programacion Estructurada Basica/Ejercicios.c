@@ -857,7 +857,7 @@ void jugadaComputadora(char tablero[3][3]) {
 }
 //Ejercicio 3.2
 void ej32(){
-  char nombre[10], apellido[10],copyName[10], apellido2[10],persona[20],persona2[25];
+  char nombre[10], apellido[10],copyName[10], apellido2[10],persona[25]={0},persona2[25]={0};
   int c;
   do{
     c=getchar();
@@ -871,20 +871,20 @@ void ej32(){
     printf("Ingrese de vuelta el apellido: ");
     quitarSalto(apellido2,10);
   }while(strcmp(apellido,apellido2)!=0);
-  fflush(stdin);
+  //fflush(stdin);
   strcat(persona,nombre);
   strcat(persona," ");
   strcat(persona,apellido);
   strcat(persona2,copyName);
   strcat(persona2,", ");
   strcat(persona2,apellido);
-  fflush(stdin);
-  printf("Nombre: %s\n",nombre);
-  printf("Apellido: %s\n",apellido);
-  printf("Nombre copiado: %s\n",copyName);
+  //fflush(stdin);
+  printf("Nombre: %s \n",nombre);
+  printf("Apellido: %s \n",apellido);
+  printf("Nombre copiado: %s \n",copyName);
   printf("Apellido igual: %s\n",apellido2);
-  printf("Nombre completo: %s\n",persona);
-  printf("Nombre completo: %s\n",persona2);
+  printf("Nombre completo: %s \n",persona);
+  printf("Nombre completo: %s \n",persona2);
 }
 
 void quitarSalto(char texto[], int largo){

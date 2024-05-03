@@ -7,6 +7,8 @@
 #include <string.h>
 #define TAM 20
 
+void flush();
+
 int ej1();
 
 int ej2();
@@ -24,6 +26,10 @@ void ej29();
 void ej210();
 
 void ej32();
+
+void ej33();
+
+void ej331();
 
 int Min(const int[], int);
 
@@ -75,6 +81,12 @@ int PosibleGanador(char [3][3], int, int);
 
 void quitarSalto(char[],int);
 
+void fixStrings();
+
+void mostrarListado(char [][20], int);
+
+void buscarAlumno(char [][20],char [20]);
+
 int main() {
     int ej;
     printf("EJERCICIOS:\n");
@@ -116,6 +128,14 @@ int main() {
         case 32:
             printf("EJ 3.2:\n");
             ej32();
+            break;
+            case 33:
+            printf("EJ 3.3:\n");
+            ej33();
+            break;
+        case 331:
+            printf("EJ 3.3 (guia):\n");
+            ej331();
             break;
     }
     return 0;
@@ -858,10 +878,7 @@ void jugadaComputadora(char tablero[3][3]) {
 //Ejercicio 3.2
 void ej32(){
   char nombre[10], apellido[10],copyName[10], apellido2[10],persona[25]={0},persona2[25]={0};
-  int c;
-  do{
-    c=getchar();
-  }while(c != EOF && c!='\n');
+  fixStrings();
   printf("Ingrese su nombre: ");
   quitarSalto(nombre,10);
   printf("Ingrese su apellido: ");
@@ -886,6 +903,13 @@ void ej32(){
   printf("Nombre completo: %s \n",persona);
   printf("Nombre completo: %s \n",persona2);
 }
+void flush(){
+  int c;
+  do{
+    c=getchar();
+  }while(c != EOF && c!='\n');
+}
+
 
 void quitarSalto(char texto[], int largo){
   int i=0;
@@ -896,5 +920,80 @@ void quitarSalto(char texto[], int largo){
     }else{
       i++;
     }
+  }
+}
+void ej33(){
+  char alumnos[50][20],alumno[20];
+  int dni[50],i=0,dniEncontrado;
+  for(i=0;i<50;i++){
+     fixStrings();
+    printf("Ingrese nombre de alumno: ");
+    gets(alumnos[i]);
+    if(stricmpi(alumnos[i],"FIN")==0){
+      break;
+    }
+    printf("Ingrese DNI de alumno: ");
+    scanf("%d",&dni[i]);
+    fflush(stdin);
+  }
+  do{
+    printf("Buscar alumno: ");
+    gets(alumno);
+    if(strcmpi(alumno,"NOBUSCARMAS")!=0){
+      dniEncontrado=buscarAlumno(alumnos,alumno);
+      if(dniEncontrado){
+        printf("Alumno encontrado, su dni es: %d", dniEncontrado);
+      }
+    }
+  }while(strcmpi(alumno,"NOBUSCARMAS")!=0);
+  mostrarListado(alumnos,dni);
+}
+
+void fixStrings(){
+  int c;
+  do{
+    c=getchar();
+  }while(c != EOF && c!='\n');
+}
+
+void buscarAlumno(char alumnos[50][20],char alumno[20]){
+  int i;
+  for(i=0;i<50;i++){
+    if(strcmpi(alumnos[i],alumno)==0){
+      printf("Alumno encontrado\n");
+      return i;
+    }
+  }
+  printf("Alumno no encontrado\n");
+}
+
+void mostrarAlumnos(char alumnos[50][20],int dni[50]){
+  int i,aux2;
+  char aux;
+  //de menor a mayor alfabeticamente
+  for(i=0;i<50;i++){
+    if(strcmpi(alumnos[i],"FIN")==0){
+      break;
+    }
+    for(j=0;j<50;j++){
+      if(strcmpi(alumnos[j],"FIN")==0){
+        break;
+      }
+      if(strcmpi(alumnos[i],alumnos[j])<0){
+        strcpy(aux,alumnos[i]);
+        strcpy(alumnos[i],alumnos[j]);
+        strcpy(alumnos[j],aux);
+        aux2=dni[i];
+        dni[i]=dni[j];
+        dni[j]=aux2;
+
+      }
+    }
+  }
+  for(i=0;i<50;i++){
+    if(strcmpi(alumnos[i],"FIN")==0){
+      break;
+    }
+    printf("Alumno: %s, Dni: %d\n",alumnos[i],dni[i]);
   }
 }

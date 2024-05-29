@@ -33,11 +33,11 @@ int Buscar(int [], int, int);
 int main() {
     int v[10];
     //ej1();
-    //ej2();
+    ej2();
     //ej3();
     //ej4();
     //ej5(v, 10);
-    ej6();
+    //ej6();
     return 0;
 }
 

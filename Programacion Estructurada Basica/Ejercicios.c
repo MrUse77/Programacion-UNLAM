@@ -2,9 +2,9 @@
 // Created by agusd on 29/3/2024.
 //
 #include <stdio.h>
-#include <time.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #define TAM 20
 
 void flush();
@@ -29,7 +29,7 @@ void ej32();
 
 void ej33();
 
-void ej331();
+// void ej331();
 
 int Min(const int[], int);
 
@@ -47,15 +47,15 @@ void BuscarMenorCantidad(int[], int[], int);
 
 int BuscarRepetido(int[], int, int);
 
-void LlenarSala(char [12][9]);
+void LlenarSala(char[12][9]);
 
-void MostrarSala(char [12][9]);
+void MostrarSala(char[12][9]);
 
-int HacerReserva(int, int, char [12][9]);
+int HacerReserva(int, int, char[12][9]);
 
-void FilasVacias(char [12][9], int);
+void FilasVacias(char[12][9], int);
 
-void MaxSpec(int [2][9], char [12][9]);
+void MaxSpec(int[2][9], char[12][9]);
 
 int Verificacion(int, int);
 
@@ -67,933 +67,949 @@ void MostrarVotos(int[11][16]);
 
 int BuscarMatrizRepetidas(int[11][16], int, int);
 
-void MostrarTablero(char [3][3]);
+void MostrarTablero(char[3][3]);
 
-int BusquedaGanador(char [3][3]);
+int BusquedaGanador(char[3][3]);
 
 void Maximos(int[15]);
 
-void jugadaComputadora(char [3][3]);
+void jugadaComputadora(char[3][3]);
 
-int esPosicionLibre(char [3][3], int, int);
+int esPosicionLibre(char[3][3], int, int);
 
-int PosibleGanador(char [3][3], int, int);
+int PosibleGanador(char[3][3], int, int);
 
-void quitarSalto(char[],int);
+void quitarSalto(char[], int);
 
 void fixStrings();
 
-void mostrarListado(char [][20], int);
+void mostrarListado(char[][20], int[]);
 
-void buscarAlumno(char [][20],char [20]);
+int buscarAlumno(char[][20], char[20]);
 
 int main() {
-    int ej;
-    printf("EJERCICIOS:\n");
-    printf("Elija el ejercicio sin puntos (ej: ejercicio 2.5 = 25): ");
-    scanf("%d", &ej);
-    switch (ej) {
-        case 1:
-            printf("EJ 1:\n");
-            ej1();
-            break;
-        case 2:
-            printf("EJ 2:\n");
-            ej2();
-            break;
-        case 3:
-            printf("EJ 3:\n");
-            ej3();
-            break;
-        case 4:
-            printf("EJ 4:\n");
-            ej4();
-            break;
-        case 24:
-            printf("EJ 2.4:\n");
-            ej24();
-            break;
-        case 25:
-            printf("EJ 2.5:\n");
-            ej25();
-            break;
-        case 29:
-            printf("EJ 2.9:\n");
-            ej29();
-            break;
-        case 210:
-            printf("EJ 2.10:\n");
-            ej210();
-            break;
-        case 32:
-            printf("EJ 3.2:\n");
-            ej32();
-            break;
-            case 33:
-            printf("EJ 3.3:\n");
-            ej33();
-            break;
-        case 331:
-            printf("EJ 3.3 (guia):\n");
-            ej331();
-            break;
-    }
-    return 0;
+  int ej;
+  printf("EJERCICIOS:\n");
+  printf("Elija el ejercicio sin puntos (ej: ejercicio 2.5 = 25): ");
+  scanf("%d", &ej);
+  switch (ej) {
+  case 1:
+    printf("EJ 1:\n");
+    ej1();
+    break;
+  case 2:
+    printf("EJ 2:\n");
+    ej2();
+    break;
+  case 3:
+    printf("EJ 3:\n");
+    ej3();
+    break;
+  case 4:
+    printf("EJ 4:\n");
+    ej4();
+    break;
+  case 24:
+    printf("EJ 2.4:\n");
+    ej24();
+    break;
+  case 25:
+    printf("EJ 2.5:\n");
+    ej25();
+    break;
+  case 29:
+    printf("EJ 2.9:\n");
+    ej29();
+    break;
+  case 210:
+    printf("EJ 2.10:\n");
+    ej210();
+    break;
+  case 32:
+    printf("EJ 3.2:\n");
+    ej32();
+    break;
+  case 33:
+    printf("EJ 3.3:\n");
+    ej33();
+    break;
+  case 331:
+    printf("EJ 3.3 (guia):\n");
+    // ej331();
+    break;
+  }
+  return 0;
 }
 
-//Ejercicio 1.1: Cargar de forma aleatoria un vector de 20 elementos con números de 3 cifras.
-//a. Mostrar el menor valor e indicar cuantas veces se repite
-//b. Mostrar el mayor valor e indicar en que posición/posiciones se encuentra
+// Ejercicio 1.1: Cargar de forma aleatoria un vector de 20 elementos con
+// números de 3 cifras. a. Mostrar el menor valor e indicar cuantas veces se
+// repite b. Mostrar el mayor valor e indicar en que posición/posiciones se
+// encuentra
 int ej1() {
-    int ce = 20;
-    int v[20];
-    int min, max;
-    srand(time(NULL));
-    int i;
+  int ce = 20;
+  int v[20];
+  int min, max;
+  srand(time(NULL));
+  int i;
 
+  for (i = 0; i < ce; i++) {
+    v[i] = rand() % 1000;
+  }
 
-    for (i = 0; i < ce; i++) {
-        v[i] = rand() % 1000;
-    }
-
-    min = Min(v, 20);
-    max = Max(v, 20);
-    printf("El menor valor es %d\n", min);
-    printf("El mayor valor es %d\n", max);
-    return 0;
+  min = Min(v, 20);
+  max = Max(v, 20);
+  printf("El menor valor es %d\n", min);
+  printf("El mayor valor es %d\n", max);
+  return 0;
 }
 
 int Min(const int v[], int N) {
-    int i, min;
-    min = v[0];
-    for (i = 1; i < N; i++) {
-        if (v[i] < min) {
-            min = v[i];
-        }
+  int i, min;
+  min = v[0];
+  for (i = 1; i < N; i++) {
+    if (v[i] < min) {
+      min = v[i];
     }
-    return min;
+  }
+  return min;
 }
 
 int Max(const int v[], int N) {
-    int i, max;
-    max = v[0];
-    for (i = 1; i < N; i++) {
-        if (v[i] > max) {
-            max = v[i];
-        }
+  int i, max;
+  max = v[0];
+  for (i = 1; i < N; i++) {
+    if (v[i] > max) {
+      max = v[i];
     }
-    return max;
+  }
+  return max;
 }
-//Ejercicio 1.2: Una empresa debe registrar los pedidos recibidos de cada uno sus 10 productos a lo largo del día. Cada
-//producto está identificado por un código de 4 cifras. Los códigos deben ingresarse al inicio del programa
-//mediante la función IngresaCódigos y no pueden repetirse.
-//Por cada pedido se recibe:
-//• Código de producto
-//• Cantidad de unidades solicitadas
-//Se puede recibir más de un pedido por producto.
-// La carga de pedidos finaliza cuando se ingresa un producto igual a 0
-//Al finalizar se debe:
-//a) Emitir un listado con código y cantidad de unidades solicitadas de cada producto.
-//b) El / los productos del cual se solicitaron mayor cantidad de unidades.
-//c) El / los productos del cual se solicitaron menos cantidad de unidades.
+// Ejercicio 1.2: Una empresa debe registrar los pedidos recibidos de cada uno
+// sus 10 productos a lo largo del día. Cada producto está identificado por un
+// código de 4 cifras. Los códigos deben ingresarse al inicio del programa
+// mediante la función IngresaCódigos y no pueden repetirse.
+// Por cada pedido se recibe:
+// • Código de producto
+// • Cantidad de unidades solicitadas
+// Se puede recibir más de un pedido por producto.
+//  La carga de pedidos finaliza cuando se ingresa un producto igual a 0
+// Al finalizar se debe:
+// a) Emitir un listado con código y cantidad de unidades solicitadas de cada
+// producto. b) El / los productos del cual se solicitaron mayor cantidad de
+// unidades. c) El / los productos del cual se solicitaron menos cantidad de
+// unidades.
 
 int ej2() {
-    int cant = 3;
-    int products[10];
-    int cants[10] = {0};
+  int cant = 3;
+  int products[10];
+  int cants[10] = {0};
 
-    int codMax, codMin;
+  int codMax, codMin;
 
-    for (int i = 0; i < cant; i++) {
-        IngresarCodigos(products, i);
-        IngresarCantidades(cants, i);
-    }
+  for (int i = 0; i < cant; i++) {
+    IngresarCodigos(products, i);
+    IngresarCantidades(cants, i);
+  }
 
-    for (int i = 0; i < cant; i++) {
-        printf("Codigo: %d, Cantidad: %d\n", products[i], cants[i]);
-    }
+  for (int i = 0; i < cant; i++) {
+    printf("Codigo: %d, Cantidad: %d\n", products[i], cants[i]);
+  }
 
-    BuscarMayorCantidad(products, cants, cant);
-    BuscarMenorCantidad(products, cants, cant);
+  BuscarMayorCantidad(products, cants, cant);
+  BuscarMenorCantidad(products, cants, cant);
 
-    return 0;
+  return 0;
 }
 
 void IngresarCodigos(int v[], int i) {
-    int pos;
-    int aux;
-    do {
-        printf("Ingrese el codigo del producto %d: ", i + 1);
-        scanf("%d", &aux);
-        pos = Buscar(v, aux, i);
-        if (pos != -1) printf("Codigo incorrecto\n");
-    } while (pos != -1);
-    v[i] = aux;
+  int pos;
+  int aux;
+  do {
+    printf("Ingrese el codigo del producto %d: ", i + 1);
+    scanf("%d", &aux);
+    pos = Buscar(v, aux, i);
+    if (pos != -1)
+      printf("Codigo incorrecto\n");
+  } while (pos != -1);
+  v[i] = aux;
 }
 
 int Buscar(int v[], int datoABuscar, int cantElem) {
-    int i = 0, pos = -1;
-    if (datoABuscar < 1000 || datoABuscar > 9999) return 1;
-    while (pos == -1 && i < cantElem) {
-        if (v[i] == datoABuscar) {
-            pos = i;
-        } else i++;
-    }
-    return pos;
+  int i = 0, pos = -1;
+  if (datoABuscar < 1000 || datoABuscar > 9999)
+    return 1;
+  while (pos == -1 && i < cantElem) {
+    if (v[i] == datoABuscar) {
+      pos = i;
+    } else
+      i++;
+  }
+  return pos;
 }
 
 int IngresarCantidades(int v[], int c) {
-    int aux = 0;
-    do {
-        printf("Ingrese la cantidad de unidades solicitadas(con 0 terminan las solicitudes del producto): ");
-        scanf("%d", &aux);
-        v[c] += aux;
+  int aux = 0;
+  do {
+    printf("Ingrese la cantidad de unidades solicitadas(con 0 terminan las "
+           "solicitudes del producto): ");
+    scanf("%d", &aux);
+    v[c] += aux;
 
-    } while (aux != 0);
+  } while (aux != 0);
 
-    return 0;
+  return 0;
 }
 
 void BuscarMayorCantidad(int v[], int c[], int N) {
-    int i, max[2];
-    max[0] = v[0];
-    max[1] = c[0];
-    for (i = 0; i < N; i++) {
-        if (c[i] > max[1]) {
-            max[0] = v[i];
-            max[1] = c[i];
-        }
+  int i, max[2];
+  max[0] = v[0];
+  max[1] = c[0];
+  for (i = 0; i < N; i++) {
+    if (c[i] > max[1]) {
+      max[0] = v[i];
+      max[1] = c[i];
     }
-    printf("La mayor cantidad de unidades, con codigo %d, solicitadas es: %d\n", max[0], max[1]);
-
-
+  }
+  printf("La mayor cantidad de unidades, con codigo %d, solicitadas es: %d\n",
+         max[0], max[1]);
 }
 
 void BuscarMenorCantidad(int v[], int c[], int N) {
-    int i, min[2];
-    min[0] = v[0];
-    min[1] = c[0];
-    for (i = 0; i < N; i++) {
-        if (c[i] < min[1]) {
-            min[0] = v[i];
-            min[1] = c[i];
-        }
+  int i, min[2];
+  min[0] = v[0];
+  min[1] = c[0];
+  for (i = 0; i < N; i++) {
+    if (c[i] < min[1]) {
+      min[0] = v[i];
+      min[1] = c[i];
     }
-    printf("La menor cantidad de unidades, con codigo %d, solicitadas es: %d\n", min[0], min[1]);
-
+  }
+  printf("La menor cantidad de unidades, con codigo %d, solicitadas es: %d\n",
+         min[0], min[1]);
 }
 
-//Ejercicio 1.3  En un curso de la maestría en informática los estudiantes deben exponer en forma grupal sus investigaciones
-//de un tema dado. El curso está formado por 5 grupos. Se pide realizar un programa para sortear el orden de
-//exposición de dichos grupos. Cada vez que se ejecute el programa deberá mostrar un orden de exposición
-//distinto para cada uno de los 5 grupos.
+// Ejercicio 1.3  En un curso de la maestría en informática los estudiantes
+// deben exponer en forma grupal sus investigaciones de un tema dado. El curso
+// está formado por 5 grupos. Se pide realizar un programa para sortear el orden
+// de exposición de dichos grupos. Cada vez que se ejecute el programa deberá
+// mostrar un orden de exposición distinto para cada uno de los 5 grupos.
 
 int ej3() {
-    int grupos[5] = {1, 2, 3, 4, 5};
-    int j, aux, num;
-    srand(time(NULL));
-    for (j = 0; j < 5; j++) {
-        num = rand() % 5;
-        aux = grupos[j];
-        grupos[j] = grupos[num];
-        grupos[num] = aux;
-    }
-    printf("Orden de exposicion de los grupos: \n");
-    for (j = 0; j < 5; j++) {
-        printf("%d ", grupos[j]);
-        printf("\n");
-    }
-    return 0;
+  int grupos[5] = {1, 2, 3, 4, 5};
+  int j, aux, num;
+  srand(time(NULL));
+  for (j = 0; j < 5; j++) {
+    num = rand() % 5;
+    aux = grupos[j];
+    grupos[j] = grupos[num];
+    grupos[num] = aux;
+  }
+  printf("Orden de exposicion de los grupos: \n");
+  for (j = 0; j < 5; j++) {
+    printf("%d ", grupos[j]);
+    printf("\n");
+  }
+  return 0;
 }
-//Ejercicio 1.4: Se ingresan DNI y nota de un parcial de los alumnos de un curso. El ingreso de datos finaliza con un DNI
-//negativo. Se sabe que como máximo pueden presentarse a rendir 60 alumnos. Tenga en cuenta que no
-//pueden existir 2 o más alumnos con el mismo DNI.
-//Mostrar el Listado de alumnos con su correspondiente DNI y la nota obtenida (en forma de listado), ordenado
-//de mayor a menor por nota.
+// Ejercicio 1.4: Se ingresan DNI y nota de un parcial de los alumnos de un
+// curso. El ingreso de datos finaliza con un DNI negativo. Se sabe que como
+// máximo pueden presentarse a rendir 60 alumnos. Tenga en cuenta que no pueden
+// existir 2 o más alumnos con el mismo DNI. Mostrar el Listado de alumnos con
+// su correspondiente DNI y la nota obtenida (en forma de listado), ordenado de
+// mayor a menor por nota.
 
 int ej4() {
-    int DNI[6] = {123, 124, 125, 126, 127, 128};
-    int nota[6] = {2, 1, 7, 10, 9, 1};
-    int i;
-    int aux;
-    int aux2;
-    int cant = 6;
+  int DNI[6] = {123, 124, 125, 126, 127, 128};
+  int nota[6] = {2, 1, 7, 10, 9, 1};
+  int i;
+  int aux;
+  int aux2;
+  int cant = 6;
+  do {
     do {
-        do {
-            printf("Ingrese el DNI del alumno: ");
-            scanf("%d", &aux);
+      printf("Ingrese el DNI del alumno: ");
+      scanf("%d", &aux);
 
-            if (BuscarRepetido(DNI, aux, cant) != -1) printf("DNI incorrecto\n");
-        } while (BuscarRepetido(DNI, aux, cant) != -1);
-        if (aux > 0) {
-            DNI[cant] = aux;
-            do {
-                printf("Ingrese la nota del alumno: ");
-                scanf("%d", &aux2);
-                if (aux2 < 0 || aux2 > 10) printf("Nota incorrecta\n");
-            } while (aux2 < 0 || aux2 > 10);
-            nota[cant] = aux2;
-            cant++;
-        }
-    } while (aux > 0 && cant < 6);
-
-    for (i = 0; i < cant; i++) {
-
-        for (int j = 0; j < cant - 1; j++) {
-            if (nota[j] < nota[j + 1]) {
-                aux = nota[j];
-                nota[j] = nota[j + 1];
-                nota[j + 1] = aux;
-                aux = DNI[j];
-                DNI[j] = DNI[j + 1];
-                DNI[j + 1] = aux;
-            }
-        }
-
+      if (BuscarRepetido(DNI, aux, cant) != -1)
+        printf("DNI incorrecto\n");
+    } while (BuscarRepetido(DNI, aux, cant) != -1);
+    if (aux > 0) {
+      DNI[cant] = aux;
+      do {
+        printf("Ingrese la nota del alumno: ");
+        scanf("%d", &aux2);
+        if (aux2 < 0 || aux2 > 10)
+          printf("Nota incorrecta\n");
+      } while (aux2 < 0 || aux2 > 10);
+      nota[cant] = aux2;
+      cant++;
     }
-    for (i = 0; i < cant; i++) {
-        printf("DNI: %d, Nota: %d\n", DNI[i], nota[i]);
+  } while (aux > 0 && cant < 6);
+
+  for (i = 0; i < cant; i++) {
+
+    for (int j = 0; j < cant - 1; j++) {
+      if (nota[j] < nota[j + 1]) {
+        aux = nota[j];
+        nota[j] = nota[j + 1];
+        nota[j + 1] = aux;
+        aux = DNI[j];
+        DNI[j] = DNI[j + 1];
+        DNI[j + 1] = aux;
+      }
     }
-    return 0;
+  }
+  for (i = 0; i < cant; i++) {
+    printf("DNI: %d, Nota: %d\n", DNI[i], nota[i]);
+  }
+  return 0;
 }
 
 int BuscarRepetido(int v[], int datoABuscar, int cantElem) {
-    int i = 0, pos = -1;
-    while (pos == -1 && i < cantElem) {
-        if (v[i] == datoABuscar) {
-            pos = i;
-        } else i++;
-    }
-    return pos;
+  int i = 0, pos = -1;
+  while (pos == -1 && i < cantElem) {
+    if (v[i] == datoABuscar) {
+      pos = i;
+    } else
+      i++;
+  }
+  return pos;
 }
 
 /*Ej 2.4:
-La empresa de turismo GUADALAJARA VIAJES comercializa 10 diferentes tours a través de 15 agencias en todo
-        el país. Diariamente cada agencia envía la cantidad de ventas efectuadas de cada tour, indicando agencia,
-tours y la cantidad de pasajes. Algunas agencias envían 0 en la cantidad cuando no existen pasajes para un
-        tour determinado, pero no en todas.
-La información que se envía tiene los siguientes datos que se ingresan en forma desordenada:
-• Código de agencia (de 1 a 15)
-• Código de tour (1 a 10)
-• Cantidad de pasajes (0 a 20)
+La empresa de turismo GUADALAJARA VIAJES comercializa 10 diferentes tours a
+través de 15 agencias en todo el país. Diariamente cada agencia envía la
+cantidad de ventas efectuadas de cada tour, indicando agencia, tours y la
+cantidad de pasajes. Algunas agencias envían 0 en la cantidad cuando no existen
+pasajes para un tour determinado, pero no en todas. La información que se envía
+tiene los siguientes datos que se ingresan en forma desordenada: • Código de
+agencia (de 1 a 15) • Código de tour (1 a 10) • Cantidad de pasajes (0 a 20)
 Informar:
 a. El total de pasajes vendidos por tour en cada agencia.
-b. El número de agencia que obtuvo la máxima cantidad de pasajes vendidos. (puede repetirse)*/
+b. El número de agencia que obtuvo la máxima cantidad de pasajes vendidos.
+(puede repetirse)*/
 
 void ej24() {
-    int tours[10][15] = {0};
-    int i, j, agencia, tour, pasajes, max[15] = {0};
-    char fin;
-    for (i = 0; i < 15; i++) {
-        for (j = 0; j < 10; j++) {
-            tours[j][i] = 0;
-        }
+  int tours[10][15] = {0};
+  int i, j, agencia, tour, pasajes, max[15] = {0};
+  char fin;
+  for (i = 0; i < 15; i++) {
+    for (j = 0; j < 10; j++) {
+      tours[j][i] = 0;
     }
+  }
+  do {
     do {
-        do {
-            printf("Ingrese el codigo de la agencia: ");
-            scanf("%d", &agencia);
-            if (agencia < 1 || agencia > 15) printf("Agencia incorrecta\n");
-        } while (agencia < 1 || agencia > 15);
-        do {
-            printf("Ingrese el codigo del tour: ");
-            scanf("%d", &tour);
-            if (tour < 1 || tour > 10) printf("Tour incorrecto\n");
-        } while (tour < 1 || tour > 10);
-        do {
-            printf("Ingrese la cantidad de pasajes: ");
-            scanf("%d", &pasajes);
-            if (pasajes < 0 || pasajes > 20) printf("Cantidad incorrecta\n");
-        } while (pasajes < 0 || pasajes > 20);
-        tours[tour - 1][agencia - 1] += pasajes;
-        printf("Desea ingresar otro tour? (S para Si o N para no): ");
-        scanf(" %c", &fin);
-    } while (fin == 'S' || fin == 's');
+      printf("Ingrese el codigo de la agencia: ");
+      scanf("%d", &agencia);
+      if (agencia < 1 || agencia > 15)
+        printf("Agencia incorrecta\n");
+    } while (agencia < 1 || agencia > 15);
+    do {
+      printf("Ingrese el codigo del tour: ");
+      scanf("%d", &tour);
+      if (tour < 1 || tour > 10)
+        printf("Tour incorrecto\n");
+    } while (tour < 1 || tour > 10);
+    do {
+      printf("Ingrese la cantidad de pasajes: ");
+      scanf("%d", &pasajes);
+      if (pasajes < 0 || pasajes > 20)
+        printf("Cantidad incorrecta\n");
+    } while (pasajes < 0 || pasajes > 20);
+    tours[tour - 1][agencia - 1] += pasajes;
+    printf("Desea ingresar otro tour? (S para Si o N para no): ");
+    scanf(" %c", &fin);
+  } while (fin == 'S' || fin == 's');
 
-    for (i = 0; i < 10; i++) {
-        printf("Tour %d\n", i + 1);
-        for (j = 0; j < 15; j++) {
-            printf("Agencia %d: %d\n", j + 1, tours[i][j]);
-        }
+  for (i = 0; i < 10; i++) {
+    printf("Tour %d\n", i + 1);
+    for (j = 0; j < 15; j++) {
+      printf("Agencia %d: %d\n", j + 1, tours[i][j]);
     }
-    for (i = 0; i < 15; i++) {
-        for (j = 0; j < 10; j++) {
-            max[i] += tours[j][i];
-        }
+  }
+  for (i = 0; i < 15; i++) {
+    for (j = 0; j < 10; j++) {
+      max[i] += tours[j][i];
     }
-    Maximos(max);
+  }
+  Maximos(max);
 }
 
 void Maximos(int max[15]) {
-    int i, maximo = max[0];
-    for (i = 1; i < 15; i++) {
-        if (max[i] > maximo) {
-            maximo = max[i];
-        }
+  int i, maximo = max[0];
+  for (i = 1; i < 15; i++) {
+    if (max[i] > maximo) {
+      maximo = max[i];
     }
-    printf("Las agencias con la maxima cantidad de pasajes vendidos son: ");
-    for (i = 0; i < 15; i++) {
-        if (max[i] == maximo) {
-            printf("%d ", i + 1);
-        }
+  }
+  printf("Las agencias con la maxima cantidad de pasajes vendidos son: ");
+  for (i = 0; i < 15; i++) {
+    if (max[i] == maximo) {
+      printf("%d ", i + 1);
     }
-    printf("\n");
+  }
+  printf("\n");
 }
 
 /*Ej 2.5:
-Se desea desarrollar un sistema de reservas de entradas para un cine. La sala consta de 12 filas numeradas de
-la 1 a la 12 y cada fila tiene 9 butacas numeradas a partir de la columna central, con las butacas impares a la
-y las pares a la izquierda, como en el siguiente esquema:
-        8 6 4 2 1 3 5 7 9
-Para la carga, se debe mostrar al usuario un esquema con las butacas disponibles y reservadas, marcando
-con la letra D las disponibles y con la letra R las reservadas.
-Por cada reserva se debe solicitar la fila y número de butaca a reservar. Cada vez que se realice una
-reserva se deberá actualizar el esquema que muestra las butacas. Si la butaca seleccionada ya estaba
-ocupada se debe informar al usuario para que seleccione otra. El proceso de reserva finaliza con una fila
-con un número negativo. Al finalizar mostrar:
-a. la cantidad de asientos disponibles y la cantidad de asientos reservados.
-b. los números de filas que quedaron vacías.
-c. la o las filas con mayor cantidad de espectadores.
-d. un listado con la cantidad de personas que se sentaron en los mismos números de butacas en todo el cine ordenado de mayor a menor.
+Se desea desarrollar un sistema de reservas de entradas para un cine. La sala
+consta de 12 filas numeradas de la 1 a la 12 y cada fila tiene 9 butacas
+numeradas a partir de la columna central, con las butacas impares a la y las
+pares a la izquierda, como en el siguiente esquema: 8 6 4 2 1 3 5 7 9 Para la
+carga, se debe mostrar al usuario un esquema con las butacas disponibles y
+reservadas, marcando con la letra D las disponibles y con la letra R las
+reservadas. Por cada reserva se debe solicitar la fila y número de butaca a
+reservar. Cada vez que se realice una reserva se deberá actualizar el esquema
+que muestra las butacas. Si la butaca seleccionada ya estaba ocupada se debe
+informar al usuario para que seleccione otra. El proceso de reserva finaliza con
+una fila con un número negativo. Al finalizar mostrar: a. la cantidad de
+asientos disponibles y la cantidad de asientos reservados. b. los números de
+filas que quedaron vacías. c. la o las filas con mayor cantidad de espectadores.
+d. un listado con la cantidad de personas que se sentaron en los mismos números
+de butacas en todo el cine ordenado de mayor a menor.
 */
 void ej25() {
-    char sala[12][9] = {0};
-    int i, fila, butaca, cantReservadas = 0, cantDisponibles = 12 * 9, cantVacias = 0, cant[2][9] = {0};
-    LlenarSala(sala);
+  char sala[12][9] = {0};
+  int i, fila, butaca, cantReservadas = 0, cantDisponibles = 12 * 9,
+                       cantVacias = 0, cant[2][9] = {0};
+  LlenarSala(sala);
+  do {
     do {
-        do {
-            printf("\n");
-            MostrarSala(sala);
-            printf("Ingrese la fila y la butaca a reservar: ");
-            scanf("%d", &fila);
-            scanf("%d", &butaca);
-        } while (HacerReserva(fila, butaca, sala) == -1 && Verificacion(fila, butaca) == -1);
-        if (fila > 0) {
-            cantReservadas++;
-            cantDisponibles--;
-        }
-    } while (fila > 0);
+      printf("\n");
+      MostrarSala(sala);
+      printf("Ingrese la fila y la butaca a reservar: ");
+      scanf("%d", &fila);
+      scanf("%d", &butaca);
+    } while (HacerReserva(fila, butaca, sala) == -1 &&
+             Verificacion(fila, butaca) == -1);
+    if (fila > 0) {
+      cantReservadas++;
+      cantDisponibles--;
+    }
+  } while (fila > 0);
 
-
-    printf("Cantidad de asientos disponibles: %d\n", cantDisponibles);
-    printf("Cantidad de asientos reservados: %d\n", cantReservadas);
-    FilasVacias(sala, cantVacias);
-    MaxSpec(cant, sala);
+  printf("Cantidad de asientos disponibles: %d\n", cantDisponibles);
+  printf("Cantidad de asientos reservados: %d\n", cantReservadas);
+  FilasVacias(sala, cantVacias);
+  MaxSpec(cant, sala);
 }
 
 void LlenarSala(char sala[12][9]) {
-    int i, j;
-    for (i = 0; i < 12; i++) {
-        for (j = 0; j < 9; j++) {
-            sala[i][j] = 'D';
-        }
+  int i, j;
+  for (i = 0; i < 12; i++) {
+    for (j = 0; j < 9; j++) {
+      sala[i][j] = 'D';
     }
+  }
 }
 
 void MostrarSala(char sala[12][9]) {
-    int i, j;
-    printf("      ");
-    for (i = 8; i >= 1; i -= 2) {
-        printf("  %d  ", i);
+  int i, j;
+  printf("      ");
+  for (i = 8; i >= 1; i -= 2) {
+    printf("  %d  ", i);
+  }
+  for (i = 1; i <= 9; i += 2) {
+    printf("  %d  ", i);
+  }
+  for (i = 0; i < 13; i++) {
+    for (j = 0; j < 10; j++) {
+      if (j == 0 && i > 0) {
+        if (i < 10)
+          printf("  0%d  ", i);
+        else
+          printf("  %d  ", i);
+      } else
+        printf("  %c  ", sala[i - 1][j - 1]);
     }
-    for (i = 1; i <= 9; i += 2) {
-        printf("  %d  ", i);
-    }
-    for (i = 0; i < 13; i++) {
-        for (j = 0; j < 10; j++) {
-            if (j == 0 && i > 0) {
-                if (i < 10) printf("  0%d  ", i);
-                else printf("  %d  ", i);
-            } else printf("  %c  ", sala[i - 1][j - 1]);
-
-        }
-        printf("\n");
-    }
+    printf("\n");
+  }
 }
 
 int Verificacion(int fila, int butaca) {
-    if (fila < 0) return 0;
-    else if (fila == 0 || fila > 12 || butaca < 1 || butaca > 9) {
-        printf("Fila o butaca incorrecta\n");
-        return -1;
-    }
+  if (fila < 0)
+    return 0;
+  else if (fila == 0 || fila > 12 || butaca < 1 || butaca > 9) {
+    printf("Fila o butaca incorrecta\n");
+    return -1;
+  }
+  return 0;
 }
 
 int HacerReserva(int fila, int butaca, char sala[12][9]) {
-    int posButaca = mapButaca(butaca);
-    if (sala[fila - 1][posButaca] == 'D') {
-        sala[fila - 1][posButaca] = 'R';
-        return 0;
-    } else {
-        printf("Butaca ocupada, seleccione otra\n");
-        return -1;
-    }
+  int posButaca = mapButaca(butaca);
+  if (sala[fila - 1][posButaca] == 'D') {
+    sala[fila - 1][posButaca] = 'R';
+    return 0;
+  } else {
+    printf("Butaca ocupada, seleccione otra\n");
+    return -1;
+  }
 }
 
 void FilasVacias(char sala[12][9], int cantVacias) {
-    int i, j, vacia = 0;
-    for (i = 0; i < 12; i++) {
-        vacia = 1;
-        for (j = 0; j < 9; j++) {
-            if (sala[i][j] == 'R') {
-                vacia = 0;
-                break;
-            }
-        }
-        if (vacia == 1) {
-            cantVacias++;
-        }
+  int i, j, vacia = 0;
+  for (i = 0; i < 12; i++) {
+    vacia = 1;
+    for (j = 0; j < 9; j++) {
+      if (sala[i][j] == 'R') {
+        vacia = 0;
+        break;
+      }
     }
-    printf("Filas vacias: %d\n", cantVacias);
+    if (vacia == 1) {
+      cantVacias++;
+    }
+  }
+  printf("Filas vacias: %d\n", cantVacias);
 }
 
 void MaxSpec(int cant[2][9], char sala[12][9]) {
-    int i, j, filas[12] = {0}, max[2] = {0}, butacas[9] = {0};
-    for (i = 0; i < 9; i++) {
-        for (j = 0; j < 12; j++) {
-            if (sala[j][i] == 'R') {
-                filas[j]++;
-            }
-        }
+  int i, j, filas[12] = {0}, max[2] = {0}, butacas[9] = {0};
+  for (i = 0; i < 9; i++) {
+    for (j = 0; j < 12; j++) {
+      if (sala[j][i] == 'R') {
+        filas[j]++;
+      }
     }
-    for (i = 0; i < 12; i++) {
-        for (j = 0; j < 9; j++) {
-            if (sala[i][j] == 'R') {
-                butacas[j]++;
-            }
-        }
+  }
+  for (i = 0; i < 12; i++) {
+    for (j = 0; j < 9; j++) {
+      if (sala[i][j] == 'R') {
+        butacas[j]++;
+      }
     }
-    for (i = 0; i < 8; i++) {
-        for (j = 0; j < 8 - i; j++) {
-            if (butacas[j] < butacas[j + 1]) {
-                max[0] = butacas[j];
-                butacas[j] = butacas[j + 1];
-                butacas[j + 1] = max[0];
-            }
-        }
+  }
+  for (i = 0; i < 8; i++) {
+    for (j = 0; j < 8 - i; j++) {
+      if (butacas[j] < butacas[j + 1]) {
+        max[0] = butacas[j];
+        butacas[j] = butacas[j + 1];
+        butacas[j + 1] = max[0];
+      }
     }
-    for (i = 0; i < 11; i++) {
-        for (j = 0; j < 11 - i; j++) {
-            if (filas[j] < filas[j + 1]) {
-                max[1] = filas[j];
-                filas[j] = filas[j + 1];
-                filas[j + 1] = max[1];
-            }
-        }
+  }
+  for (i = 0; i < 11; i++) {
+    for (j = 0; j < 11 - i; j++) {
+      if (filas[j] < filas[j + 1]) {
+        max[1] = filas[j];
+        filas[j] = filas[j + 1];
+        filas[j + 1] = max[1];
+      }
     }
-    max[1] = filas[0];
-    i = 0;
-    i = 0;
-    while (filas[i] == max[1]) {
-        cant[0][i] = i + 1;
-        i++;
+  }
+  max[1] = filas[0];
+  i = 0;
+  i = 0;
+  while (filas[i] == max[1]) {
+    cant[0][i] = i + 1;
+    i++;
+  }
+  printf("Filas con mayor cantidad de espectadores: ");
+  for (i = 0; i < 9; i++) {
+    if (cant[0][i] != 0) {
+      printf("%d ", cant[0][i]);
     }
-    printf("Filas con mayor cantidad de espectadores: ");
-    for (i = 0; i < 9; i++) {
-        if (cant[0][i] != 0) {
-            printf("%d ", cant[0][i]);
-        }
-    }
-    printf("\n");
-    printf("Cantidad de personas que se sentaron en los mismos numeros de butacas en todo el cine ordenado de mayor a menor: ");
-    for (i = 0; i < 9; i++) {
-        if (butacas[i] != 0)printf("%d ", butacas[i]);
-    }
+  }
+  printf("\n");
+  printf("Cantidad de personas que se sentaron en los mismos numeros de "
+         "butacas en todo el cine ordenado de mayor a menor: ");
+  for (i = 0; i < 9; i++) {
+    if (butacas[i] != 0)
+      printf("%d ", butacas[i]);
+  }
 }
 
 int mapButaca(int butaca) {
-    switch (butaca) {
-        case 8:
-            return 0;
-        case 6:
-            return 1;
-        case 4:
-            return 2;
-        case 2:
-            return 3;
-        case 1:
-            return 4;
-        case 3:
-            return 5;
-        case 5:
-            return 6;
-        case 7:
-            return 7;
-        case 9:
-            return 8;
-    }
+  switch (butaca) {
+  case 8:
+    return 0;
+  case 6:
+    return 1;
+  case 4:
+    return 2;
+  case 2:
+    return 3;
+  case 1:
+    return 4;
+  case 3:
+    return 5;
+  case 5:
+    return 6;
+  case 7:
+    return 7;
+  case 9:
+    return 8;
+  }
 }
 
-/*Ej:2.9 Se desea contabilizar los votos recibidos en las elecciones de un club de fútbol. Existen 10 candidatos cada
-uno representado por un número de lista diferente (número de 3 cifras no correlativo). La votación se realiza
-en 15 sedes distintas codificadas del 1 al 15. Se ingresan los votos registrados en cada una de las sedes
-        registrando:
-• Número de lista
-• Número de sede
-• Cantidad de votos
-(Solo se informan candidatos que recibieron votos).
-La carga de votos finaliza con un número de lista igual a 0
-Mostrar:
-a. Cantidad de votos recibidos por cada candidato en cada sede.
-LISTA SEDE1 SEDE2 SEDE3… SEDE15
-873 36 78 99… XX
-735 XX XX XXX… XX
-b. Listado ordenado por cantidad de votos totales en formar decreciente, con el siguiente formato:
-TOTAL DE VOTOS PORCENTAJE LISTA
+/*Ej:2.9 Se desea contabilizar los votos recibidos en las elecciones de un club
+de fútbol. Existen 10 candidatos cada uno representado por un número de lista
+diferente (número de 3 cifras no correlativo). La votación se realiza en 15
+sedes distintas codificadas del 1 al 15. Se ingresan los votos registrados en
+cada una de las sedes registrando: • Número de lista • Número de sede • Cantidad
+de votos (Solo se informan candidatos que recibieron votos). La carga de votos
+finaliza con un número de lista igual a 0 Mostrar: a. Cantidad de votos
+recibidos por cada candidato en cada sede. LISTA SEDE1 SEDE2 SEDE3… SEDE15 873
+36 78 99… XX 735 XX XX XXX… XX b. Listado ordenado por cantidad de votos totales
+en formar decreciente, con el siguiente formato: TOTAL DE VOTOS PORCENTAJE LISTA
 800 80% 873
 200 20% 735
 c. Candidatos que NO recibieron votos en la sede 5*/
 void ej29() {
-    int votos[11][16] = {0};
-    int i, j;
-    int lista, sede, voto, rep = 0;
-    int totalVotos[10] = {0};
-    int totalVotosSede[15] = {0};
-    int totalVotosTotal = 0;
-    for (i = 0; i < 16; i++) {
-        votos[0][i] = i;
-    }
-    i = 1;
+  int votos[11][16] = {0};
+  int i, j;
+  int lista, sede, voto, rep = 0;
+  int totalVotos[10] = {0};
+  int totalVotosSede[15] = {0};
+  int totalVotosTotal = 0;
+  for (i = 0; i < 16; i++) {
+    votos[0][i] = i;
+  }
+  i = 1;
+  do {
     do {
-        do {
-            printf("Ingrese el numero de lista: ");
-            scanf("%d", &lista);
-            rep = BuscarMatrizRepetidas(votos, lista, 11);
-        } while (lista != 0 && (lista < 100 || lista > 999));
-        if (rep = -1) votos[i][0] = lista;
-        if (lista != 0) {
-            IngresoVotos(lista, sede, voto, votos, totalVotos, totalVotosSede, totalVotosTotal);
-            i++;
-        }
+      printf("Ingrese el numero de lista: ");
+      scanf("%d", &lista);
+      rep = BuscarMatrizRepetidas(votos, lista, 11);
+    } while (lista != 0 && (lista < 100 || lista > 999));
+    if (rep = -1)
+      votos[i][0] = lista;
+    if (lista != 0) {
+      IngresoVotos(lista, sede, voto, votos, totalVotos, totalVotosSede,
+                   totalVotosTotal);
+      i++;
+    }
 
-    } while (lista != 0);
-    MostrarVotos(votos);
-    for (i = 1; i < 11; i++) {
-        printf("TOTAL DE VOTOS PORCENTAJE LISTA\n");
-        printf("     %d            %d       %d\n", totalVotos[i], totalVotos[i] * 100 / totalVotosTotal,
-               votos[i][0]);
+  } while (lista != 0);
+  MostrarVotos(votos);
+  for (i = 1; i < 11; i++) {
+    printf("TOTAL DE VOTOS PORCENTAJE LISTA\n");
+    printf("     %d            %d       %d\n", totalVotos[i],
+           totalVotos[i] * 100 / totalVotosTotal, votos[i][0]);
+  }
+  printf("Candidatos que NO recibieron votos en la sede 5\n");
+  for (i = 1; i < 11; i++) {
+    if (votos[i][5] == 0) {
+      printf("LISTA: ");
+      printf("%d\n", votos[i][0]);
     }
-    printf("Candidatos que NO recibieron votos en la sede 5\n");
-    for (i = 1; i < 11; i++) {
-        if (votos[i][5] == 0) {
-            printf("LISTA: ");
-            printf("%d\n", votos[i][0]);
-        }
-    }
+  }
 }
 
-void IngresoVotos(int lista, int sede, int voto, int votos[11][16], int totalVotos[10], int totalVotosSede[15],
+void IngresoVotos(int lista, int sede, int voto, int votos[11][16],
+                  int totalVotos[10], int totalVotosSede[15],
                   int totalVotosTotal) {
-    int i, j;
-    do {
-        printf("Ingrese el numero de sede: ");
-        scanf("%d", &sede);
-    } while (sede < 1 || sede > 15);
-    printf("Ingrese la cantidad de votos: ");
-    scanf("%d", &voto);
-    for (i = 1; i < 11; i++) {
-        printf("\n%d %d", votos[i][0], lista);
-        if (votos[i][0] == lista) {
-            votos[i][sede] = voto;
-            totalVotos[i] += voto;
-            totalVotosSede[sede] += voto;
-            totalVotosTotal += voto;
-        }
-
+  int i, j;
+  do {
+    printf("Ingrese el numero de sede: ");
+    scanf("%d", &sede);
+  } while (sede < 1 || sede > 15);
+  printf("Ingrese la cantidad de votos: ");
+  scanf("%d", &voto);
+  for (i = 1; i < 11; i++) {
+    printf("\n%d %d", votos[i][0], lista);
+    if (votos[i][0] == lista) {
+      votos[i][sede] = voto;
+      totalVotos[i] += voto;
+      totalVotosSede[sede] += voto;
+      totalVotosTotal += voto;
     }
-
+  }
 }
 
 void MostrarVotos(int votos[11][16]) {
-    int i, j;
-    printf("LISTA ");
-    for (i = 1; i < 16; i++) {
-        printf("\tSEDE %d", votos[0][i]);
+  int i, j;
+  printf("LISTA ");
+  for (i = 1; i < 16; i++) {
+    printf("\tSEDE %d", votos[0][i]);
+  }
+  printf("\n");
+  for (i = 1; i < 11; i++) {
+    printf("%d ", votos[i][0]);
+    for (j = 1; j < 16; j++) {
+      printf("\t%d", votos[i][j]);
     }
     printf("\n");
-    for (i = 1; i < 11; i++) {
-        printf("%d ", votos[i][0]);
-        for (j = 1; j < 16; j++) {
-            printf("\t%d", votos[i][j]);
-        }
-        printf("\n");
-    }
+  }
 }
 
 int BuscarMatrizRepetidas(int v[11][16], int datoABuscar, int cantElem) {
-    int i = 0, pos = -1;
-    while (pos == -1 && i < cantElem) {
-        if (v[i][0] == datoABuscar) {
-            pos = i;
-        } else i++;
-    }
-    return pos;
+  int i = 0, pos = -1;
+  while (pos == -1 && i < cantElem) {
+    if (v[i][0] == datoABuscar) {
+      pos = i;
+    } else
+      i++;
+  }
+  return pos;
 }
 
 /*Ej: 2.10 Realizar el juego del Tateti. El jugador 1 utilizara la letra X
 y el jugador 2 la letra O para maracar sus elecciones. el tablero armarlo con
 una matriz de 3x3 que debe ser visualizada en pantalla en cada jugada marcando
-la ubicacion elegida por cada jugador. Luego de cada jugada se debe llamar a una funcion
-para verificar si el jugador gano o no la partida. Si se llega a la ultima jugada y nadie
-gana, se debe informar del empate
- Complemento: Modificar el juego para que sea de un solo jugador. Deberá programar la inteligencia
-artificial para que la computadora elija donde realizar la jugada para intentar ganar la partida y no perder
-completando el espacio correspondiente cuando haga falta
+la ubicacion elegida por cada jugador. Luego de cada jugada se debe llamar a una
+funcion para verificar si el jugador gano o no la partida. Si se llega a la
+ultima jugada y nadie gana, se debe informar del empate Complemento: Modificar
+el juego para que sea de un solo jugador. Deberá programar la inteligencia
+artificial para que la computadora elija donde realizar la jugada para intentar
+ganar la partida y no perder completando el espacio correspondiente cuando haga
+falta
 */
 void ej210() {
-    char tablero[3][3] = {0};
-    int i, j, x, y, ganador = 0;
-    for (i = 0; i < 3; i++) {
-        for (j = 0; j < 3; j++) {
-            tablero[i][j] = ' ';
-        }
+  char tablero[3][3] = {0};
+  int i, j, x, y, ganador = 0;
+  for (i = 0; i < 3; i++) {
+    for (j = 0; j < 3; j++) {
+      tablero[i][j] = ' ';
+    }
+  }
+  MostrarTablero(tablero);
+  i = 0;
+  do {
+    if (i % 2 == 0) {
+      printf("Jugador 1: ");
+      scanf("%d %d", &x, &y);
+      tablero[x - 1][y - 1] = 'X';
+    } else {
+      // automatizar jugada
+      jugadaComputadora(tablero);
     }
     MostrarTablero(tablero);
-    i = 0;
-    do {
-        if (i % 2 == 0) {
-            printf("Jugador 1: ");
-            scanf("%d %d", &x, &y);
-            tablero[x - 1][y - 1] = 'X';
-        } else {
-            //automatizar jugada
-            jugadaComputadora(tablero);
-        }
-        MostrarTablero(tablero);
-        ganador = BusquedaGanador(tablero);
-        i++;
-        printf("ganador: %c\n", ganador);
-        printf("i: %d\n", i);
-    } while (i < 9 && !ganador);
-    if (ganador == 1) {
-        printf("El ganador es: X");
-    } else if (ganador == 2) {
-        printf("El ganador es: O");
-    } else {
-        printf("Empate");
-
-    }
+    ganador = BusquedaGanador(tablero);
+    i++;
+    printf("ganador: %c\n", ganador);
+    printf("i: %d\n", i);
+  } while (i < 9 && !ganador);
+  if (ganador == 1) {
+    printf("El ganador es: X");
+  } else if (ganador == 2) {
+    printf("El ganador es: O");
+  } else {
+    printf("Empate");
+  }
 }
 
 void MostrarTablero(char tablero[3][3]) {
-    int i, j;
-    for (i = 0; i < 3; i++) {
-        for (j = 0; j < 3; j++) {
-            printf("| %c |", tablero[i][j]);
-        }
-        printf("\n");
+  int i, j;
+  for (i = 0; i < 3; i++) {
+    for (j = 0; j < 3; j++) {
+      printf("| %c |", tablero[i][j]);
     }
+    printf("\n");
+  }
 }
 
 int BusquedaGanador(char tablero[3][3]) {
-    int i;
-    for (i = 0; i < 3; i++) {
-        if (tablero[i][0] == tablero[i][1] && tablero[i][1] == tablero[i][2]) {
-            if (tablero[i][0] == 'X') {
-                return 1;
-            } else if (tablero[i][0] == 'O') {
-                return 2;
-            }
-        } else if (tablero[0][i] == tablero[1][i] && tablero[1][i] == tablero[2][i]) {
-            if (tablero[0][i] == 'X') {
-                return 1;
-            } else if (tablero[0][i] == 'O') {
-                return 2;
-            }
-        }
+  int i;
+  for (i = 0; i < 3; i++) {
+    if (tablero[i][0] == tablero[i][1] && tablero[i][1] == tablero[i][2]) {
+      if (tablero[i][0] == 'X') {
+        return 1;
+      } else if (tablero[i][0] == 'O') {
+        return 2;
+      }
+    } else if (tablero[0][i] == tablero[1][i] &&
+               tablero[1][i] == tablero[2][i]) {
+      if (tablero[0][i] == 'X') {
+        return 1;
+      } else if (tablero[0][i] == 'O') {
+        return 2;
+      }
     }
-    if (tablero[0][0] == tablero[1][1] && tablero[1][1] == tablero[2][2]) {
-        if (tablero[0][0] == 'X') {
-            return 1;
-        } else if (tablero[0][0] == 'O') {
-            return 2;
-        }
-    } else if (tablero[0][2] == tablero[1][1] && tablero[1][1] == tablero[2][0]) {
-        if (tablero[0][2] == 'X') {
-            return 1;
-        } else if (tablero[0][2] == 'O') {
-            return 2;
-        }
+  }
+  if (tablero[0][0] == tablero[1][1] && tablero[1][1] == tablero[2][2]) {
+    if (tablero[0][0] == 'X') {
+      return 1;
+    } else if (tablero[0][0] == 'O') {
+      return 2;
     }
-    return 0;
+  } else if (tablero[0][2] == tablero[1][1] && tablero[1][1] == tablero[2][0]) {
+    if (tablero[0][2] == 'X') {
+      return 1;
+    } else if (tablero[0][2] == 'O') {
+      return 2;
+    }
+  }
+  return 0;
 }
 
 int esPosicionLibre(char tablero[3][3], int fila, int columna) {
-    return tablero[fila][columna] == ' ';
+  return tablero[fila][columna] == ' ';
 }
 
 int PosibleGanador(char tablero[3][3], int fila, int columna) {
-    //realizar copia del tablero
-    char aux[3][3];
-    int i, j;
-    for (i = 0; i < 3; i++) {
-        for (j = 0; j < 3; j++) {
-            aux[i][j] = tablero[i][j];
-        }
+  // realizar copia del tablero
+  char aux[3][3];
+  int i, j;
+  for (i = 0; i < 3; i++) {
+    for (j = 0; j < 3; j++) {
+      aux[i][j] = tablero[i][j];
     }
-    if (esPosicionLibre(aux, fila, columna)) {
-        aux[fila][columna] = 'X';
-        if (BusquedaGanador(aux) == 1) {
-            return 1;
-        } else {
-            aux[fila][columna] = 'O';
-            if (BusquedaGanador(aux) == 2) {
-                return 2;
-            }
-        }
+  }
+  if (esPosicionLibre(aux, fila, columna)) {
+    aux[fila][columna] = 'X';
+    if (BusquedaGanador(aux) == 1) {
+      return 1;
+    } else {
+      aux[fila][columna] = 'O';
+      if (BusquedaGanador(aux) == 2) {
+        return 2;
+      }
     }
-    return 0;
+  }
+  return 0;
 }
-
 
 void jugadaComputadora(char tablero[3][3]) {
   //  srand(time(NULL));
-    int fila, columna, pos;
+  int fila, columna, pos;
 
-    if (esPosicionLibre(tablero, 1, 1)) {
-        tablero[1][1] = 'O';
+  if (esPosicionLibre(tablero, 1, 1)) {
+    tablero[1][1] = 'O';
+    return;
+  }
+  for (fila = 0; fila < 3; fila++) {
+    for (columna = 0; columna < 3; columna++) {
+      pos = PosibleGanador(tablero, fila, columna);
+      if (pos == 1) {
+        tablero[fila][columna] = 'O';
         return;
+      } else if (PosibleGanador(tablero, fila, columna) == 2) {
+        tablero[fila][columna] = 'O';
+        return;
+      }
     }
-    for (fila = 0; fila < 3; fila++) {
-        for (columna = 0; columna < 3; columna++) {
-            pos = PosibleGanador(tablero, fila, columna);
-            if (pos == 1) {
-                tablero[fila][columna] = 'O';
-                return;
-            } else if (PosibleGanador(tablero, fila, columna) == 2) {
-                tablero[fila][columna] = 'O';
-                return;
-            }
-        }
+  }
+  do {
+    fila = rand() % 3;
+    columna = rand() % 3;
+    if (esPosicionLibre(tablero, fila, columna)) {
+      tablero[fila][columna] = 'O';
+      return;
     }
-    do {
-        fila = rand() % 3;
-        columna = rand() % 3;
-        if (esPosicionLibre(tablero, fila, columna)) {
-            tablero[fila][columna] = 'O';
-            return;
-        }
-    } while (!esPosicionLibre(tablero, fila, columna));
+  } while (!esPosicionLibre(tablero, fila, columna));
 }
-//Ejercicio 3.2
-void ej32(){
-  char nombre[10], apellido[10],copyName[10], apellido2[10],persona[25]={0},persona2[25]={0};
+// Ejercicio 3.2
+void ej32() {
+  char nombre[10], apellido[10], copyName[10], apellido2[10],
+      persona[25] = {0}, persona2[25] = {0};
   fixStrings();
   printf("Ingrese su nombre: ");
-  quitarSalto(nombre,10);
+  quitarSalto(nombre, 10);
   printf("Ingrese su apellido: ");
-  quitarSalto(apellido,10);
-    strcpy(copyName,nombre);
-  do{
+  quitarSalto(apellido, 10);
+  strcpy(copyName, nombre);
+  do {
     printf("Ingrese de vuelta el apellido: ");
-    quitarSalto(apellido2,10);
-  }while(strcmp(apellido,apellido2)!=0);
-  //fflush(stdin);
-  strcat(persona,nombre);
-  strcat(persona," ");
-  strcat(persona,apellido);
-  strcat(persona2,copyName);
-  strcat(persona2,", ");
-  strcat(persona2,apellido);
-  //fflush(stdin);
-  printf("Nombre: %s \n",nombre);
-  printf("Apellido: %s \n",apellido);
-  printf("Nombre copiado: %s \n",copyName);
-  printf("Apellido igual: %s\n",apellido2);
-  printf("Nombre completo: %s \n",persona);
-  printf("Nombre completo: %s \n",persona2);
+    quitarSalto(apellido2, 10);
+  } while (strcmp(apellido, apellido2) != 0);
+  // fflush(stdin);
+  strcat(persona, nombre);
+  strcat(persona, " ");
+  strcat(persona, apellido);
+  strcat(persona2, copyName);
+  strcat(persona2, ", ");
+  strcat(persona2, apellido);
+  // fflush(stdin);
+  printf("Nombre: %s \n", nombre);
+  printf("Apellido: %s \n", apellido);
+  printf("Nombre copiado: %s \n", copyName);
+  printf("Apellido igual: %s\n", apellido2);
+  printf("Nombre completo: %s \n", persona);
+  printf("Nombre completo: %s \n", persona2);
 }
-void flush(){
+void flush() {
   int c;
-  do{
-    c=getchar();
-  }while(c != EOF && c!='\n');
+  do {
+    c = getchar();
+  } while (c != EOF && c != '\n');
 }
 
-
-void quitarSalto(char texto[], int largo){
-  int i=0;
-  fgets(texto,largo,stdin);
-  while(texto[i]!='\0'){
-    if(texto[i]=='\n'){
-      texto[i]='\0';
-    }else{
+void quitarSalto(char texto[], int largo) {
+  int i = 0;
+  fgets(texto, largo, stdin);
+  while (texto[i] != '\0') {
+    if (texto[i] == '\n') {
+      texto[i] = '\0';
+    } else {
       i++;
     }
   }
 }
-void ej33(){
-  char alumnos[50][20],alumno[20];
-  int dni[50],i=0,dniEncontrado;
-  for(i=0;i<50;i++){
-     fixStrings();
+void ej33() {
+  char alumnos[50][20], alumno[20];
+  int dni[50], i = 0, dniEncontrado;
+  for (i = 0; i < 50; i++) {
+    fixStrings();
     printf("Ingrese nombre de alumno: ");
-    gets(alumnos[i]);
-    if(stricmpi(alumnos[i],"FIN")==0){
+    fgets(alumnos[i], 20, stdin);
+    if (strcmp(alumnos[i], "FIN") == 0) {
       break;
     }
     printf("Ingrese DNI de alumno: ");
-    scanf("%d",&dni[i]);
+    scanf("%d", &dni[i]);
     fflush(stdin);
   }
-  do{
+  do {
     printf("Buscar alumno: ");
-    gets(alumno);
-    if(strcmpi(alumno,"NOBUSCARMAS")!=0){
-      dniEncontrado=buscarAlumno(alumnos,alumno);
-      if(dniEncontrado){
+    fgets(alumno, 20, stdin);
+    if (strcmp(alumno, "NOBUSCARMAS") != 0) {
+      dniEncontrado = buscarAlumno(alumnos, alumno);
+      if (dniEncontrado) {
         printf("Alumno encontrado, su dni es: %d", dniEncontrado);
       }
     }
-  }while(strcmpi(alumno,"NOBUSCARMAS")!=0);
-  mostrarListado(alumnos,dni);
+  } while (strcmp(alumno, "NOBUSCARMAS") != 0);
+  mostrarListado(alumnos, dni);
 }
 
-void fixStrings(){
+void fixStrings() {
   int c;
-  do{
-    c=getchar();
-  }while(c != EOF && c!='\n');
+  do {
+    c = getchar();
+  } while (c != EOF && c != '\n');
 }
 
-void buscarAlumno(char alumnos[50][20],char alumno[20]){
+int buscarAlumno(char alumnos[50][20], char alumno[20]) {
   int i;
-  for(i=0;i<50;i++){
-    if(strcmpi(alumnos[i],alumno)==0){
+  for (i = 0; i < 50; i++) {
+    if (strcmp(alumnos[i], alumno) == 0) {
       printf("Alumno encontrado\n");
       return i;
     }
   }
   printf("Alumno no encontrado\n");
+  return 0;
 }
 
-void mostrarAlumnos(char alumnos[50][20],int dni[50]){
-  int i,aux2;
-  char aux;
-  //de menor a mayor alfabeticamente
-  for(i=0;i<50;i++){
-    if(strcmpi(alumnos[i],"FIN")==0){
+void mostrarListado(char alumnos[50][20], int dni[50]) {
+  int i, aux2, j;
+  char aux[20];
+  // de menor a mayor alfabeticamente
+  for (i = 0; i < 50; i++) {
+    if (strcmp(alumnos[i], "FIN") == 0) {
       break;
     }
-    for(j=0;j<50;j++){
-      if(strcmpi(alumnos[j],"FIN")==0){
+    for (j = 0; j < 50; j++) {
+      if (strcmp(alumnos[j], "FIN") == 0) {
         break;
       }
-      if(strcmpi(alumnos[i],alumnos[j])<0){
-        strcpy(aux,alumnos[i]);
-        strcpy(alumnos[i],alumnos[j]);
-        strcpy(alumnos[j],aux);
-        aux2=dni[i];
-        dni[i]=dni[j];
-        dni[j]=aux2;
-
+      if (strcmp(alumnos[i], alumnos[j]) < 0) {
+        strcpy(aux, alumnos[i]);
+        strcpy(alumnos[i], alumnos[j]);
+        strcpy(alumnos[j], aux);
+        aux2 = dni[i];
+        dni[i] = dni[j];
+        dni[j] = aux2;
       }
     }
   }
-  for(i=0;i<50;i++){
-    if(strcmpi(alumnos[i],"FIN")==0){
+  for (i = 0; i < 50; i++) {
+    if (strcmp(alumnos[i], "FIN") == 0) {
       break;
     }
-    printf("Alumno: %s, Dni: %d\n",alumnos[i],dni[i]);
+    printf("Alumno: %s, Dni: %d\n", alumnos[i], dni[i]);
   }
 }

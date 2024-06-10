@@ -58,9 +58,52 @@ typedef struct {
   int code;
   float price;
   char desc[51];
-} precios4;
+} PRECIOS;
 void ej4();
-
+typedef struct {
+  int code;
+  float price;
+  char desc[51];
+} PRODUCTOS;
+void ej5();
+int buscar5(FILE *, int);
+void ej6();
+typedef struct {
+  int code;
+  int stock;
+  char desc[51];
+} STOCK;
+typedef struct {
+  int code;
+  int stockF;
+} FALTANTES;
+void ej7();
+int buscar7(FILE *, int);
+int buscar7Faltante(FILE *, int);
+typedef struct {
+  char code[11];
+  int day;
+  int vuelo;
+  float price;
+  int pasajeros;
+} VUELOS;
+typedef struct {
+  int dni;
+  int vuelo;
+} PASAJEROS;
+void ej8();
+typedef struct {
+  int dni;
+  char AyN[21];
+  int Pagado;
+} INSCRIPTOS;
+typedef struct {
+  int dni;
+  int tel;
+  char AyN[21];
+} INTERESADOS;
+void ej9();
+int buscar9(FILE *, int);
 int main() {
   srand(time(NULL));
   int opcion;
@@ -76,6 +119,24 @@ int main() {
     break;
   case 3:
     ej3();
+    break;
+  case 4:
+    ej4();
+    break;
+  case 5:
+    ej5();
+    break;
+  case 6:
+    ej6();
+    break;
+  case 7:
+    ej7();
+    break;
+  case 8:
+    ej8();
+    break;
+  case 9:
+    ej9();
     break;
   }
   return 0;
@@ -335,4 +396,406 @@ void crearVentas3() {
     fwrite(v, sizeof(venta), 1, f);
   }
   fclose(f);
+}
+/*Realizar un programa que permite actualizar una lista de precios en forma
+masiva, ingresando un porcentaje de incremento. El archivo se llama precios.dat
+y fue generado utilizando la siguiente estructura: • Código (entero) • Precio
+(float) • Descripción (de hasta 50 caracteres)*/
+void ej4() {
+  FILE *f = fopen("../archivosParaEjercicios/PRECIOS.dat", "r + b");
+  if (f == NULL) {
+    printf("Error al abrir el archivo");
+    exit(1);
+  }
+  PRECIOS precios, *p;
+  p = &precios;
+  float porcentaje;
+  printf("Ingrese el porcentaje de incremento: ");
+  scanf("%f", &porcentaje);
+  fread(&precios, sizeof(PRECIOS), 1, f);
+  while (!feof(f)) {
+    printf("Codigo: %d\n", p->code);
+    printf("Precio Sin actualizar: %.2f\n", p->price);
+    p->price += p->price * porcentaje / 100;
+    printf("Precio actualizado: %.2f\n", p->price);
+    printf("Descripcion: %s\n", p->desc);
+    long desp = -sizeof(PRECIOS);
+    fseek(f, desp, SEEK_CUR); // Retrocedo 60 bytes
+    fwrite(p, sizeof(PRECIOS), 1,
+           f);             // Avanzo 60 bytes (escribo en la misma posicion)
+    fseek(f, 0, SEEK_CUR); // Retrocedo 60 bytes
+    fread(p, sizeof(PRECIOS), 1,
+          f); // Avanzo 60 bytes (leo la posicion siguiente a la que escribi)//
+  }
+}
+void ej5() {
+  FILE *f = fopen("../archivosParaEjercicios/PRODUCTOS.dat", "r + b");
+  if (f == NULL) {
+    printf("Error al abrir el archivo");
+    exit(1);
+  }
+  PRODUCTOS productos, *p;
+  p = &productos;
+  int code;
+  printf("Codigos");
+  fread(p, sizeof(PRODUCTOS), 1, f);
+  while (!feof(f)) {
+    printf("%d\n", p->code);
+    fread(p, sizeof(PRODUCTOS), 1, f);
+  }
+  rewind(f);
+  printf("Ingrese el codigo del producto a buscar: ");
+  scanf("%d", &code);
+  while (code != 0) {
+    int pos = buscar5(f, code);
+    if (pos == -1) {
+      printf("No se encontro el producto\n");
+    } else {
+      fseek(f, pos * sizeof(PRODUCTOS), SEEK_SET);
+      printf("Ingrese el nuevo precio: ");
+      scanf("%f", &p->price);
+      fwrite(p, sizeof(PRODUCTOS), 1, f);
+    }
+    printf("Ingrese el codigo del producto a buscar: ");
+    scanf("%d", &code);
+  }
+  // exportar a csv
+  FILE *csv = fopen("../archivosParaEjercicios/productos.csv", "wt");
+  if (csv == NULL) {
+    printf("Error al abrir el archivo");
+    exit(1);
+  }
+  fprintf(csv, "Codigo; Precio; Descripcion\n");
+  fread(&productos, sizeof(PRODUCTOS), 1, f);
+  while (!feof(f)) {
+    fprintf(csv, "%d; %.2f; %s\n", p->code, p->price, p->desc);
+    fread(&productos, sizeof(PRODUCTOS), 1, f);
+  }
+  fclose(f);
+  fclose(csv);
+}
+int buscar5(FILE *f, int code) {
+  PRODUCTOS productos, *p;
+  p = &productos;
+  int i = -1;
+  fread(p, sizeof(PRODUCTOS), 1, f);
+  while (!feof(f)) {
+    printf("Codigo: %d\n", p->code);
+    printf("Codigo a buscar: %d\n", code);
+    if (p->code == code) {
+      i = ftell(f) / sizeof(PRODUCTOS);
+    }
+    fread(p, sizeof(PRODUCTOS), 1, f);
+  }
+  return i;
+}
+void ej6() {
+  FILE *f = fopen("../archivosParaEjercicios/PRODUCTOS.dat", "r+b"),
+       *f2 = fopen("../archivosParaEjercicios/PRODUCTOS2.dat", "w+b");
+  PRODUCTOS productos, *p;
+
+  p = &productos;
+  int code;
+  printf("Codigos");
+  fread(&productos, sizeof(PRODUCTOS), 1, f);
+  while (!feof(f)) {
+    printf("%d\n", p->code);
+    fread(&productos, sizeof(PRODUCTOS), 1, f);
+  }
+  printf("Ingrese el codigo para buscarlo y eliminarlo: ");
+  scanf("%d", &code);
+  while (code != 0) {
+    rewind(f);
+    fread(p, sizeof(PRODUCTOS), 1, f);
+    while (!feof(f)) {
+      if (p->code != code) {
+        fwrite(p, sizeof(PRODUCTOS), 1, f2);
+      }
+      fread(p, sizeof(PRODUCTOS), 1, f);
+    }
+    fclose(f);
+    fclose(f2);
+    remove("../archivosParaEjercicios/PRODUCTOS.dat");
+    rename("../archivosParaEjercicios/PRODUCTOS2.dat",
+           "../archivosParaEjercicios/PRODUCTOS.dat");
+    f = fopen("../archivosParaEjercicios/PRODUCTOS.dat", "r+b");
+    f2 = fopen("../archivosParaEjercicios/PRODUCTOS2.dat", "w+b");
+    printf("Codigos");
+    rewind(f);
+    fread(p, sizeof(PRODUCTOS), 1, f);
+    while (!feof(f)) {
+      printf("%d\n", p->code);
+      fread(p, sizeof(PRODUCTOS), 1, f);
+    }
+
+    printf("Ingrese el codigo para buscarlo y eliminarlo: ");
+    scanf("%d", &code);
+  }
+  fclose(f);
+  fclose(f2);
+}
+void ej7() {
+  FILE *FSTOCK = fopen("../archivosParaEjercicios/STOCK.dat", "r+b"),
+       *FALTANTE = fopen("../archivosParaEjercicios/Faltantes.dat", "w+b");
+  if (!FSTOCK || !FALTANTE) {
+    perror("Error al abrir los archivos");
+    return;
+  }
+  STOCK stock, *s;
+  FALTANTES faltante = {0, 0}, *f;
+  s = &stock;
+  f = &faltante;
+  int code, venta;
+  printf("CODGIOS: \n");
+  fread(s, sizeof(STOCK), 1, FSTOCK);
+  while (!feof(FSTOCK)) {
+    s->stock = rand() % 100;
+    fwrite(s, sizeof(STOCK), 1, FSTOCK);
+    fseek(FSTOCK, 0, SEEK_CUR);
+    printf("%d\n", s->code);
+    printf("%d\n", s->stock);
+    fread(s, sizeof(STOCK), 1, FSTOCK);
+  }
+  printf("Ingrese el codigo del producto a buscar: ");
+  scanf("%d", &code);
+  while (code != 0) {
+    int pos = buscar7(FSTOCK, code);
+    if (pos == -1) {
+      printf("No se encontro el producto\n");
+    } else {
+      fseek(FSTOCK, (pos - 1) * sizeof(STOCK), SEEK_SET);
+      fread(s, sizeof(STOCK), 1, FSTOCK);
+
+      printf("Ingrese la cantidad que se vendio: ");
+      venta = rand() % 100;
+      printf("%d\n", venta);
+
+      if (venta > s->stock) {
+        int posF = buscar7Faltante(FALTANTE, code);
+
+        printf("%d\n", posF);
+        if (posF == -1) {
+          fseek(FALTANTE, 0, SEEK_END);
+        } else {
+          fseek(FALTANTE, (posF - 1) * sizeof(FALTANTES), SEEK_SET);
+        }
+        printf("Posicion: %ld\t\n", ftell(FALTANTE));
+
+        if (fread(f, sizeof(FALTANTES), 1, FALTANTE) == 1) {
+          fseek(FALTANTE, -sizeof(FALTANTES), SEEK_CUR);
+          printf("Posicion: %ld\t,stockF: %d\n", ftell(FALTANTE), f->stockF);
+        } else {
+          f->stockF = 0;
+          f->code = code;
+
+          fseek(FALTANTE, 0, SEEK_CUR);
+        }
+        printf("Posicion: %ld\t,stockF: %d\n", ftell(FALTANTE), f->stockF);
+        f->stockF += venta - s->stock;
+        s->stock = 0;
+        f->code = code;
+
+        printf("Posicion: %ld\t,stockF: %d\n", ftell(FALTANTE), f->stockF);
+
+        fwrite(f, sizeof(FALTANTES), 1, FALTANTE);
+        fflush(FALTANTE);
+      } else {
+        s->stock -= venta;
+      }
+      fseek(FSTOCK, -sizeof(STOCK), SEEK_CUR);
+      printf("Posicion: %ld\t,stock: %d\n", ftell(FSTOCK), s->stock);
+      fwrite(s, sizeof(STOCK), 1, FSTOCK);
+      fflush(FSTOCK);
+      printf("Posicion: %ld\n", ftell(FSTOCK));
+    }
+    printf("Ingrese el codigo del producto a buscar: ");
+
+    scanf("%d", &code);
+  }
+  rewind(FSTOCK);
+  fread(s, sizeof(STOCK), 1, FSTOCK);
+  if (!feof(FSTOCK)) {
+    printf("STOCK ACTUALIZADO\n");
+  }
+  while (!feof(FSTOCK)) {
+    printf("Codigo: %d\n", s->code);
+    printf("Stock: %d\n", s->stock);
+    printf("Descripcion: %s\n", s->desc);
+    fread(s, sizeof(STOCK), 1, FSTOCK);
+  }
+  rewind(FALTANTE);
+  fread(f, sizeof(FALTANTES), 1, FALTANTE);
+  if (!feof(FALTANTE))
+    printf("FALTANTES\n");
+  while (!feof(FALTANTE)) {
+    printf("Codigo: %d\n", f->code);
+    printf("Stock faltante: %d\n", f->stockF);
+    fread(f, sizeof(FALTANTES), 1, FALTANTE);
+  }
+}
+int buscar7(FILE *FSTOCK, int code) {
+  STOCK stock, *s;
+  s = &stock;
+  int i = -1;
+
+  rewind(FSTOCK);
+  fread(s, sizeof(STOCK), 1, FSTOCK);
+  while (!feof(FSTOCK)) {
+    if (s->code == code) {
+      i = ftell(FSTOCK) / sizeof(STOCK);
+    }
+    fread(s, sizeof(STOCK), 1, FSTOCK);
+  }
+  return i;
+}
+int buscar7Faltante(FILE *FALTANTE, int code) {
+  FALTANTES faltante, *f;
+  f = &faltante;
+  int i = -1;
+
+  rewind(FALTANTE);
+  fread(f, sizeof(FALTANTES), 1, FALTANTE);
+  while (!feof(FALTANTE)) {
+    printf("Codigo: %d\n", f->code);
+    if (f->code == code) {
+      i = ftell(FALTANTE) / sizeof(FALTANTES);
+    }
+    fread(f, sizeof(FALTANTES), 1, FALTANTE);
+  }
+  return i;
+}
+void ej8() {
+  FILE *f = fopen("../archivosParaEjercicios/PASAJEROS.dat", "r+b"),
+       *f2 = fopen("../archivosParaEjercicios/VUELOS.dat", "r+b");
+  if (!f || !f2) {
+    perror("Error al abrir los archivos");
+    exit(1);
+  }
+  PASAJEROS pasajeros, *p;
+  VUELOS vuelos, *v;
+  p = &pasajeros;
+  v = &vuelos;
+  fread(v, sizeof(VUELOS), 1, f2);
+  while (!feof(f2)) {
+    v->pasajeros = 0;
+    printf("Codigo de vuelo: %s\n", v->code);
+    if (strcmp(v->code, "AERO1") == 0) {
+
+      fread(p, sizeof(PASAJEROS), 1, f);
+      while (!feof(f)) {
+        printf("Codigo: %d\n", p->vuelo);
+        if (v->vuelo == p->vuelo) {
+          v->pasajeros++;
+          printf("Pasajeros: %d\n", v->pasajeros);
+        }
+        fread(p, sizeof(PASAJEROS), 1, f);
+      }
+    }
+    fseek(f, 0, SEEK_SET);
+    fseek(f2, -sizeof(VUELOS), SEEK_CUR);
+    printf("\n-----------------------------------------------------\n");
+    printf("Codigo: %s\n", v->code);
+    printf("Dia: %d\n", v->day);
+    printf("Vuelo: %d\n", v->vuelo);
+    printf("Precio: %.2f\n", v->price);
+    printf("Pasajeros: %d\n", v->pasajeros);
+
+    printf("\n-----------------------------------------------------\n");
+    fwrite(v, sizeof(VUELOS), 1, f2);
+
+    fflush(f2);
+    fread(v, sizeof(VUELOS), 1, f2);
+  }
+  FILE *csv = fopen("../archivosParaEjercicios/vuelos.csv", "wt");
+  if (!csv) {
+    perror("Error al abrir el archivo");
+    exit(1);
+  }
+  fseek(f2, 0, SEEK_SET);
+  fprintf(csv, "Codigo; Dia; Vuelo; Precio; Pasajeros\n");
+  fread(v, sizeof(VUELOS), 1, f2);
+  while (!feof(f2)) {
+    fprintf(csv, "%s; %d; %d; %.2f; %d\n", v->code, v->day, v->vuelo, v->price,
+            v->pasajeros);
+    fread(v, sizeof(VUELOS), 1, f2);
+  }
+  fclose(f);
+  fclose(f2);
+  fclose(csv);
+}
+void ej9() {
+  FILE *f = fopen("../archivosParaEjercicios/INSCRIPTOS.dat", "r+b"),
+       *f2 = fopen("../archivosParaEjercicios/Interesados.dat", "w+b");
+  int dni;
+  fseek(f, 0, SEEK_END);
+  int cupos = ftell(f) / sizeof(INSCRIPTOS);
+  rewind(f);
+  INSCRIPTOS inscriptos, *i;
+  INTERESADOS interesados, *in;
+  in = &interesados;
+  i = &inscriptos;
+  if (!f || !f2) {
+    perror("Error al abrir los archivos");
+    exit(1);
+  }
+  printf("Ingrese el DNI: ");
+  scanf("%d", &dni);
+  while (dni > 0) {
+    int pos = buscar9(f, dni);
+    if (pos == -1) {
+      if (cupos < 60) {
+        printf("Ingrese el nombre: ");
+        scanf("%s", i->AyN);
+        i->dni = dni;
+        i->Pagado = 0;
+        cupos++;
+      } else {
+        printf("Quiere ingresar a la lista de interesados? (s/n): ");
+        char c;
+        scanf(" %c", &c);
+        if (c == 's') {
+          printf("Ingrese el nombre: ");
+          scanf("%s", in->AyN);
+          in->dni = dni;
+          printf("Ingrese el telefono: ");
+          scanf("%d", &in->tel);
+          fwrite(in, sizeof(INTERESADOS), 1, f2);
+        }
+      }
+    } else {
+      fseek(f, pos * sizeof(INSCRIPTOS), SEEK_SET);
+      fread(i, sizeof(INSCRIPTOS), 1, f);
+    }
+    if (i->Pagado == 1) {
+      printf("Ya se encuentra inscripto\n");
+    } else if (i->Pagado == 0) {
+      printf("Pago pendiente. Desea registrar el pago?\n");
+      char c;
+      scanf(" %c", &c);
+      if (c == 's') {
+        i->Pagado = 1;
+        fseek(f, pos * sizeof(INSCRIPTOS), SEEK_SET);
+        fwrite(i, sizeof(INSCRIPTOS), 1, f);
+        fflush(f);
+      }
+    }
+    printf("Ingrese el DNI: ");
+    scanf("%d", &dni);
+  }
+  fclose(f);
+  fclose(f2);
+}
+int buscar9(FILE *f, int dni) {
+  INSCRIPTOS inscriptos, *i;
+  i = &inscriptos;
+  int pos = -1;
+  rewind(f);
+  fread(i, sizeof(INSCRIPTOS), 1, f);
+  while (!feof(f)) {
+    if (i->dni == dni) {
+      pos = ftell(f) / sizeof(INSCRIPTOS);
+    }
+    fread(i, sizeof(INSCRIPTOS), 1, f);
+  }
+  return pos;
 }

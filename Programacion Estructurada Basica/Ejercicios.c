@@ -642,6 +642,7 @@ int mapButaca(int butaca) {
   case 9:
     return 8;
   }
+  return 0;
 }
 
 /*Ej:2.9 Se desea contabilizar los votos recibidos en las elecciones de un club
@@ -674,7 +675,7 @@ void ej29() {
       scanf("%d", &lista);
       rep = BuscarMatrizRepetidas(votos, lista, 11);
     } while (lista != 0 && (lista < 100 || lista > 999));
-    if (rep = -1)
+    if (rep == -1)
       votos[i][0] = lista;
     if (lista != 0) {
       IngresoVotos(lista, sede, voto, votos, totalVotos, totalVotosSede,

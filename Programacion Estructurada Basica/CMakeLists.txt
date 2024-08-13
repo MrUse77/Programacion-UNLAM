@@ -10,3 +10,5 @@ add_executable(Ejercicios Ejercicios.c)
 add_executable(EjerciciosStruct EjerciciosStruct.c)
 add_executable(EjerciciosPunteros EjerciciosPunteros.c)
 add_executable(EjerciciosArchivos EjerciciosArchivos.c)
+add_executable(EjerciciosCorteDeControl EjerciciosCorteDeControl.c)
+

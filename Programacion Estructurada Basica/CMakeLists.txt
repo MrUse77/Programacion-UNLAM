@@ -6,7 +6,7 @@ set(CMAKE_C_STANDARD 17)
 
 
 add_executable(Ejemplos main.c)
-add_executable(Ejercicios Ejercicios.c)
+add_executable(EjerciciosVectores EjerciciosVectores.c)
 add_executable(EjerciciosStruct EjerciciosStruct.c)
 add_executable(EjerciciosPunteros EjerciciosPunteros.c)
 add_executable(EjerciciosArchivos EjerciciosArchivos.c)

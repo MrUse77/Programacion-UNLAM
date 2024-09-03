@@ -59,8 +59,28 @@ int main() {
 void ej1() {
   int n[20], num, i;
   for (i = 0; i < 20; i++) {
-    n[i] = rand() % 1000;
-    printf("%d\n", n[i]);
+    n[i] = rand() % 100 + 100;
+  }
+  int menor = n[0], rep, mayor = n[0], pos[20] = {0}, j = 1;
+  for (i = 1; i < 20; i++) {
+    if (n[i] < menor) {
+      menor = n[i];
+      rep = 0;
+    } else if (menor == n[i]) {
+      rep++;
+    }
+    if (n[i] > mayor) {
+      mayor = n[i];
+      pos[0] = i;
+    } else if (mayor == n[i]) {
+      pos[j] = i;
+      j++;
+    }
+  }
+  printf("Valor menor: %d, se repite: %d\n", menor, rep);
+  printf("Valor mayor: %d, se repite en las posiciones: ", mayor);
+  for (i = 0; i < j; i++) {
+    printf("%d \n", pos[i]);
   }
 }
 void ej2() {

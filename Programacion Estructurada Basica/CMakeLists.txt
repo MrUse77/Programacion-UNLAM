@@ -1,14 +1,21 @@
-cmake_minimum_required(VERSION 3.26)
-project(Programacion_Estructurada_Basica C)
+cmake_minimum_required(VERSION 3.10)
+project(Programacion_Estructurada_Basica)
+set(CMAKE_C_STANDARD 23)
 
-set(CMAKE_C_STANDARD 17)
+include_directories(${CMAKE_SOURCE_DIR}/includes)
+add_library(flush STATIC includes/flush.c)
 
-
-
-add_executable(Ejemplos main.c)
 add_executable(EjerciciosVectores EjerciciosVectores.c)
+add_executable(EjerciciosMatrices EjerciciosMatrices.c)
+target_link_libraries(EjerciciosMatrices flush)
+add_executable(EjerciciosStrings EjerciciosStrings.c)
+target_link_libraries(EjerciciosStrings flush)
 add_executable(EjerciciosStruct EjerciciosStruct.c)
+target_link_libraries(EjerciciosStruct flush)
 add_executable(EjerciciosPunteros EjerciciosPunteros.c)
+target_link_libraries(EjerciciosPunteros flush)
 add_executable(EjerciciosArchivos EjerciciosArchivos.c)
+target_link_libraries(EjerciciosArchivos flush)
 add_executable(EjerciciosCorteDeControl EjerciciosCorteDeControl.c)
+target_link_libraries(EjerciciosCorteDeControl flush)
 

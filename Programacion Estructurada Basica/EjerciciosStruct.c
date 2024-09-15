@@ -1,17 +1,10 @@
+#include "flush.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
-void flush(FILE *stream) {
-  int c;
-  do {
-    c = getchar();
-  } while (c != EOF && c != '\n');
-}
 void fsgets(char texto[], int largo) {
   int i = 0;
-  flush(stdin);
   fgets(texto, largo, stdin);
   while (texto[i] != '\0') {
     if (texto[i] == '\n') {
@@ -22,7 +15,7 @@ void fsgets(char texto[], int largo) {
   }
 }
 typedef struct {
-  int code;
+  char code[6];
   float price;
   char description[30];
   int unidadesVendidas;
@@ -30,7 +23,7 @@ typedef struct {
 } product;
 
 void ej1();
-int Buscar(product[], int, int);
+int Buscar1(product[], char[], int);
 
 typedef struct {
   int code;
@@ -46,7 +39,7 @@ int BuscarMedicamentos2(medicamentos[], int, int);
 
 typedef struct {
   int dni;
-  char name[80];
+  char name[81];
   int nota1;
   int nota2;
   float promedio;
@@ -56,6 +49,18 @@ int INGRESO3(alumno[]);
 void RESULTADO3(alumno[], int);
 void INFORME_PROM(alumno[], int);
 int BuscarAlumno(alumno[], int, int);
+
+typedef struct {
+  int cliente;
+  int importe;
+  int vendedor;
+} venta4;
+typedef struct {
+  int code;
+  char NyA[51];
+
+} cliente4;
+void ej4();
 
 int main() {
   int opcion;
@@ -72,30 +77,33 @@ int main() {
   case 3:
     ej3();
     break;
+  case 4:
+    ej4();
+    break;
   }
-  system("pause");
   return 0;
 }
 /*
  * */
 void ej1() {
-  int i = 0, j = 2, codigo, unidades, venta[2] = {0};
+  int i = 0, j = 2, unidades, venta[2] = {0};
   float total[2] = {0};
   product productos[2] = {0};
-  ;
-  char fin[] = "fin";
+  char fin[] = "fin", code[6];
   do {
     do {
       printf("Ingrese el codigo del producto: ");
-      scanf("%d", &productos[i].code);
-
-    } while (productos[i].code < 10000 || productos[i].code > 99999 ||
-             Buscar(productos, productos[i].code, j) != i);
+      flush(stdin);
+      fsgets(code, 6);
+    } while (Buscar1(productos, code, j) != i);
+    strcpy(productos[i].code, code);
     printf("Ingrese el precio del producto: ");
     scanf("%f", &productos[i].price);
     do {
       printf("Ingrese la descripcion del producto: ");
-      scanf("%s", productos[i].description);
+      flush(stdin);
+      fsgets(productos[i].description, 30);
+
     } while (strlen(productos[i].description) > 30);
     printf("Ingrese la cantidad de unidades vendidas: ");
     scanf("%d", &productos[i].unidadesVendidas);
@@ -106,13 +114,13 @@ void ej1() {
 
   } while (i != j && strcmp(productos[i - 1].description, fin) != 0);
   do {
-    int codigoProducto = 0, aux = 0;
+    int codigoProducto = 0;
     do {
       printf("Ingrese Codigo de producto");
-      scanf("%d", &codigo);
-    } while ((codigo < 10000 || codigo > 99999) &&
-             Buscar(productos, codigo, j) == -1);
-    codigoProducto = Buscar(productos, codigo, j);
+      flush(stdin);
+      fsgets(code, 6);
+      codigoProducto = Buscar1(productos, code, j);
+    } while (codigoProducto == -1);
     printf("Ingrese cantidad de unidades vendidas");
     scanf("%d", &unidades);
     venta[codigoProducto] += unidades;
@@ -130,10 +138,10 @@ void ej1() {
            productos[i].unidadesVendidas, productos[i].total);
   }
 }
-int Buscar(product productos[], int code, int j) {
+int Buscar1(product productos[], char code[6], int j) {
   int i = 0;
   while (i < j) {
-    if (productos[i].code == code) {
+    if (strcmp(productos[i].code, code) == 0) {
       return i;
     }
     i++;
@@ -205,7 +213,7 @@ int BuscarMedicamentos2(medicamentos medicamento[], int codigo, int j) {
   return -1;
 }
 void ej3() {
-  alumno alumnos[80];
+  alumno alumnos[81];
   int i = 0;
   i = INGRESO3(alumnos);
   system("cls");
@@ -218,16 +226,11 @@ int INGRESO3(alumno alumnos[]) {
     do {
       printf("Ingrese el DNI del alumno: ");
       scanf("%d", &alumnos[i].dni);
-      printf("%d\n", BuscarAlumno(alumnos, alumnos[i].dni, i + 1));
       // con 0 termina
-    } while (((alumnos[i].dni < 10000000 || alumnos[i].dni > 99999999) &&
-              alumnos[i].dni != 0) ||
-             BuscarAlumno(alumnos, alumnos[i].dni, i + 1) != i);
+    } while (BuscarAlumno(alumnos, alumnos[i].dni, i 1) != -1);
 
-    do {
-      printf("Ingrese el nombre del alumno: ");
-      fsgets(alumnos[i].name, 80);
-    } while (strlen(alumnos[i].name) > 80);
+    printf("Ingrese el nombre del alumno: ");
+    fsgets(alumnos[i].name, 80);
     do {
       printf("Ingrese la nota 1 del alumno: ");
       scanf("%d", &alumnos[i].nota1);
@@ -252,8 +255,6 @@ void RESULTADO3(alumno alumnos[], int cant) {
       reprobados[k] = alumnos[i];
       k++;
     }
-    printf("%d\n", j);
-    printf("%d\n", k);
   }
   printf("APROBADOS\n");
   printf("\t DNI \t NOMBRE \t NOTA 1 \t NOTA 2 \t PROMEDIO\n");
@@ -297,4 +298,53 @@ int BuscarAlumno(alumno alumnos[], int dni, int j) {
   }
   return -1;
 }
-void ej4() {}
+void ej4() {
+  cliente4 clientes[100];
+  int i, cliente, importe, vendedor, code;
+  char NyA[51];
+  i = CARGA_CLIENTE(code, NyA, clientes);
+
+  venta4 ventas[i];
+  int j = 0;
+  do {
+    printf("Ingrese Numero de cliente: ");
+    scanf("%d", &cliente);
+  } while (!EsCorrelativo4(cliente, i) && cliente != 999);
+  while (cliente != 999 && i < 100) {
+    // numero de cliente debe ser no correlativo
+    ventas[j].cliente = cliente;
+    do {
+
+      printf("Ingrese Importe: ");
+      scanf("%d", &importe);
+    } while (importe < 0);
+    ventas[j].importe = importe;
+    j++;
+    do {
+      printf("Ingrese Numero de vendedor: ");
+      scanf("%d", &vendedor);
+    } while (vendedor < 1 && vendedor > 10);
+    ventas[j].vendedor = vendedor;
+  }
+}
+int CARGA_CLIENTE(int code, char NyA[51], cliente4 clientes[100]) {
+  int i = 0;
+  do {
+    printf("Ingrese el codigo del cliente: ");
+    scanf("%d", &code);
+  } while (!EsCorrelativo(code, i));
+  while (code != 999 && i < 100) {
+    clientes[i].code = code;
+    printf("Ingrese el nombre y apellido del cliente: ");
+    flush(stdin);
+    fsgets(NyA, 51);
+    strcpy(clientes[i].NyA, NyA);
+    i++;
+    do {
+      printf("Ingrese el codigo del cliente: ");
+      scanf("%d", &code);
+    } while (!EsCorrelativo(code, i));
+  }
+
+  return i;
+}

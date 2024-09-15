@@ -61,6 +61,8 @@ typedef struct {
 
 } cliente4;
 void ej4();
+int CARGA_CLIENTE(int, char[], cliente4[]);
+int EsCorrelativo4(int, int);
 
 int main() {
   int opcion;
@@ -227,7 +229,7 @@ int INGRESO3(alumno alumnos[]) {
       printf("Ingrese el DNI del alumno: ");
       scanf("%d", &alumnos[i].dni);
       // con 0 termina
-    } while (BuscarAlumno(alumnos, alumnos[i].dni, i 1) != -1);
+    } while (BuscarAlumno(alumnos, alumnos[i].dni, i) != -1);
 
     printf("Ingrese el nombre del alumno: ");
     fsgets(alumnos[i].name, 80);
@@ -309,8 +311,8 @@ void ej4() {
   do {
     printf("Ingrese Numero de cliente: ");
     scanf("%d", &cliente);
-  } while (!EsCorrelativo4(cliente, i) && cliente != 999);
-  while (cliente != 999 && i < 100) {
+  } while (EsCorrelativo4(cliente, i) && cliente != 999);
+  while (cliente != 999 && i < j) {
     // numero de cliente debe ser no correlativo
     ventas[j].cliente = cliente;
     do {
@@ -332,7 +334,7 @@ int CARGA_CLIENTE(int code, char NyA[51], cliente4 clientes[100]) {
   do {
     printf("Ingrese el codigo del cliente: ");
     scanf("%d", &code);
-  } while (!EsCorrelativo(code, i));
+  } while (EsCorrelativo4(code, i));
   while (code != 999 && i < 100) {
     clientes[i].code = code;
     printf("Ingrese el nombre y apellido del cliente: ");
@@ -343,8 +345,23 @@ int CARGA_CLIENTE(int code, char NyA[51], cliente4 clientes[100]) {
     do {
       printf("Ingrese el codigo del cliente: ");
       scanf("%d", &code);
-    } while (!EsCorrelativo(code, i));
+    } while (EsCorrelativo4(code, i));
   }
 
   return i;
+}
+int EsCorrelativo4(int code, int i) {
+  int j = 1;
+  int anterior = code % 10, actual;
+  code /= 10;
+  // saber si un numero es correlativo o no
+  while (code > 0) {
+    actual = code % 10;
+    if (actual + 1 != anterior && anterior != actual + 1) {
+      j = 0;
+    }
+    anterior = actual;
+    code /= 10;
+  }
+  return j;
 }

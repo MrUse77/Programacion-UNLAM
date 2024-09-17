@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#define TAM6 4
+#define CANT_CARRERAS 3
 void fsgets(char texto[], int largo) {
   int i = 0;
   fgets(texto, largo, stdin);
@@ -63,6 +65,54 @@ typedef struct {
 void ej4();
 int CARGA_CLIENTE(int, char[], cliente4[]);
 int EsCorrelativo4(int, int);
+typedef struct {
+  int legajo;
+  char apellido[16];
+  char nombre[16];
+  float altura;
+  char Sexo;
+  int DiaNacimiento;
+  int MesNacimiento;
+  int AnioNacimiento;
+} persona5;
+typedef struct {
+  int DiaNacimiento;
+  int MesNacimiento;
+  int AnioNacimiento;
+} FechaNacimiento;
+typedef struct {
+  char Nombre[16];
+  char Apellido[16];
+} NomCompleto;
+typedef struct {
+  NomCompleto NyA;
+  FechaNacimiento fecha;
+  int legajo;
+  float altura;
+  char Sexo;
+  int code;
+} persona51;
+typedef struct {
+  NomCompleto NyA;
+  FechaNacimiento fecha;
+  int legajo;
+  float altura;
+  char Sexo;
+  int code;
+  int MateriasAprobadas[36];
+
+} persona52;
+void ej5();
+persona51 CargaPersona2(persona5);
+void CargaPersona3(persona51, persona52);
+void MostrarPersona3(persona52, int);
+typedef struct {
+  char nombre[30];
+  char escuderia[30];
+  int posicion[CANT_CARRERAS];
+} piloto;
+void ej6();
+void MostrarCarrera(piloto[], int);
 
 int main() {
   int opcion;
@@ -81,6 +131,12 @@ int main() {
     break;
   case 4:
     ej4();
+    break;
+  case 5:
+    ej5();
+    break;
+  case 6:
+    ej6();
     break;
   }
   return 0;
@@ -364,4 +420,166 @@ int EsCorrelativo4(int code, int i) {
     code /= 10;
   }
   return j;
+}
+
+void ej5() {
+  persona5 persona;
+  persona51 persona2;
+  persona52 persona3;
+  printf("Ingrese los datos de la persona\n");
+  do {
+    printf("Legajo: ");
+    scanf("%d", &persona.legajo);
+  } while (persona.legajo < 1 && persona.legajo > 10000);
+  printf("Apellido: ");
+  flush(stdin);
+  fsgets(persona.apellido, 16);
+  printf("Nombre: ");
+  fsgets(persona.nombre, 16);
+  do {
+    printf("Altura: ");
+    scanf("%f", &persona.altura);
+  } while (persona.altura < 0);
+  do {
+    printf("Sexo: ");
+    scanf(" %c", &persona.Sexo);
+  } while (persona.Sexo != 'F' && persona.Sexo != 'M');
+  do {
+    printf("Dia de nacimiento: ");
+    scanf("%d", &persona.DiaNacimiento);
+  } while (persona.DiaNacimiento < 1 || persona.DiaNacimiento > 31);
+  do {
+    printf("Mes de nacimiento: ");
+    scanf("%d", &persona.MesNacimiento);
+  } while (persona.MesNacimiento < 1 || persona.MesNacimiento > 12);
+  do {
+    printf("Anio de nacimiento: ");
+    scanf("%d", &persona.AnioNacimiento);
+  } while (persona.AnioNacimiento < 1950 || persona.AnioNacimiento > 2019);
+  printf("Persona:\n");
+  printf("Legajo: %d\n", persona.legajo);
+  printf("Apellido: %s\n", persona.apellido);
+  printf("Nombre: %s\n", persona.nombre);
+  printf("Altura: %.2f\n", persona.altura);
+  printf("Sexo: %c\n", persona.Sexo);
+  printf("Fecha de nacimiento: %d/%d/%d\n", persona.DiaNacimiento,
+         persona.MesNacimiento, persona.AnioNacimiento);
+  persona2 = CargaPersona2(persona);
+  printf("Persona:\n");
+  printf("Legajo: %d\n", persona2.legajo);
+  printf("Apellido: %s\n", persona2.NyA.Apellido);
+  printf("Nombre: %s\n", persona2.NyA.Nombre);
+  printf("Altura: %.2f\n", persona2.altura);
+  printf("Sexo: %c\n", persona2.Sexo);
+  printf("Fecha de nacimiento: %d/%d/%d\n", persona2.fecha.DiaNacimiento,
+         persona2.fecha.MesNacimiento, persona2.fecha.AnioNacimiento);
+
+  CargaPersona3(persona2, persona3);
+}
+persona51 CargaPersona2(persona5 persona) {
+  persona51 persona2;
+  printf("Modificacion de datos\n");
+  printf("Ingrese los datos de la persona\n");
+  printf("Nombre: ");
+  flush(stdin);
+  fsgets(persona2.NyA.Nombre, 16);
+  printf("Apellido: ");
+  fsgets(persona2.NyA.Apellido, 16);
+  do {
+    printf("Dia de nacimiento: ");
+    scanf("%d", &persona2.fecha.DiaNacimiento);
+  } while (persona2.fecha.DiaNacimiento < 1 ||
+           persona2.fecha.DiaNacimiento > 31);
+  do {
+    printf("Mes de nacimiento: ");
+    scanf("%d", &persona2.fecha.MesNacimiento);
+  } while (persona2.fecha.MesNacimiento < 1 ||
+           persona2.fecha.MesNacimiento > 12);
+  do {
+    printf("Anio de nacimiento: ");
+    scanf("%d", &persona2.fecha.AnioNacimiento);
+  } while (persona2.fecha.AnioNacimiento < 1950 ||
+           persona2.fecha.AnioNacimiento > 2019);
+  persona2.legajo = persona.legajo;
+  persona2.altura = persona.altura;
+  persona2.Sexo = persona.Sexo;
+
+  return persona2;
+}
+void CargaPersona3(persona51 persona2, persona52 persona3) {
+  int i = 0;
+  do {
+    printf("Ingrese el codigo de la materia aprobada: ");
+    scanf("%d", &persona3.MateriasAprobadas[i]);
+    i++;
+  } while (persona3.MateriasAprobadas[i - 1] != 0 && i < 36);
+  persona3.code = persona2.code;
+  persona3.legajo = persona2.legajo;
+  persona3.altura = persona2.altura;
+  persona3.Sexo = persona2.Sexo;
+  persona3.fecha = persona2.fecha;
+  strcpy(persona3.NyA.Apellido, persona2.NyA.Apellido);
+  strcpy(persona3.NyA.Nombre, persona2.NyA.Nombre);
+  MostrarPersona3(persona3, i);
+}
+void MostrarPersona3(persona52 persona3, int j) {
+  int i;
+  printf("Persona:\n");
+  printf("Legajo: %d\n", persona3.legajo);
+  printf("Apellido: %s\n", persona3.NyA.Apellido);
+  printf("Nombre: %s\n", persona3.NyA.Nombre);
+  printf("Altura: %.2f\n", persona3.altura);
+  printf("Sexo: %c\n", persona3.Sexo);
+  printf("Fecha de nacimiento: %d/%d/%d\n", persona3.fecha.DiaNacimiento,
+         persona3.fecha.MesNacimiento, persona3.fecha.AnioNacimiento);
+  printf("Materias aprobadas: ");
+  for (i = 0; i < j; i++) {
+    printf("%d ", persona3.MateriasAprobadas[i]);
+  }
+  printf("\n");
+}
+void ej6() {
+  piloto pilotos[TAM6];
+  int i, j;
+  for (i = 0; i < TAM6; i++) {
+    flush(stdin);
+    printf("Ingrese Nombre de piloto: ");
+    fsgets(pilotos[i].nombre, 30);
+    printf("Ingrese escuderia: ");
+    fsgets(pilotos[i].escuderia, 30);
+    printf("Ingrese la posicion del piloto de cada carrera: \n");
+    for (j = 0; j < CANT_CARRERAS; j++) {
+      printf("Carrera %d: ", j);
+      scanf("%d", &pilotos[i].posicion[j]);
+    }
+  }
+  int carrera;
+  do {
+    printf("Ingrese Numero de carrera (0 para terminar): ");
+    scanf("%d", &carrera);
+    carrera--;
+    MostrarCarrera(pilotos, carrera);
+  } while (carrera < 0 || carrera < CANT_CARRERAS);
+}
+void MostrarCarrera(piloto pilotos[], int pos) {
+  int i, j;
+  piloto top10[TAM6], aux;
+  for (i = 0; i < TAM6; i++) {
+    if (pilotos[i].posicion[pos] <= 10) {
+      top10[i] = pilotos[i];
+    }
+  }
+  for (i = 0; i < TAM6 - 1; i++) {
+    for (j = 0; j < TAM6 - 1 - i; j++) {
+      if (top10[j].posicion[pos] > top10[j + 1].posicion[pos]) {
+        aux = top10[j];
+        top10[j] = top10[j + 1];
+        top10[j + 1] = aux;
+      }
+    }
+  }
+  for (i = 0; i < TAM6; i++) {
+    printf("Nombre: %s \t Escuderia: %s \t Posicion: %d\n", top10[i].nombre,
+           top10[i].escuderia, top10[i].posicion[pos]);
+  }
 }

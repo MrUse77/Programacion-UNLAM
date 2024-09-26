@@ -16,7 +16,6 @@ mult:
     li t1,0
     bnez t0,loop
     li a0,0
-    ret
 loop:
     addi t0,t0,-1
     add t1,t1,a1

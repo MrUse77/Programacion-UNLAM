@@ -22,7 +22,7 @@ printVector:
     bne x2,a2,printVector
     ret
 coma:
-    li a0,59,
+    li a0,59
     li a7,11
     ecall
     j printVector

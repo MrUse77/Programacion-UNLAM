@@ -1,37 +1,20 @@
 //
 // Created by agusd on 23/5/2024.
 //
+#include "flush.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <string.h>
-void flush(FILE *stream)
-{
-  int c;
-  if (stream != stdin)
-  {
-    // generar error
-    exit(EXIT_FAILURE);
-  }
-  do
-  {
-    c = getchar();
-  } while (c != EOF && c != '\n');
-}
-void fsgetsP(char *texto, int largo)
-{
-  int i = 0;
+#include <time.h>
+void fsgetsP(char *texto, int largo) {
+
   flush(stdin);
   fgets(texto, largo, stdin);
-  while (*(texto + i) != '\0')
-  {
-    if (*(texto + i) == '\n')
-    {
-      *(texto + i) = '\0';
-    }
-    else
-    {
-      i++;
+  while (*(texto) != '\0') {
+    if (*(texto) == '\n') {
+      *(texto) = '\0';
+    } else {
+      texto++;
     }
   }
 }
@@ -46,30 +29,26 @@ void ej5();
 int *Buscar5(int[], int, int);
 void ej6();
 int *BuscarMayor6(int[], int);
-typedef struct
-{
+typedef struct {
   int codigo;
   char descripcion[31];
   float precio;
 } sProductos;
 void ej7();
-typedef struct
-{
+typedef struct {
   char nom[31];
   int dni;
 } alumno;
 void ej8();
 int Cargar8(alumno *, int);
 void Mostrar8(alumno *, int);
-int main()
-{
+int main() {
   srand(time(NULL));
   int opcion;
   printf("EJERCICIOS DE PUNTEROS\n");
   printf("Elija el ejercicio que desea realizar: \n");
   scanf("%d", &opcion);
-  switch (opcion)
-  {
+  switch (opcion) {
   case 1:
     ej1();
     break;
@@ -95,7 +74,7 @@ int main()
     ej8();
     break;
   }
-  system("pause");
+  //  system("pause");
   return 0;
 }
 // 5.1 Crear una variable entera y un puntero a dicha variable
@@ -107,11 +86,9 @@ int main()
 //  d) el contenido de la variable accediendo mediante el puntero
 //  e) el contenido del puntero
 
-void ej1()
-{
-  int num;
+void ej1() {
+  int num = rand();
   int *p;
-  num = rand();
   p = &num;
   *p = 10;
   printf("Numero aleatorio: %d\n", *p);
@@ -121,18 +98,16 @@ void ej1()
   printf("contenido de la variable accediendo mediante el puntero: %d\n", *p);
   printf("Contenido del puntero: %p\n", p);
 }
-void ej2()
-{
+void ej2() {
   int a, b, *pa, *pb, suma;
-  a = rand();
-  b = rand();
+  a = rand() % 100;
+  b = rand() % 100;
   pa = &a;
   pb = &b;
   suma = *pa + *pb;
   printf("La suma de %d + %d es: %d\n", b, a, suma);
 }
-void ej3()
-{
+void ej3() {
   int a, *pa;
   float b, *pb;
   char c, *pc;
@@ -146,8 +121,7 @@ void ej3()
   printf("El caracter es: %c\n", c);
 }
 
-void Carga3(int *a, float *b, char *c)
-{
+void Carga3(int *a, float *b, char *c) {
   printf("Ingrese un valor entero: ");
   scanf("%d", a);
   printf("Ingrese un valor flotante: ");
@@ -156,65 +130,55 @@ void Carga3(int *a, float *b, char *c)
   scanf(" %c", c);
 }
 
-void ej4()
-{
+void ej4() {
   int vector[10];
   Carga4(vector, 10);
   Mostrar4(vector, 10);
 }
-void Carga4(int *v, int N)
-{
+void Carga4(int *v, int N) {
   int i;
-  for (i = 0; i < N; i++)
-  {
+  for (i = 0; i < N; i++) {
     printf("Ingrese un valor: \n");
     scanf("%d", v + i);
   }
 }
-void Mostrar4(int *v, int N)
-{
+void Mostrar4(int *v, int N) {
   int i;
-  for (i = 0; i < N; i++)
-  {
+  for (i = 0; i < N; i++) {
     printf("%d\n", *(v + i));
   }
 }
-// 5.5 Al programa anterior agregarle una función que reciba la dirección de inicio del vector y un número a buscar
-//  y retorne un puntero al dato encontrado o NULL sino lo encuentra. En el main agregar un proceso de
-//  búsqueda que se repita hasta ingresar un número negativo o cero a buscar. Si se lo encontró se debe
-// indicar en que posición del vector estaba (calcular dicha posición utilizando la dirección retornada)
-void ej5()
-{
+// 5.5 Al programa anterior agregarle una función que reciba la dirección de
+// inicio del vector y un número a buscar
+//  y retorne un puntero al dato encontrado o NULL sino lo encuentra. En el main
+//  agregar un proceso de búsqueda que se repita hasta ingresar un número
+//  negativo o cero a buscar. Si se lo encontró se debe
+// indicar en que posición del vector estaba (calcular dicha posición utilizando
+// la dirección retornada)
+void ej5() {
   int vector[10], num, *p;
   Carga4(vector, 10);
   Mostrar4(vector, 10);
-  do
-  {
+  do {
     printf("Ingrese el numero a buscar: ");
     scanf("%d", &num);
     p = Buscar5(vector, num, 10);
     printf("\n%p\n", p);
     printf("\n%p\n", p - vector);
     printf("\n%p\n", vector);
-    if (p == NULL)
-    {
+    if (p == NULL) {
       printf("El numero a buscar no se encuentra en el vector\n");
-    }
-    else
-    {
+    } else {
 
       printf("El numero a buscar esta en la posicion: %d\n", (p - vector));
     }
   } while (num > 0);
 }
 
-int *Buscar5(int *v, int num, int N)
-{
+int *Buscar5(int *v, int num, int N) {
   int i = 0;
-  while (i <= N)
-  {
-    if (*(v + i) == num)
-    {
+  while (i <= N) {
+    if (*(v + i) == num) {
       printf("%p,%d\n", (v + i), i);
       return (v + i);
     }
@@ -225,13 +189,12 @@ int *Buscar5(int *v, int num, int N)
 
 // 5.6 Cargar un vector de enteros con números aleatorios de 3 cifras máximo.
 // Realizar una función que retorne un puntero al mayor valor del vector
-// Mostrar el máximo valor mediante el puntero y la posición en la cual se encuentra
-void ej6()
-{
+// Mostrar el máximo valor mediante el puntero y la posición en la cual se
+// encuentra
+void ej6() {
   int vec[10];
 
-  for (int i = 0; i < 10; i++)
-  {
+  for (int i = 0; i < 10; i++) {
     // numero de 3 cifras maximo
     vec[i] = rand() % 1000;
     printf("%d\n", vec[i]);
@@ -239,21 +202,17 @@ void ej6()
   int *ptr = BuscarMayor6(vec, 10);
   printf("El mayor es: %d, en la pos %p\n", *ptr, ptr);
 }
-int *BuscarMayor6(int *vec, int n)
-{
+int *BuscarMayor6(int *vec, int n) {
   int *ptr = vec;
-  for (int i = 0; i < n; i++)
-  {
-    if (*ptr < *(vec + i))
-    {
+  for (int i = 0; i < n; i++) {
+    if (*ptr < *(vec + i)) {
       ptr = (vec + i);
     }
   }
   return ptr;
 }
 
-void ej7()
-{
+void ej7() {
   sProductos producto;
   sProductos *pProducto;
   pProducto = &producto;
@@ -269,8 +228,7 @@ void ej7()
   printf("Precio: %.2f\n", pProducto->precio);
 }
 
-void ej8()
-{
+void ej8() {
   alumno alu[30];
   alumno *pAlu;
   pAlu = alu;
@@ -279,17 +237,14 @@ void ej8()
   Mostrar8(pAlu, i);
 }
 
-int Cargar8(alumno *alu, int n)
-{
+int Cargar8(alumno *alu, int n) {
   int i;
-  for (i = 0; i < n; i++)
-  {
+  for (i = 0; i < n; i++) {
     printf("Ingrese el nombre del alumno: ");
     fsgetsP(alu->nom, 31);
     printf("Ingrese el DNI del alumno: ");
     scanf("%d", &alu->dni);
-    if (alu->dni < 0)
-    {
+    if (alu->dni < 0) {
       return i;
     }
     alu++;
@@ -297,10 +252,8 @@ int Cargar8(alumno *alu, int n)
   return i;
 }
 
-void Mostrar8(alumno *alu, int n)
-{
-  for (int i = 0; i < n; i++)
-  {
+void Mostrar8(alumno *alu, int n) {
+  for (int i = 0; i < n; i++) {
     printf("Nombre: %s \n", alu->nom);
     printf("DNI: %d \n", alu->dni);
     alu++;

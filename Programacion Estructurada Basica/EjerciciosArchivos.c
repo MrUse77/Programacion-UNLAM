@@ -2,12 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#define dir "../archivosParaEjercicios/"
 void flush(FILE *stream) {
   int c;
-  if (stream != stdin) {
-    // generar error
-    exit(EXIT_FAILURE);
-  }
   do {
     c = getchar();
   } while (c != EOF && c != '\n');
@@ -16,11 +13,11 @@ void fsgetsP(char *texto, int largo) {
   int i = 0;
   flush(stdin);
   fgets(texto, largo, stdin);
-  while (*(texto + i) != '\0') {
-    if (*(texto + i) == '\n') {
-      *(texto + i) = '\0';
+  while (*texto != '\0') {
+    if (*texto == '\n') {
+      *texto = '\0';
     } else {
-      i++;
+      texto++;
     }
   }
 }
@@ -43,7 +40,7 @@ typedef struct {
   float promedio;
 } Alumno;
 void ej1();
-void LECTURA(FILE *);
+void LECTURA(FILE *, char[]);
 void ej2();
 typedef struct {
   int mes;
@@ -147,24 +144,29 @@ void ej1() {
                       {24387232, "Mash Burndead", 1, 1},
                       {1238912, "Maximiliano Barata Vaz", 9, 10},
                       {12328, "El Gabi", 7, 6},
-                      {129378291, "lolero puto", 2, 1}};
+                      {129378291, "lolero puto", 2, 1}},
+         *pAl;
+  pAl = &alumno[0];
+  char dire[100];
+  strcpy(dire, dir);
   FILE *f;
   int i;
-  f = fopen("../archivosParaEjercicios/alumnos.dat", "wb");
+  f = fopen(strcat(dire, "alumnos.dat"), "wb");
   if (f == NULL) {
     printf("Error al abrir el archivo");
     exit(1);
   }
   for (i = 0; i < 5; i++) {
-    fwrite(&alumno[i], sizeof(Alumno), 1, f);
+    (pAl + i)->promedio = ((pAl + i)->nota1 + (pAl + i)->nota2) / 2.0;
+    fwrite(pAl + i, sizeof(Alumno), 1, f);
   }
   fclose(f);
-  LECTURA(f);
+  LECTURA(f, dire);
 }
-void LECTURA(FILE *f) {
+void LECTURA(FILE *f, char dire[]) {
   Alumno alumno[5];
   int i = 0;
-  f = fopen("../archivosParaEjercicios/alumnos.dat", "rb");
+  f = fopen(dire, "rb");
   if (f == NULL) {
     printf("Error al abrir el archivo");
     exit(1);
@@ -184,23 +186,35 @@ void LECTURA(FILE *f) {
 void ej2() {
   FILE *f, *aprob, *prom, *reprob;
   Alumno alumno[5];
+  char dire[100];
+  char dirAprob[100];
+  char dirReprob[100];
+  char dirProm[100];
+  strcpy(dirAprob, dir);
+  strcpy(dirReprob, dir);
+  strcpy(dirProm, dir);
+  strcpy(dire, dir);
+  strcat(dire, "alumnos.dat");
+  strcat(dirAprob, "aprobados.dat");
+  strcat(dirReprob, "reprobados.dat");
+  strcat(dirProm, "promocionados.dat");
   int i = 0;
-  f = fopen("../archivosParaEjercicios/alumnos.dat", "rb");
+  f = fopen(dire, "rb");
   if (f == NULL) {
     printf("Error al abrir el archivo");
     exit(1);
   }
-  aprob = fopen("../archivosParaEjercicios/APROBADOS.dat", "wb");
+  aprob = fopen(dirAprob, "wb");
   if (aprob == NULL) {
     printf("Error al abrir el archivo");
     exit(1);
   }
-  prom = fopen("../archivosParaEjercicios/PROMOCIONADOS.dat", "wb");
+  prom = fopen(dirProm, "wb");
   if (prom == NULL) {
     printf("Error al abrir el archivo");
     exit(1);
   }
-  reprob = fopen("../archivosParaEjercicios/REPROBADOS.dat", "wb");
+  reprob = fopen(dirReprob, "wb");
   if (reprob == NULL) {
     printf("Error al abrir el archivo");
     exit(1);
@@ -227,17 +241,16 @@ void ej2() {
   fclose(prom);
   fclose(reprob);
   fclose(f);
-  aprob = fopen("../archivosParaEjercicios/APROBADOS.dat", "rb");
-  prom = fopen("../archivosParaEjercicios/PROMOCIONADOS.dat", "rb");
-  reprob = fopen("../archivosParaEjercicios/REPROBADOS.dat", "rb");
-
+  aprob = fopen(dirAprob, "rb");
+  prom = fopen(dirProm, "rb");
+  reprob = fopen(dirReprob, "rb");
   i = 0;
 
   printf("PROMOCIONADOS\n");
   printf("DNI \t NOMBRE \t NOTA 1 \t NOTA 2 \t PROMEDIO\n");
   fread(&alumno[i], sizeof(Alumno), 1, prom);
   while (!feof(prom)) {
-    printf("%d \t %s \t %d \t %d \t %.2f\n", alumno[i].dni, alumno[i].nombre,
+    printf("%d\t%s\t%d\t%d\t%.2f\n", alumno[i].dni, alumno[i].nombre,
            alumno[i].nota1, alumno[i].nota2, alumno[i].promedio);
     i++;
     fread(&alumno[i], sizeof(Alumno), 1, prom);

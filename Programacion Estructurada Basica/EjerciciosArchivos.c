@@ -41,6 +41,7 @@ typedef struct {
 } Alumno;
 void ej1();
 void LECTURA(FILE *, char[]);
+/******************************************/
 void ej2();
 typedef struct {
   int mes;
@@ -49,6 +50,7 @@ typedef struct {
   int codigo;
   float importe;
 } venta;
+/*****************************************/
 void ej3();
 void crearVentas3();
 typedef struct {
@@ -56,14 +58,22 @@ typedef struct {
   float price;
   char desc[51];
 } PRECIOS;
+void ventasMesAnio(int, int, int[][10]);
+void importeMesAnio(int, int, float[][10]);
+int IngresoRango(int *, int *);
+void LlenarMatrices(int, int, int, int[][10], float[][10], FILE *, venta *);
+void menu3(int, int, float[][10], int[][10]);
+/*****************************************/
 void ej4();
 typedef struct {
   int code;
   float price;
   char desc[51];
 } PRODUCTOS;
+/*****************************************/
 void ej5();
 int buscar5(FILE *, int);
+/*****************************************/
 void ej6();
 typedef struct {
   int code;
@@ -74,6 +84,7 @@ typedef struct {
   int code;
   int stockF;
 } FALTANTES;
+/*****************************************/
 void ej7();
 int buscar7(FILE *, int);
 int buscar7Faltante(FILE *, int);
@@ -88,6 +99,7 @@ typedef struct {
   int dni;
   int vuelo;
 } PASAJEROS;
+/*****************************************/
 void ej8();
 typedef struct {
   int dni;
@@ -99,8 +111,10 @@ typedef struct {
   int tel;
   char AyN[21];
 } INTERESADOS;
+/*****************************************/
 void ej9();
 int buscar9(FILE *, int);
+/*****************************************/
 int main() {
   srand(time(NULL));
   int opcion;
@@ -292,104 +306,46 @@ void ej3() {
   FILE *f;
   venta v[100], *vp;
   vp = v;
-  int anio1, anio2;
+  int anio1, anio2, rango, *a1, *a2;
   int ventas[12][10];
   float importes[12][10];
   crearVentas3();
-  f = fopen("../archivosParaEjercicios/ventas.dat", "rb");
+  char dirVentas[100];
+  strcpy(dirVentas, dir);
+  strcat(dirVentas, "ventas.dat");
+  a1 = &anio1;
+  a2 = &anio2;
+
+  f = fopen(dirVentas, "rb");
   if (f == NULL) {
     printf("Error al abrir el archivo");
     exit(1);
   }
-  printf("Ingrewsa un rango de anios: ");
-  printf("Desde: ");
-  scanf("%d", &anio1);
-  printf("Hasta: ");
-  scanf("%d", &anio2);
-  for (int i = 0; i < 12; i++) {
-    for (int j = anio1; j < anio2 + 1; j++) {
-      ventas[i][j - anio1] = 0;
-      importes[i][j - anio1] = 0;
-    }
-  }
-  fread(v, sizeof(venta), 1, f);
-  while (!feof(f)) {
-    if (vp->anio >= anio1 && vp->anio <= anio2) {
-      ventas[vp->mes - 1][vp->anio - anio1]++;
-      importes[vp->mes - 1][vp->anio - anio1] += vp->importe;
-    }
-    fread(v, sizeof(venta), 1, f);
-  }
-  fread(v, sizeof(venta), 1, f);
-
+  rango = IngresoRango(a1, a2);
+  printf("%d,%d,%d", anio1, anio2, rango);
+  LlenarMatrices(anio1, anio2, rango, ventas, importes, f, vp);
   fclose(f);
-  printf("Detalle de ventas por mes/año\n\t");
-  for (int mes = 1; mes <= 12; mes++) {
-    printf("Mes %2d\t", mes);
-  }
-  printf("\n");
-  for (int i = 0; i < anio2 - anio1 + 1; i++) {
-    printf("%4d", anio1 + i);
-    for (int j = 0; j < 12; j++) {
-      printf(" \t%d", ventas[j][i]);
-    }
-    printf("\n");
-  }
+  ventasMesAnio(anio1, anio2, ventas);
   printf("Desea ver el detalle de importes por mes/año? (s/n): ");
   char c;
   scanf(" %c", &c);
   if (c == 's') {
-    printf("Detalle de importes por mes/año\n\t");
-    for (int mes = 1; mes <= 12; mes++) {
-      printf("Mes %2d\t", mes);
-    }
-    printf("\n");
-    for (int i = 0; i < anio2 - anio1 + 1; i++) {
-      printf("%4d\t", anio1 + i);
-      for (int j = 0; j < 12; j++) {
-        printf("%.2f\t", importes[j][i]);
-      }
-      printf("\n");
-    }
-  }
-  int opcion;
-  do {
-    printf("Seleccione la opcion que quiera: \n 1. Ver el detalle de importes "
-           "por mes/año\n 2. Ver el detalle de ventas mes/año \n 3. Finalizar "
-           "el programa\n");
-    scanf("%d", &opcion);
-    switch (opcion) {
-    case 1:
-      printf("Detalle de importes por mes/año\n\t");
-      for (int mes = 1; mes <= 12; mes++) {
-        printf("Mes %2d\t", mes);
-      }
-      printf("\n");
-      for (int i = 0; i < anio2 - anio1 + 1; i++) {
-        printf("%4d\t", anio1 + i);
-        for (int j = 0; j < 12; j++) {
-          printf("%.2f\t", importes[j][i]);
-        }
-        printf("\n");
-      }
-      break;
-    case 2:
-      printf("Detalle de ventas por mes/año\n\t");
-      for (int mes = 1; mes <= 12; mes++) {
-        printf("Mes %2d\t", mes);
-      }
-      printf("\n");
-      for (int i = 0; i < anio2 - anio1 + 1; i++) {
-        printf("%4d", anio1 + i);
-        for (int j = 0; j < 12; j++) {
-          printf(" \t%d", ventas[j][i]);
-        }
-        printf("\n");
-      }
-      break;
-    }
+    importeMesAnio(anio1, anio2, importes);
 
-  } while (opcion != 3);
+    menu3(anio1, anio2, importes, ventas);
+  }
+}
+int IngresoRango(int *anio1, int *anio2) {
+  do {
+    printf("Ingresa un rango de anios: ");
+    printf("Desde: ");
+    scanf("%d", anio1);
+  } while (*anio1 < 2014 || *anio1 > 2023);
+  do {
+    printf("Hasta: ");
+    scanf("%d", anio2);
+  } while (*anio2 < *anio1 || *anio2 > 2023);
+  return *anio2 - *anio1 + 1;
 }
 void crearVentas3() {
   FILE *f;
@@ -410,10 +366,75 @@ void crearVentas3() {
   }
   fclose(f);
 }
+void LlenarMatrices(int anio1, int anio2, int rango, int ventas[][10],
+                    float importes[][10], FILE *f, venta *vp) {
+  for (int i = 0; i < 12; i++) {
+    for (int j = 0; j < rango; j++) {
+      ventas[i][j] = 0;
+      importes[i][j] = 0;
+    }
+  }
+  fread(vp, sizeof(venta), 1, f);
+  while (!feof(f)) {
+    if (vp->anio >= anio1 && vp->anio <= anio2) {
+      ventas[vp->mes - 1][vp->anio - anio1]++;
+      importes[vp->mes - 1][vp->anio - anio1] += vp->importe;
+    }
+    fread(vp, sizeof(venta), 1, f);
+  }
+}
+void ventasMesAnio(int anio1, int anio2, int ventas[][10]) {
+  printf("Detalle de ventas por mes/año\n\t");
+  for (int mes = 1; mes <= 12; mes++) {
+    printf("Mes %2d\t", mes);
+  }
+  printf("\n");
+  for (int i = 0; i < anio2 - anio1 + 1; i++) {
+    printf("%4d", anio1 + i);
+    for (int j = 0; j < 12; j++) {
+      printf(" \t%d", ventas[j][i]);
+    }
+    printf("\n");
+  }
+}
+
+void importeMesAnio(int anio1, int anio2, float importes[][10]) {
+  printf("Detalle de importes por mes/año\n\t");
+  for (int mes = 1; mes <= 12; mes++) {
+    printf("Mes %2d\t", mes);
+  }
+  printf("\n");
+  for (int i = 0; i < anio2 - anio1 + 1; i++) {
+    printf("%4d\t", anio1 + i);
+    for (int j = 0; j < 12; j++) {
+      printf("%.2f\t", importes[j][i]);
+    }
+    printf("\n");
+  }
+}
+
+void menu3(int anio1, int anio2, float importes[][10], int ventas[][10]) {
+  int opcion;
+  do {
+    printf("Seleccione la opcion que quiera: \n 1. Ver el detalle de importes "
+           "por mes/año\n 2. Ver el detalle de ventas mes/año \n 3. Finalizar "
+           "el programa\n");
+    scanf("%d", &opcion);
+    switch (opcion) {
+    case 1:
+      importeMesAnio(anio1, anio2, importes);
+      break;
+    case 2:
+      ventasMesAnio(anio1, anio2, ventas);
+      break;
+    }
+  } while (opcion != 3);
+}
+
 /*Realizar un programa que permite actualizar una lista de precios en forma
-masiva, ingresando un porcentaje de incremento. El archivo se llama precios.dat
-y fue generado utilizando la siguiente estructura: • Código (entero) • Precio
-(float) • Descripción (de hasta 50 caracteres)*/
+masiva, ingresando un porcentaje de incremento. El archivo se llama
+precios.dat y fue generado utilizando la siguiente estructura: • Código
+(entero) • Precio (float) • Descripción (de hasta 50 caracteres)*/
 void ej4() {
   FILE *f = fopen("../archivosParaEjercicios/PRECIOS.dat", "r + b");
   if (f == NULL) {

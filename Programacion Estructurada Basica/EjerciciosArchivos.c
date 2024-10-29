@@ -45,6 +45,7 @@ void ej1();
 void LECTURA(FILE*, char[]);
 /******************************************/
 void ej2();
+/*****************************************/
 typedef struct {
 	int mes;
 	int anio;
@@ -52,7 +53,6 @@ typedef struct {
 	int codigo;
 	float importe;
 } venta;
-/*****************************************/
 void ej3();
 void crearVentas3();
 typedef struct {
@@ -66,13 +66,18 @@ int IngresoRango(int*, int*);
 void LlenarMatrices(int, int, int, int[][10], float[][10], FILE*, venta*);
 void menu3(int, int, float[][10], int[][10]);
 /*****************************************/
+typedef struct {
+	int code;
+	float price;
+	char desc[51];
+} PRECIOS;
 void ej4();
+/*****************************************/
 typedef struct {
 	int code;
 	float price;
 	char desc[51];
 } PRODUCTOS;
-/*****************************************/
 void ej5();
 int buscar5(FILE*, int);
 /*****************************************/
@@ -88,8 +93,8 @@ typedef struct {
 } FALTANTES;
 /*****************************************/
 void ej7();
-int buscar7(FILE*, int);
-int buscar7Faltante(FILE*, int);
+int buscar7(FILE*, int, long);
+int buscar7Faltante(FILE*, int, long);
 typedef struct {
 	char code[11];
 	int day;
@@ -154,7 +159,7 @@ int main() {
 	}
 	return 0;
 }
-
+/******************************************************************/
 void ej1() {
 	Alumno alumno[5] = { {44937522, "Agustin Doricich", 10, 10},
 											{24387232, "Mash Burndead", 1, 1},
@@ -199,6 +204,7 @@ void LECTURA(FILE* f, char dire[]) {
 	}
 	fclose(f);
 }
+/******************************************************************/
 void ej2() {
 	FILE* f, * aprob, * prom, * reprob;
 	Alumno alumno[5];
@@ -291,17 +297,7 @@ void ej2() {
 	fclose(prom);
 	fclose(reprob);
 }
-// Se pide ingresar un rango de años y mostrar un cuadro ventas realizadas en
-// cada mes de cada año. Por ejemplo,
-//  si se ingresa desde 2020 a 2022 debe mostrar lo siguiente:
-//      Mes 1 Mes 2 Mes 3 ……. Mes 12
-// 2020  xxx    xxx   xxx       xxx
-// 2021  xxx    xxx   xxx       xxx
-// 2022  xxx    xxx   xxx       xxx
-// Una vez configurados los años debe poder cambiarse la vista para en lugar de
-// visualizar cantidad de ventas, ver el
-//  detalle de importe por mes/año. El usuario podrá alternar las vistas las
-//  veces que quiera. Agregar una opción para finalizar el programa.
+/******************************************************************/
 void ej3() {
 	FILE* f;
 	venta v[100], * vp;
@@ -397,7 +393,6 @@ void ventasMesAnio(int anio1, int anio2, int ventas[][10]) {
 		printf("\n");
 	}
 }
-
 void importeMesAnio(int anio1, int anio2, float importes[][10]) {
 	printf("Detalle de importes por mes/año\n\t");
 	for (int mes = 1; mes <= 12; mes++) {
@@ -412,7 +407,6 @@ void importeMesAnio(int anio1, int anio2, float importes[][10]) {
 		printf("\n");
 	}
 }
-
 void menu3(int anio1, int anio2, float importes[][10], int ventas[][10]) {
 	int opcion;
 	do {
@@ -430,15 +424,12 @@ void menu3(int anio1, int anio2, float importes[][10], int ventas[][10]) {
 		}
 	} while (opcion != 3);
 }
-
-/*Realizar un programa que permite actualizar una lista de precios en forma
-masiva, ingresando un porcentaje de incremento. El archivo se llama
-precios.dat y fue generado utilizando la siguiente estructura: • Código
-(entero) • Precio (float) • Descripción (de hasta 50 caracteres)*/
+/*****************************************************************/
 void ej4() {
 	char dire[100];
 	strcpy(dire, dir);
-	strcat(dire, "PRECIOS.dat");
+	strcat(dire, "6.4/PRECIOS.dat");
+	printf("%s\n", dire);
 	FILE* f = fopen(dire, "r + b");
 	if (f == NULL) {
 		printf("Error al abrir el archivo");
@@ -456,13 +447,15 @@ void ej4() {
 		p->price += p->price * porcentaje / 100;
 		printf("Precio actualizado: %.2f\n", p->price);
 		printf("Descripcion: %s\n", p->desc);
-		long int desp = sizeof(PRECIOS);
-		fseek(f, -desp, SEEK_CUR); // Retrocedo 60 bytes
-		fwrite(p, desp, 1, f);             // Avanzo 60 bytes (escribo en la misma posicion)
-		fseek(f, 0, SEEK_CUR); // Retrocedo 60 bytes
-		fread(p, desp, 1, f); // Avanzo 60 bytes (leo la posicion siguiente a la que escribi)
+		long desp = -sizeof(PRECIOS);
+		fseek(f, desp, SEEK_CUR); // Retrocedo 60 bytes
+		fwrite(p, sizeof(PRECIOS), 1,
+					 f);             // Avanzo 60 bytes (escribo en la misma posicion)
+		fseek(f, 0, SEEK_CUR); // Limpio el buffer
+		fread(p, sizeof(PRECIOS), 1, f); // Leo la siguiente posicion
 	}
 }
+/*****************************************************************/
 void ej5() {
 	char dire[100];
 	strcpy(dire, dir);
@@ -536,6 +529,7 @@ int buscar5(FILE* f, int code) {
 	rewind(f);
 	return i;
 }
+/*****************************************************************/
 void ej6() {
 	char dire[100], dire2[100];
 	strcpy(dire, dir);
@@ -585,59 +579,79 @@ void ej6() {
 	fclose(f);
 	fclose(f2);
 }
+/*****************************************************************/
 void ej7() {
-	FILE* FSTOCK = fopen("../archivosParaEjercicios/STOCK.dat", "r+b"),
-		* FALTANTE = fopen("../archivosParaEjercicios/Faltantes.dat", "w+b");
+	char dire[100], dire2[100];
+	strcpy(dire, dir);
+	strcpy(dire2, dir);
+	strcat(dire, "6.7/STOCK.dat");
+	strcat(dire2, "6.7/Faltantes.dat");
+	FILE* FSTOCK = fopen(dire, "r+b"), * FALTANTE = fopen(dire2, "w+b");
 	if (!FSTOCK || !FALTANTE) {
-		perror("Error al abrir los archivos");
-		return;
+		printf("Error al abrir los archivos");
+		exit(1);
 	}
 	STOCK stock, * s;
 	FALTANTES faltante = { 0, 0 }, * f;
+	long despStock = sizeof(STOCK), despFaltante = sizeof(FALTANTES);
 	s = &stock;
 	f = &faltante;
 	int code, venta;
 	printf("CODGIOS: \n");
-	fread(s, sizeof(STOCK), 1, FSTOCK);
+	fread(s, despStock, 1, FSTOCK);
 	while (!feof(FSTOCK)) {
 		s->stock = rand() % 100;
-		fwrite(s, sizeof(STOCK), 1, FSTOCK);
+		fwrite(s, despStock, 1, FSTOCK);
 		fseek(FSTOCK, 0, SEEK_CUR);
 		printf("%d\n", s->code);
 		printf("%d\n", s->stock);
-		fread(s, sizeof(STOCK), 1, FSTOCK);
+		fread(s, despStock, 1, FSTOCK);
 	}
 	printf("Ingrese el codigo del producto a buscar: ");
 	scanf("%d", &code);
 	while (code != 0) {
-		int pos = buscar7(FSTOCK, code);
+		int pos = buscar7(FSTOCK, code, despStock);
 		if (pos == -1) {
 			printf("No se encontro el producto\n");
 		}
 		else {
-			fseek(FSTOCK, (pos - 1) * sizeof(STOCK), SEEK_SET);
-			fread(s, sizeof(STOCK), 1, FSTOCK);
-			printf("Ingrese la cantidad que se vendio: ");
-			venta = rand() % 100;
-			printf("%d\n", venta);
+			fseek(FSTOCK, (pos - 1) * despStock, SEEK_SET);
+			fread(s, despStock, 1, FSTOCK);
+
+			if (fread(f, sizeof(FALTANTES), 1, FALTANTE) == 1) {
+				fseek(FALTANTE, sizeof(FALTANTES), SEEK_CUR);
+				printf("Posicion: %ld\t,stockF: %d\n", ftell(FALTANTE), f->stockF);
+			}
+			else {
+				f->stockF = 0;
+				f->code = code;
+				fseek(FALTANTE, 0, SEEK_CUR);
+			}
+			printf("Posicion: %ld\t,stockF: %d\n", ftell(FALTANTE), f->stockF);
+			f->stockF += venta - s->stock;
+			s->stock = 0;
+			f->code = code;
+
 			if (venta > s->stock) {
-				int posF = buscar7Faltante(FALTANTE, code);
+				int posF = buscar7Faltante(FALTANTE, code, despFaltante);
+
 				printf("%d\n", posF);
 				if (posF == -1) {
 					fseek(FALTANTE, 0, SEEK_END);
 				}
 				else {
-					fseek(FALTANTE, (posF - 1) * sizeof(FALTANTES), SEEK_SET);
+					fseek(FALTANTE, (posF - 1) * despFaltante, SEEK_SET);
 				}
 				printf("Posicion: %ld\t\n", ftell(FALTANTE));
 
 				if (fread(f, sizeof(FALTANTES), 1, FALTANTE) == 1) {
-					fseek(FALTANTE, sizeof(FALTANTES), SEEK_CUR);
+					fseek(FALTANTE, -despFaltante, SEEK_CUR);
 					printf("Posicion: %ld\t,stockF: %d\n", ftell(FALTANTE), f->stockF);
 				}
 				else {
 					f->stockF = 0;
 					f->code = code;
+
 					fseek(FALTANTE, 0, SEEK_CUR);
 				}
 				printf("Posicion: %ld\t,stockF: %d\n", ftell(FALTANTE), f->stockF);
@@ -647,16 +661,15 @@ void ej7() {
 
 				printf("Posicion: %ld\t,stockF: %d\n", ftell(FALTANTE), f->stockF);
 
-				fwrite(f, sizeof(FALTANTES), 1, FALTANTE);
+				fwrite(f, despFaltante, 1, FALTANTE);
 				fflush(FALTANTE);
 			}
 			else {
 				s->stock -= venta;
 			}
-			long desp = sizeof(STOCK);
-			fseek(FSTOCK, -desp, SEEK_CUR);
+			fseek(FSTOCK, -despStock, SEEK_CUR);
 			printf("Posicion: %ld\t,stock: %d\n", ftell(FSTOCK), s->stock);
-			fwrite(s, sizeof(STOCK), 1, FSTOCK);
+			fwrite(s, despStock, 1, FSTOCK);
 			fflush(FSTOCK);
 			printf("Posicion: %ld\n", ftell(FSTOCK));
 		}
@@ -665,7 +678,7 @@ void ej7() {
 		scanf("%d", &code);
 	}
 	rewind(FSTOCK);
-	fread(s, sizeof(STOCK), 1, FSTOCK);
+	fread(s, despStock, 1, FSTOCK);
 	if (!feof(FSTOCK)) {
 		printf("STOCK ACTUALIZADO\n");
 	}
@@ -673,49 +686,49 @@ void ej7() {
 		printf("Codigo: %d\n", s->code);
 		printf("Stock: %d\n", s->stock);
 		printf("Descripcion: %s\n", s->desc);
-		fread(s, sizeof(STOCK), 1, FSTOCK);
+		fread(s, despStock, 1, FSTOCK);
 	}
 	rewind(FALTANTE);
-	fread(f, sizeof(FALTANTES), 1, FALTANTE);
+	fread(f, despFaltante, 1, FALTANTE);
 	if (!feof(FALTANTE))
 		printf("FALTANTES\n");
 	while (!feof(FALTANTE)) {
 		printf("Codigo: %d\n", f->code);
 		printf("Stock faltante: %d\n", f->stockF);
-		fread(f, sizeof(FALTANTES), 1, FALTANTE);
+		fread(f, despFaltante, 1, FALTANTE);
 	}
 }
-int buscar7(FILE* FSTOCK, int code) {
+int buscar7(FILE* FSTOCK, int code, long despStock) {
 	STOCK stock, * s;
 	s = &stock;
 	int i = -1;
 
 	rewind(FSTOCK);
-	fread(s, sizeof(STOCK), 1, FSTOCK);
+	fread(s, despStock, 1, FSTOCK);
 	while (!feof(FSTOCK)) {
 		if (s->code == code) {
-			i = ftell(FSTOCK) / sizeof(STOCK);
+			i = ftell(FSTOCK) / despStock;
 		}
-		fread(s, sizeof(STOCK), 1, FSTOCK);
+		fread(s, despStock, 1, FSTOCK);
 	}
 	return i;
 }
-int buscar7Faltante(FILE* FALTANTE, int code) {
+int buscar7Faltante(FILE* FALTANTE, int code, long despFaltante) {
 	FALTANTES faltante, * f;
 	f = &faltante;
 	int i = -1;
-
 	rewind(FALTANTE);
-	fread(f, sizeof(FALTANTES), 1, FALTANTE);
+	fread(f, despFaltante, 1, FALTANTE);
 	while (!feof(FALTANTE)) {
 		printf("Codigo: %d\n", f->code);
 		if (f->code == code) {
-			i = ftell(FALTANTE) / sizeof(FALTANTES);
+			i = ftell(FALTANTE) / despFaltante;
 		}
-		fread(f, sizeof(FALTANTES), 1, FALTANTE);
+		fread(f, despFaltante, 1, FALTANTE);
 	}
 	return i;
 }
+/*****************************************************************/
 void ej8() {
 	FILE* f = fopen("../archivosParaEjercicios/PASAJEROS.dat", "r+b"),
 		* f2 = fopen("../archivosParaEjercicios/VUELOS.dat", "r+b");
@@ -743,16 +756,14 @@ void ej8() {
 				fread(p, sizeof(PASAJEROS), 1, f);
 			}
 		}
-		long desp = sizeof(VUELOS);
 		fseek(f, 0, SEEK_SET);
-		fseek(f2, -desp, SEEK_CUR);
+		fseek(f2, -sizeof(VUELOS), SEEK_CUR);
 		printf("\n-----------------------------------------------------\n");
 		printf("Codigo: %s\n", v->code);
 		printf("Dia: %d\n", v->day);
 		printf("Vuelo: %d\n", v->vuelo);
 		printf("Precio: %.2f\n", v->price);
 		printf("Pasajeros: %d\n", v->pasajeros);
-
 		printf("\n-----------------------------------------------------\n");
 		fwrite(v, sizeof(VUELOS), 1, f2);
 

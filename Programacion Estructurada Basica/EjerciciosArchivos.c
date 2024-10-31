@@ -602,15 +602,11 @@ void ej7() {
   long despStock = sizeof(STOCK), despFaltante = sizeof(FALTANTES);
   s = &stock;
   f = &faltante;
-  int code, venta;
+  int code, venta, hit;
   printf("CODGIOS: \n");
   fread(s, despStock, 1, FSTOCK);
   while (!feof(FSTOCK)) {
-    s->stock = rand() % 100;
-    fwrite(s, despStock, 1, FSTOCK);
-    fseek(FSTOCK, 0, SEEK_CUR);
-    printf("%d\n", s->code);
-    printf("%d\n", s->stock);
+    printf("%d, %s, %d\n", s->code, s->desc, s->stock);
     fread(s, despStock, 1, FSTOCK);
   }
   printf("Ingrese el codigo del producto a buscar: ");
@@ -620,69 +616,35 @@ void ej7() {
     if (pos == -1) {
       printf("No se encontro el producto\n");
     } else {
-      fseek(FSTOCK, (pos - 1) * despStock, SEEK_SET);
-      fread(s, despStock, 1, FSTOCK);
-
-      if (fread(f, sizeof(FALTANTES), 1, FALTANTE) == 1) {
-        fseek(FALTANTE, sizeof(FALTANTES), SEEK_CUR);
-        printf("Posicion: %ld\t,stockF: %d\n", ftell(FALTANTE), f->stockF);
-      } else {
-        f->stockF = 0;
-        f->code = code;
-        fseek(FALTANTE, 0, SEEK_CUR);
-      }
-      printf("Posicion: %ld\t,stockF: %d\n", ftell(FALTANTE), f->stockF);
-      f->stockF += venta - s->stock;
-      s->stock = 0;
-      f->code = code;
-
       if (venta > s->stock) {
         int posF = buscar7Faltante(FALTANTE, code, despFaltante);
-
-        printf("%d\n", posF);
         if (posF == -1) {
           fseek(FALTANTE, 0, SEEK_END);
+          fread(f, despFaltante, 1, FALTANTE);
+          f->stockF = 0;
         } else {
           fseek(FALTANTE, (posF - 1) * despFaltante, SEEK_SET);
+          fread(f, despFaltante, 1, FALTANTE);
         }
-        printf("Posicion: %ld\t\n", ftell(FALTANTE));
-
-        if (fread(f, sizeof(FALTANTES), 1, FALTANTE) == 1) {
-          fseek(FALTANTE, -despFaltante, SEEK_CUR);
-          printf("Posicion: %ld\t,stockF: %d\n", ftell(FALTANTE), f->stockF);
-        } else {
-          f->stockF = 0;
-          f->code = code;
-
-          fseek(FALTANTE, 0, SEEK_CUR);
-        }
-        printf("Posicion: %ld\t,stockF: %d\n", ftell(FALTANTE), f->stockF);
+        fseek(FALTANTE, 0, SEEK_CUR);
         f->stockF += venta - s->stock;
         s->stock = 0;
         f->code = code;
-
-        printf("Posicion: %ld\t,stockF: %d\n", ftell(FALTANTE), f->stockF);
-
         fwrite(f, despFaltante, 1, FALTANTE);
         fflush(FALTANTE);
       } else {
         s->stock -= venta;
       }
       fseek(FSTOCK, -despStock, SEEK_CUR);
-      printf("Posicion: %ld\t,stock: %d\n", ftell(FSTOCK), s->stock);
       fwrite(s, despStock, 1, FSTOCK);
       fflush(FSTOCK);
-      printf("Posicion: %ld\n", ftell(FSTOCK));
     }
+    printf("Stock actualizado\n");
     printf("Ingrese el codigo del producto a buscar: ");
-
     scanf("%d", &code);
   }
   rewind(FSTOCK);
   fread(s, despStock, 1, FSTOCK);
-  if (!feof(FSTOCK)) {
-    printf("STOCK ACTUALIZADO\n");
-  }
   while (!feof(FSTOCK)) {
     printf("Codigo: %d\n", s->code);
     printf("Stock: %d\n", s->stock);
@@ -691,8 +653,6 @@ void ej7() {
   }
   rewind(FALTANTE);
   fread(f, despFaltante, 1, FALTANTE);
-  if (!feof(FALTANTE))
-    printf("FALTANTES\n");
   while (!feof(FALTANTE)) {
     printf("Codigo: %d\n", f->code);
     printf("Stock faltante: %d\n", f->stockF);
@@ -706,7 +666,7 @@ int buscar7(FILE *FSTOCK, int code, long despStock) {
 
   rewind(FSTOCK);
   fread(s, despStock, 1, FSTOCK);
-  while (!feof(FSTOCK)) {
+  while (!feof(FSTOCK) && i == -1) {
     if (s->code == code) {
       i = ftell(FSTOCK) / despStock;
     }

@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(Programacion_Estructurada_Basica)
 set(CMAKE_C_STANDARD 23)
+set(CMAKE_BUILD_TYPE Debug)
 
 include_directories(${CMAKE_SOURCE_DIR}/includes)
 add_library(flush STATIC includes/flush.c)

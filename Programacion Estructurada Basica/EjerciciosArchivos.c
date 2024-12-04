@@ -72,7 +72,7 @@ typedef struct {
   char desc[51];
 } PRODUCTOS;
 void ej5();
-int buscar5(FILE *, int);
+int buscar5(FILE *, int, PRODUCTOS *);
 /*****************************************/
 void ej6();
 typedef struct {
@@ -474,16 +474,18 @@ void ej5() {
   scanf("%d", &code);
   while (code != 0) {
     rewind(f);
-    int pos = buscar5(f, code);
+    int pos = buscar5(f, code, p);
     if (pos == -1) {
       printf("No se encontro el producto\n");
     } else {
-      fseek(f, pos * size, SEEK_SET);
-      fread(p, size, 1, f);
-      printf("Codigo: %d, Precio: %f, Descripcion: %s\n", p->code, p->price,
-             p->desc);
+      printf("Codigo: %d, Precio: %f, Descripcion: %s,Posicion:%d\n", p->code,
+             p->price, p->desc, (ftell(f) / sizeof(PRODUCTOS)));
       printf("Ingrese el nuevo precio: ");
-      scanf("%f", &p->price);
+      float price;
+      scanf("%f", &price);
+      p->price = price;
+      printf("Codigo: %d, Precio: %f, Descripcion: %s,Posicion:%d\n", p->code,
+             p->price, p->desc, (ftell(f) / sizeof(PRODUCTOS)));
       fseek(f, -size, SEEK_CUR);
       fwrite(p, size, 1, f);
     }
@@ -498,19 +500,19 @@ void ej5() {
     exit(1);
   }
   fprintf(csv, "Codigo; Precio; Descripcion\n");
-  fread(&productos, size, 1, f);
+  fread(p, size, 1, f);
   while (!feof(f)) {
     fprintf(csv, "%d; %.2f; %s\n", p->code, p->price, p->desc);
-    fread(&productos, size, 1, f);
+    fread(p, size, 1, f);
   }
   fclose(f);
   fclose(csv);
 }
 
-int buscar5(FILE *f, int code) {
-  PRODUCTOS productos, *p;
-  p = &productos;
+int buscar5(FILE *f, int code, PRODUCTOS *p) {
   int i = -1;
+  rewind(f);
+
   fread(p, sizeof(PRODUCTOS), 1, f);
   while (!feof(f) && i == -1) {
     if (p->code == code) {
@@ -520,7 +522,6 @@ int buscar5(FILE *f, int code) {
       fread(p, sizeof(PRODUCTOS), 1, f);
     }
   }
-  rewind(f);
   return i;
 }
 /*****************************************************************/

@@ -1,13 +1,14 @@
 #include "myShortCuts.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-
-
 void ejercicio1();
 void ejercicio2();
 void ejercicio3();
 int Buscar3(char nomBusqueda[], char nombre[50][12], int alumnos);
 void ejercicio4();
+int Buscar4(char codigo[], char codigos[][4], int productos);
+void Listado4(char[][4], int[], int[], int);
 void ejercicio5();
 void ejercicio6();
 
@@ -128,6 +129,90 @@ int Buscar3(char nomBusqueda[], char nombre[][12], int alumnos) {
 	}
 	return -1;
 }
-void ejercicio4() {}
+void ejercicio4() {
+	flush(stdin);
+	int precio[50], auxP, i = 0, productos = 0, encontrado = 0, venta[50],
+		total = 0;
+	char codigo[50][4], aux[4];
+	printf("Ingrese el codigo y el precio de un producto\n");
+	fsgets(aux, 10);
+	auxP = rand() % 100; //  scanf("%d", &auxP);
+	printf("%d\n", auxP);
+	while (strcmp(aux, "FIN") != 0 && productos < 50) {
+		strcpy(codigo[i], aux);
+		precio[i] = auxP;
+		productos++;
+		i++;
+		printf("Ingrese el codigo y el precio de un producto\n");
+		fsgets(aux, 4);
+		flush(stdin);
+		auxP = rand() % 101; //  scanf("%d", &auxP);
+		printf("%d\n", auxP);
+	}
+	// flush(stdin);
+	do {
+		printf("Ingrese el codigo de un producto a buscar: ");
+		fsgets(aux, 4);
+		encontrado = Buscar4(aux, codigo, productos);
+		if (encontrado == -1) {
+			printf("Producto no encontrado\n");
+		}
+	} while (encontrado == -1);
+	do {
+		printf("Indique unidades vendidas: \n");
+		auxP = rand() % 10; //  scanf("%d", &auxP);
+		printf("%d\n", auxP);
+	} while (auxP < 0);
+	while (auxP != 0 && encontrado != -1) {
+
+		venta[encontrado] += auxP;
+
+		printf("Ingrese el codigo de un producto a buscar: ");
+		fsgets(aux, 4);
+		encontrado = Buscar4(aux, codigo, productos);
+
+		flush(stdin);
+		do {
+			printf("Indique unidades vendidas: ");
+			auxP = rand() % 10; //  scanf("%d", &auxP);
+		} while (auxP < 0);
+	}
+	for (i = 0; i < productos; i++) {
+		total += precio[i] * venta[i];
+	}
+	printf("Total de la venta: %d\n", total);
+	Listado4(codigo, precio, venta, productos);
+}
+
+int Buscar4(char codigo[], char codigos[][4], int productos) {
+	int i;
+	for (i = 0; i < productos; i++) {
+		if (strcmp(codigo, codigos[i]) == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
+void Listado4(char codigos[][4], int precios[], int ventas[], int productos) {
+	int i, j;
+	for (i = 0; i < productos - 1; i++) {
+		for (j = 0; j < productos - 1 - i; j++) {
+			if (strcmp(codigos[j], codigos[j + 1]) > 0) {
+				// intercambiar
+				char aux[3];
+				int aux2;
+				aux2 = precios[j];
+				precios[j] = precios[j + 1];
+				precios[j + 1] = aux2;
+				strcpy(aux, codigos[j]);
+				strcpy(codigos[j], codigos[j + 1]);
+				strcpy(codigos[j + 1], aux);
+			}
+		}
+	}
+	for (i = 0; i < productos; i++) {
+		printf("%s %d %d\n", codigos[i], precios[i], ventas[i]);
+	}
+}
 void ejercicio5() {}
 void ejercicio6() {}

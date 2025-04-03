@@ -7,6 +7,9 @@ include_directories(${CMAKE_SOURCE_DIR}/includes)
 include_directories(${CMAKE_SOURCE_DIR}/parciales)
 add_library(myShortCuts STATIC includes/myShortCuts.c)
 
+add_executable(ejemplos ejemplos.c)
+target_link_libraries(ejemplos myShortCuts)
+
 add_executable(EjerciciosVectores EjerciciosVectores.c)
 add_executable(EjerciciosMatrices EjerciciosMatrices.c)
 target_link_libraries(EjerciciosMatrices myShortCuts)

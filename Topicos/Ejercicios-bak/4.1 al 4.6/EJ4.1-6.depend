@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1744037821 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/EJ4.1-6/EJ4.1-6/main.c
+	"Fecha.h"
+	<stdio.h>
+
+1744035620 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/EJ4.1-6/EJ4.1-6/Fecha.c
+	"Fecha.h"
+	<stdbool.h>
+	<stdio.h>
+
+1744036683 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/EJ4.1-6/EJ4.1-6/Fecha.h
+	<stdbool.h>
+

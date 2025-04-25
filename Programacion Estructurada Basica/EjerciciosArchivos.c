@@ -3,7 +3,6 @@
 #include <string.h>
 #include <time.h>
 #define dir "../archivosParaEjercicios/"
-#defince FIN 100
 void flush(FILE *stream) {
   int c;
   do {

@@ -31,9 +31,31 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="src/codigos/TDAPalabra/TDAPalabra.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/codigos/TDAPalabra/mainTDAPalabra.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/codigos/TDAPalabra/secuenciaPalabra.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/codigos/TDAVector/Vector.h" />
+		<Unit filename="src/codigos/TDAVector/mainTDAVector.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/codigos/TDAVector/vector.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/codigos/ej1.1/ej1_1.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/codigos/ej1.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/headers/SecuenciaPalabra.h" />
+		<Unit filename="src/headers/TDAPalabra.h" />
+		<Unit filename="src/headers/Vector.h" />
 		<Unit filename="src/headers/ejercicios.h" />
 		<Unit filename="src/main.c">
 			<Option compilerVar="CC" />

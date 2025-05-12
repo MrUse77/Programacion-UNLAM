@@ -1,7 +1,9 @@
 #ifndef EJERCICIOS_H_INCLUDED
 #define EJERCICIOS_H_INCLUDED
 
-void ej1();
+void ej0_1();
+void ej1_1();
 int mainTDAPalabra();
+int mainTDAVector();
 
 #endif // EJERCICIOS_H_INCLUDED

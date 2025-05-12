@@ -8,7 +8,7 @@ int factorial(int n) {
   return n * factorial(n - 1);
 }
 
-void ej1() {
+void ej0_1() {
   int n;
   printf("Ingrese un numero para calcular su factorial: ");
   scanf("%d", &n);

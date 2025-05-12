@@ -2,6 +2,8 @@
 
 int main() {
   // ej1();
-  mainTDAPalabra();
+  // ej1_1();
+  // mainTDAPalabra();
+  mainTDAVector();
   return 0;
 }

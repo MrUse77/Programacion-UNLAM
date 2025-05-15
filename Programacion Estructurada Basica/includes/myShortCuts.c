@@ -1,7 +1,6 @@
 #include "myShortCuts.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 void scanfInt(int *n, int li, int ls, int c) {
   do {

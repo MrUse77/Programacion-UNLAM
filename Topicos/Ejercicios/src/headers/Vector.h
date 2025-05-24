@@ -19,6 +19,9 @@
 
 #define AUMENTAR 1
 #define DISMINUIR 2
+#define BURBUJEO 1
+#define SELECCION 2
+#define INSERCION 3
 typedef struct {
   int *vec;
   size_t ce;
@@ -27,10 +30,13 @@ typedef struct {
 
 bool vectorCrear(Vector *vector); // malloc
 int vectorOrdInsertar(Vector *vector, int elem);
+int vectorInsertarAlFinal(Vector *vector, int elem);
 int vectorOrdBuscar(const Vector *vector, int elem);
 bool vectorOrdEliminar(Vector *vector, int elem);
+void vectorOrdenar(Vector *vector, int metodo);
 bool vectorEliminarDePos(Vector *vector, int pos);
 void vectorDestruir(Vector *vector); // free
+void vectorMostrar(const Vector *vector);
 
 size_t max(size_t a, size_t b);
 #endif // VECTOR_H

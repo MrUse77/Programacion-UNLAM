@@ -1,7 +1,11 @@
 #include "../../headers/Vector.h"
 #include <stdio.h>
 #include <stdlib.h>
-
+int *BuscarMenor(int *li, int *ls);
+void intercambiar(int *a, int *b);
+void ordenarBurbujeo(Vector *vector);
+void ordenarSeleccion(Vector *vector);
+void ordenarInsercion(Vector *vector);
 bool redimensionarVector(Vector *vector, int operacion);
 
 bool vectorCrear(Vector *vector) {
@@ -137,3 +141,94 @@ bool redimensionarVector(Vector *vector, int operacion) {
 }
 
 size_t max(size_t a, size_t b) { return a >= b ? a : b; }
+
+void vectorOrdenar(Vector *vector, int metodo) {
+  switch (metodo) {
+  case BURBUJEO:
+    ordenarBurbujeo(vector);
+    break;
+  case SELECCION:
+    // Implementar otro método de ordenamiento
+    ordenarSeleccion(vector);
+    break;
+  case INSERCION:
+    ordenarInsercion(vector);
+    break;
+  default:
+    printf("Método de ordenamiento no válido\n");
+    break;
+  }
+}
+void ordenarBurbujeo(Vector *vector) {
+  int *ult = vector->vec + vector->ce - 1;
+  bool huboIntercambio = true;
+  for (int i = 1, *limJ = ult - 1; huboIntercambio && i < vector->ce;
+       i++, limJ--) {
+    huboIntercambio = false;
+    for (int *j = vector->vec; j <= limJ; j++) {
+      if (*j > *(j + 1)) {
+        intercambiar(j, j + 1);
+        huboIntercambio = true;
+      }
+    }
+  }
+}
+
+void intercambiar(int *a, int *b) {
+  int temp = *a;
+  *a = *b;
+  *b = temp;
+}
+
+int vectorInsertarAlFinal(Vector *vector, int elem) {
+  if (vector->ce == vector->cap) {
+    if (!redimensionarVector(vector, AUMENTAR)) {
+      return SIN_MEM;
+    }
+  }
+  int *posIns = vector->vec + vector->ce;
+  *posIns = elem;
+  vector->ce++;
+  return TODO_OK;
+}
+
+void vectorMostrar(const Vector *vector) {
+  int *ult = vector->vec + vector->ce - 1;
+  for (int *i = vector->vec; i <= ult; i++) {
+    printf("%3d ", *i);
+  }
+  putchar('\n');
+}
+
+void ordenarSeleccion(Vector *vector) {
+  int *ult = vector->vec + vector->ce - 1;
+  int *m;
+  for (int *i = vector->vec; i < ult; i++) {
+    m = BuscarMenor(i, ult);
+
+    intercambiar(i, m);
+  }
+}
+
+int *BuscarMenor(int *li, int *ls) {
+  int *menor = li;
+  for (int *i = li + 1; i <= ls; i++) {
+    if (*i < *menor) {
+      menor = i;
+    }
+  }
+  return menor;
+}
+void ordenarInsercion(Vector *vector) {
+  int *ult = vector->vec + vector->ce - 1;
+  int elemenAis;
+  for (int *i = vector->vec + 1; i <= ult; i++) {
+    int *j = i - 1;
+    elemenAis = *i;
+    while (j >= vector->vec && elemenAis < *j) {
+      *(j + 1) = *j;
+      j--;
+    }
+    *(j + 1) = elemenAis;
+  }
+}

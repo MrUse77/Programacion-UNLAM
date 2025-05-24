@@ -40,7 +40,6 @@
 		<Unit filename="src/codigos/TDAPalabra/secuenciaPalabra.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="src/codigos/TDAVector/Vector.h" />
 		<Unit filename="src/codigos/TDAVector/mainTDAVector.c">
 			<Option compilerVar="CC" />
 		</Unit>

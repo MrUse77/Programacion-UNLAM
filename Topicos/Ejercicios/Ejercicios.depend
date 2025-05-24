@@ -62,19 +62,19 @@
 	"../../headers/ejercicios.h"
 	<stdio.h>
 
-1746716759 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/headers/Vector.h
+1747916858 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/headers/Vector.h
 	<stdbool.h>
 	<stddef.h>
 
-1746716663 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/TDAVector/vector.c
+1747920677 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/TDAVector/vector.c
 	"../../headers/Vector.h"
-	<stdbool.h>
 	<stdio.h>
 	<stdlib.h>
 
-1746713817 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/TDAVector/mainTDAVector.c
+1747924097 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/TDAVector/mainTDAVector.c
 	"../../headers/Vector.h"
 	"../../headers/ejercicios.h"
+	<stdio.h>
 	<stdlib.h>
 	<time.h>
 

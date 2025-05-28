@@ -49,6 +49,9 @@
 		<Unit filename="src/codigos/ej1.1/ej1_1.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/codigos/ej1.2/ej1_2.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/codigos/ej1.c">
 			<Option compilerVar="CC" />
 		</Unit>

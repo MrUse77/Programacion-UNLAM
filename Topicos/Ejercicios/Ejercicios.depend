@@ -78,3 +78,59 @@
 	<stdlib.h>
 	<time.h>
 
+1748144206 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/ej1.1/ej1_1.c
+	"../../headers/ejercicios.h"
+	<stdio.h>
+
+1748365548 /home/agustin/Documentos/unlam/Topicos/Ejercicios/src/headers/ejercicios.h
+
+1748144206 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/ej1.c
+	"../headers/ejercicios.h"
+	<stdio.h>
+	<stdlib.h>
+
+1748144206 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/TDAPalabra/mainTDAPalabra.c
+	"../../headers/SecuenciaPalabra.h"
+	<stdio.h>
+
+1748144206 /home/agustin/Documentos/unlam/Topicos/Ejercicios/src/headers/SecuenciaPalabra.h
+	"TDAPalabra.h"
+	<stdbool.h>
+
+1748144206 /home/agustin/Documentos/unlam/Topicos/Ejercicios/src/headers/TDAPalabra.h
+	<stdbool.h>
+
+1748144206 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/TDAPalabra/secuenciaPalabra.c
+	"../../headers/SecuenciaPalabra.h"
+
+1748144206 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/TDAPalabra/TDAPalabra.c
+	"../../headers/TDAPalabra.h"
+	<ctype.h>
+	<stdbool.h>
+	<stdio.h>
+
+1748193956 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/TDAVector/mainTDAVector.c
+	"../../headers/Vector.h"
+	"../../headers/ejercicios.h"
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+
+1748193956 /home/agustin/Documentos/unlam/Topicos/Ejercicios/src/headers/Vector.h
+	<stdbool.h>
+	<stddef.h>
+
+1748193956 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/TDAVector/vector.c
+	"../../headers/Vector.h"
+	<stdio.h>
+	<stdlib.h>
+
+1748368448 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/main.c
+	"headers/ejercicios.h"
+
+1748370430 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/ej1.2/ej1_2.c
+	"../../headers/ejercicios.h"
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+

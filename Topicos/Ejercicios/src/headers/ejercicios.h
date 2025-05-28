@@ -3,6 +3,7 @@
 
 void ej0_1();
 void ej1_1();
+void ej1_2();
 int mainTDAPalabra();
 int mainTDAVector();
 

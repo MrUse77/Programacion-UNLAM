@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1748476366 source:/home/agustin/Documentos/unlam/Sitemas Operativos/Ejercicio 2 TP/Cliente/Cliente/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<unistd.h>
+	<arpa/inet.h>
+	<sys/socket.h>
+

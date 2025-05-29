@@ -22,21 +22,27 @@
 #define BURBUJEO 1
 #define SELECCION 2
 #define INSERCION 3
+#define QSORT 4
 typedef struct {
-  int *vec;
+  void *vec;
   size_t ce;
   size_t cap;
+  size_t tamElem;
 } Vector;
 
-bool vectorCrear(Vector *vector); // malloc
-int vectorOrdInsertar(Vector *vector, int elem);
-int vectorInsertarAlFinal(Vector *vector, int elem);
-int vectorOrdBuscar(const Vector *vector, int elem);
+typedef int (*Cmp)(const void *a, const void *b);
+typedef void (*Imprimir)(const void *elem);
+
+bool vectorCrear(Vector *vector, size_t tamElem); // malloc
+int vectorOrdInsertar(Vector *vector, const void *elem, Cmp cmp);
+int vectorInsertarAlFinal(Vector *vector, const void *elem);
+int vectorOrdBuscar(const Vector *vector, void *elem, Cmp cmp);
 bool vectorOrdEliminar(Vector *vector, int elem);
-void vectorOrdenar(Vector *vector, int metodo);
+void vectorOrdenar(Vector *vector, int metodo, Cmp cmp);
 bool vectorEliminarDePos(Vector *vector, int pos);
 void vectorDestruir(Vector *vector); // free
-void vectorMostrar(const Vector *vector);
+
+void vectorMostrar(const Vector *vector, Imprimir imp);
 
 size_t max(size_t a, size_t b);
 #endif // VECTOR_H

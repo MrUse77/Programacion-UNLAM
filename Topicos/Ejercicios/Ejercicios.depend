@@ -28,54 +28,56 @@
 1745506104 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/Ejercicios/src/codigos/TDAPalabra/secuenciaPalabra.c
 	"../../headers/SecuenciaPalabra.h"
 
-1745506104 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/TDAPalabra/secuenciaPalabra.c
+1748519998 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/TDAPalabra/secuenciaPalabra.c
 	"../../headers/SecuenciaPalabra.h"
 
-1745506055 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/headers/SecuenciaPalabra.h
+1748519998 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/headers/SecuenciaPalabra.h
 	"TDAPalabra.h"
 	<stdbool.h>
 
-1745505460 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/headers/TDAPalabra.h
+1748519998 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/headers/TDAPalabra.h
 	<stdbool.h>
 
-1745505639 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/TDAPalabra/TDAPalabra.c
+1748519998 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/TDAPalabra/TDAPalabra.c
 	"../../headers/TDAPalabra.h"
 	<ctype.h>
 	<stdbool.h>
 	<stdio.h>
 
-1746462508 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/ej1.c
+1748519998 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/ej1.c
 	"../headers/ejercicios.h"
 	<stdio.h>
 	<stdlib.h>
 
-1746713033 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/headers/ejercicios.h
+1748519998 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/headers/ejercicios.h
 
-1745506735 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/TDAPalabra/mainTDAPalabra.c
+1748519998 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/TDAPalabra/mainTDAPalabra.c
 	"../../headers/SecuenciaPalabra.h"
 	<stdio.h>
 
-1746712878 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/main.c
+1748523934 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/main.c
 	"headers/ejercicios.h"
 
-1746463974 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/ej1.1/ej1_1.c
+1748519998 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/ej1.1/ej1_1.c
 	"../../headers/ejercicios.h"
 	<stdio.h>
 
-1747916858 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/headers/Vector.h
+1748530418 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/headers/Vector.h
 	<stdbool.h>
 	<stddef.h>
 
-1747920677 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/TDAVector/vector.c
+1748531121 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/TDAVector/vector.c
 	"../../headers/Vector.h"
 	<stdio.h>
 	<stdlib.h>
+	<string.h>
 
-1747924097 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/TDAVector/mainTDAVector.c
+1748530924 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/TDAVector/mainTDAVector.c
 	"../../headers/Vector.h"
 	"../../headers/ejercicios.h"
 	<stdio.h>
 	<stdlib.h>
+	<string.h>
 	<time.h>
 
 1748144206 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/ej1.1/ej1_1.c
@@ -129,6 +131,12 @@
 	"headers/ejercicios.h"
 
 1748370430 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/ej1.2/ej1_2.c
+	"../../headers/ejercicios.h"
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+
+1748519998 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Ejercicios/src/codigos/ej1.2/ej1_2.c
 	"../../headers/ejercicios.h"
 	<stdio.h>
 	<stdlib.h>

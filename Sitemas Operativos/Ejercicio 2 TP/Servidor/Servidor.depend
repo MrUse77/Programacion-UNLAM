@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1748863779 source:/home/agustin/Documentos/unlam/Sitemas Operativos/Ejercicio 2 TP/Servidor/Servidor.c
+	<errno.h>
+	<fcntl.h>
+	<netinet/in.h>
+	<pthread.h>
+	<signal.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<sys/socket.h>
+	<unistd.h>
+

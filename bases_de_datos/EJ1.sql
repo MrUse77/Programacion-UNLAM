@@ -155,21 +155,52 @@ select CodProv, Nombre from EJ1.Proveedor where CodProv in (select CodProv from 
 
 -- 17 Listar el/los artículo/s de mayor precio.
 
+select CodArt, descripcion, precio from EJ1.Articulo where precio = (select max(precio) from EJ1.Articulo);
+
+-- 18 Listar el/los articulo/s de menor precio
+
+select CodArt, descripcion, precio from EJ1.Articulo where precio = (select min(precio) from EJ1.Articulo);
+
+-- 19 Listar el/los el precio promedio de los articulos por almacen.
+
+select t.Nro as Almacen, avg(ar.precio) as PrecioPromedio from EJ1.Tiene t JOIN EJ1.Articulo ar ON t.CodArt = ar.CodArt GROUP BY t.Nro;
+
+-- 20 Listar los almacenes que almacenan la mayor cantidad de artículos.
+
+select * from EJ1.Almacen where Nro in (select t.Nro from EJ1.Tiene t GROUP BY t.Nro HAVING count(t.CodArt) = (select max(cantidad) from (select count(CodArt) as cantidad from EJ1.Tiene group by Nro) as subquery));
+
+-- 21 Listar los articulos compuesto por al menos 2 materiales.
+
+select * from Ej1.Articulo where CodArt in (select CodArt from EJ1.Compuesto_Por group by CodArt having count(CodMat) >= 2);
+
+-- 22 Listar los articulos compuesto por exactamente 2 materiales.
+
+select * from Ej1.Articulo where CodArt in (select CodArt from EJ1.Compuesto_Por group by CodArt having count(CodMat) = 2);
+
+-- 23 LIstar los articulos compuesto con hasta 2 materiales.
+
+select * from Ej1.Articulo where CodArt in (select CodArt from EJ1.Compuesto_Por group by CodArt having count(CodMat) <= 2);
+
+-- 24 Listar los articulos compuestos por todos los materiales.
+
+select * from EJ1.articulo where CodArt in (select CodArt from EJ1.Compuesto_Por group by CodArt having count(CodMat) = (select count(*) from EJ1.Material));
+
+-- 25 Listar todas las ciudades de los proveedores que provean todos los materiales.
+
+select Ciudad from EJ1.Proveedor where CodProv in (select CodProv from EJ1.Provisto_Por group by CodProv having count(CodMat) = (select count(*) from EJ1.Material));
 
 
+select t.CodArt , t.Nro from EJ1.Tiene t group by t.CodArt;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+-- Precio potencial si todos los proveedores suministraran todos los materiales
+SELECT p.Nombre as Nproveedor, m.descripcion AS Dmaterial,
+       12 AS precio_con_ganancia
+FROM EJ1.Proveedor p
+CROSS JOIN EJ1.Material m
+WHERE NOT EXISTS (
+    SELECT 1 FROM EJ1.Provisto_por pp 
+    WHERE pp.CodProv = p.CodProv AND pp.CodMat = m.CodMat
+);
 
 

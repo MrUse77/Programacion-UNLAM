@@ -19,7 +19,49 @@ static int clientes[MAX_CLIENTES];
 static int listen_fd;          // socket
 static int active_clients = 0; // Contador de clientes activos
 // Mutex para proteger el contador de clientes activos (condicion de carrera)
-static pthread_mutex_t count_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t count_mutex =
+    PTHREAD_MUTEX_INITIALIZER; // Mutex para contar clientes
+static pthread_mutex_t clientes_mutex =
+    PTHREAD_MUTEX_INITIALIZER; // Mutex para lista de clientes
+
+// Agrega un cliente al arreglo
+void agregar_cliente(int fd) {
+  pthread_mutex_lock(&clientes_mutex);
+  for (int i = 0; i < MAX_CLIENTES; i++) {
+    if (clientes[i] == -1) {
+      clientes[i] = fd;
+      break;
+    }
+  }
+  pthread_mutex_unlock(&clientes_mutex);
+}
+
+// Elimina un cliente del arreglo
+void eliminar_cliente(int fd) {
+  pthread_mutex_lock(&clientes_mutex);
+  for (int i = 0; i < active_clients; i++) {
+    if (clientes[i] == fd) {
+      clientes[i] = -1;
+      break;
+    }
+  }
+  pthread_mutex_unlock(&clientes_mutex);
+}
+void enviar_a_todos(int emisor_fd, const char *mensaje, size_t len) {
+  pthread_mutex_lock(&clientes_mutex);
+  for (int i = 0; i < active_clients; i++) {
+    int fd = clientes[i];
+    printf("Enviando mensaje a cliente %d\n", fd);
+    printf("Mensaje: %.*s\n", (int)len, mensaje);
+    printf("Emisor: %d\n", emisor_fd);
+    if (fd > 0 && fd != emisor_fd) {
+      if (send(fd, mensaje, len, 0) < 0) {
+        perror("Error al enviar mensaje a cliente");
+      }
+    }
+  }
+  pthread_mutex_unlock(&clientes_mutex);
+}
 
 /*
  * Maneja la conexión de un cliente.
@@ -34,23 +76,33 @@ void *client_handler(void *arg) {
   char buf[BUF_SIZE];
   ssize_t n;
 
-  while ((n = recv(client_fd, buf, sizeof(buf), 0)) > 0) {
-    // Si el cliente envía un mensaje vacío, lo ignoramos
-    int count = n;
-    // Si el último carácter es un salto de línea, no lo contamos
-    char resp[32];
-    int len = snprintf(resp, sizeof(resp), "%d\n", count);
-    if (send(client_fd, resp, len, 0) < 0) {
-      perror("send");
+  while ((n = recv(client_fd, buf, sizeof(buf) - 1, 0)) > 0) {
+    buf[n] = '\0'; // Convertimos el mensaje recibido en un string válido
+
+    // Formatear la respuesta que contiene el mensaje original y el conteo de
+    // caracteres
+    char mensaje_formateado[BUF_SIZE + 100];
+    int count = strlen(buf);
+    snprintf(mensaje_formateado, sizeof(mensaje_formateado),
+             "Mensaje recibido: %s - Letras: %d\n", buf, count);
+
+    // Enviar el mensaje a todos los clientes conectados (incluido el emisor)
+    pthread_mutex_lock(&count_mutex);
+    enviar_a_todos(client_fd, mensaje_formateado, strlen(mensaje_formateado));
+    pthread_mutex_unlock(&count_mutex);
+  }
+
+  // Desconexión del cliente
+  close(client_fd);
+
+  // Eliminar al cliente del array y restar el contador
+  pthread_mutex_lock(&count_mutex);
+  for (int i = 0; i < MAX_CLIENTES; i++) {
+    if (clientes[i] == client_fd) {
+      clientes[i] = 0;
       break;
     }
   }
-
-  // Desconexión del cliente o error
-  close(client_fd);
-
-  // decrementar el contador de clientes activos
-  pthread_mutex_lock(&count_mutex);
   active_clients--;
   pthread_mutex_unlock(&count_mutex);
 
@@ -126,6 +178,23 @@ int main() {
         break;
       }
     }
+    pthread_mutex_lock(&clientes_mutex);
+    int added = 0;
+    for (int i = 0; i < MAX_CLIENTES; i++) {
+      if (clientes[i] == 0) {
+        printf("Cliente conectado: %d\n", *pclient);
+        clientes[i] = *pclient;
+        added = 1;
+        break;
+      }
+    }
+    if (!added) {
+      fprintf(stderr, "Máximo de clientes alcanzado. Cerrando conexión.\n");
+      close(*pclient);
+      free(pclient);
+      continue;
+    }
+    pthread_mutex_unlock(&clientes_mutex);
 
     // Hacer el socket del cliente no bloqueante
     pthread_mutex_lock(&count_mutex);
@@ -166,7 +235,23 @@ int main() {
         break;
       }
     }
-
+    pthread_mutex_lock(&clientes_mutex);
+    int added = 0;
+    for (int i = 0; i < MAX_CLIENTES; i++) {
+      if (clientes[i] == 0) {
+        printf("Cliente conectado: %d\n", *pclient);
+        clientes[i] = *pclient;
+        added = 1;
+        break;
+      }
+    }
+    if (!added) {
+      fprintf(stderr, "Máximo de clientes alcanzado. Cerrando conexión.\n");
+      close(*pclient);
+      free(pclient);
+      continue;
+    }
+    pthread_mutex_unlock(&clientes_mutex);
     // Hacer el socket del cliente no bloqueante
     pthread_mutex_lock(&count_mutex);
     active_clients++;

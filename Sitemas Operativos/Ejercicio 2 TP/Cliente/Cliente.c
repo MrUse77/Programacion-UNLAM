@@ -9,6 +9,18 @@
 #define PORT "8080"
 #define BUF_SIZE 1024
 
+char *fsgets(char t[], int n) {
+  int i = 0;
+  fgets(t, n, stdin);
+  while (t[i] != '\0') {
+    if (t[i] == '\n') {
+      t[i] = '\0';
+    } else {
+      i++;
+    }
+  }
+  return t;
+}
 int main(int argc, char *argv[]) {
   if (argc != 2) {
     fprintf(stderr, "Usage: %s <server_ip>\n", argv[0]);
@@ -30,6 +42,7 @@ int main(int argc, char *argv[]) {
     freeaddrinfo(res);
     return 1;
   }
+
   if (connect(sock, res->ai_addr, res->ai_addrlen) < 0) {
     perror("connect");
     close(sock);
@@ -43,20 +56,40 @@ int main(int argc, char *argv[]) {
   char sendbuf[BUF_SIZE];
   char recvbuf[BUF_SIZE];
 
-  while (fgets(sendbuf, sizeof(sendbuf), stdin)) {
-    size_t len = strlen(sendbuf);
-    if (send(sock, sendbuf, len, 0) < 0) {
-      perror("send");
-      break;
+  while (1) {
+    fd_set readfds;
+    FD_ZERO(&readfds);
+    FD_SET(STDIN_FILENO, &readfds); // Entrada estándar
+    FD_SET(sock, &readfds);         // Socket del servidor
+    int maxfd = sock > STDIN_FILENO ? sock : STDIN_FILENO;
+    int ready = select(maxfd + 1, &readfds, NULL, NULL, NULL);
+    if (ready < 0) {
+      perror("select");
+      close(sock);
+      return 1;
     }
-    // Esperar respuesta del servidor
-    ssize_t n = recv(sock, recvbuf, sizeof(recvbuf) - 1, 0);
-    if (n <= 0) {
-      printf("Server closed connection.\n");
-      break;
+    if (FD_ISSET(STDIN_FILENO, &readfds)) {
+      // Leer del stdin
+      if (fsgets(sendbuf, BUF_SIZE) == NULL) {
+        break; // Ctrl+D o error
+      }
+      size_t len = strlen(sendbuf);
+      if (send(sock, sendbuf, len, 0) < 0) {
+        perror("send");
+        break;
+      }
     }
-    recvbuf[n] = '\0';
-    printf("Char count: %s", recvbuf);
+    // Si el servidor envió algo
+    if (FD_ISSET(sock, &readfds)) {
+      ssize_t n = recv(sock, recvbuf, sizeof(recvbuf) - 1, 0);
+      if (n <= 0) {
+        printf("El servidor cerró la conexión.\n");
+        break;
+      }
+
+      recvbuf[n] = '\0';
+      printf("%s", recvbuf); // Muestra directamente lo que envió el servidor
+    }
   }
 
   close(sock);

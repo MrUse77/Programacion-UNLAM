@@ -7,3 +7,11 @@
 	<arpa/inet.h>
 	<sys/socket.h>
 
+1748872900 source:/home/agustin/Documentos/unlam/Sitemas Operativos/Ejercicio 2 TP/Cliente/Cliente.c
+	<arpa/inet.h>
+	<netdb.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<unistd.h>
+

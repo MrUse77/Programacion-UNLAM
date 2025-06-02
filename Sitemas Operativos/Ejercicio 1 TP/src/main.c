@@ -22,46 +22,38 @@ int sem_signal(int semid) {
 }
 void aplicar_recargo(Dia *mes, int semid, float rec) {
   sem_wait(semid);
-  printf("Monto Modificado: $%8.2f\n", mes[0].ventas[0].montoModificado);
   for (int i = 0; i < DIAS; i++) {
     for (int j = 0; j < mes[i].numVentas; j++) {
       mes[i].ventas[j].montoModificado *= rec;
     }
   }
-  printf("Monto Modificado: $%8.2f\n", mes[0].ventas[0].montoModificado);
   sem_signal(semid);
 }
 void aplicar_iva(Dia *mes, int semid) {
   sem_wait(semid);
-  printf("Monto Modificado: $%8.2f\n", mes[0].ventas[0].montoModificado);
   for (int i = 0; i < DIAS; i++) {
     for (int j = 0; j < mes[i].numVentas; j++) {
       mes[i].ventas[j].montoModificado *= 1.21;
     }
   }
-  printf("Monto Modificado: $%8.2f\n", mes[0].ventas[0].montoModificado);
   sem_signal(semid);
 }
 void aplicar_descuento(Dia *mes, int semid) {
-  printf("Monto Modificado: $%8.2f\n", mes[0].ventas[0].montoModificado);
   sem_wait(semid);
   for (int i = 0; i < DIAS; i++) {
     for (int j = 0; j < mes[i].numVentas; j++) {
       mes[i].ventas[j].montoModificado *= 0.75;
     }
   }
-  printf("Monto Modificado: $%8.2f\n", mes[0].ventas[0].montoModificado);
   sem_signal(semid);
 }
 void aplicar_descuento_porcentual(Dia *mes, int semid, float desc) {
-  printf("Monto Modificado: $%8.2f\n", mes[0].ventas[0].montoModificado);
   sem_wait(semid);
   for (int i = 0; i < DIAS; i++) {
     for (int j = 0; j < mes[i].numVentas; j++) {
       mes[i].ventas[j].montoModificado *= (1 - desc);
     }
   }
-  printf("Monto Modificado: $%8.2f\n", mes[0].ventas[0].montoModificado);
   sem_signal(semid);
 }
 
@@ -116,7 +108,7 @@ int main() {
     wait(NULL);
   }
   printf("\n=== RESUMEN FINAL ===\n");
- // getchar();
+  // getchar();
   for (int d = 0; d < DIAS; d++) {
     double nuevo_total = 0;
     for (int j = 0; j < mem.mes[d].numVentas; j++) {

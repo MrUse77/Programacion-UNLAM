@@ -1,7 +1,7 @@
 #ifndef FILE_H
 #define FILE_H
 
-#define MAX_VENTAS 50
+#define MAX_VENTAS 100
 #define DIAS 30
 
 typedef struct {

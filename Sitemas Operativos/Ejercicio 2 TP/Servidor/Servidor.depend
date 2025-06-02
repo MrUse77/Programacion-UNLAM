@@ -11,3 +11,15 @@
 	<sys/socket.h>
 	<unistd.h>
 
+1748881258 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Sitemas Operativos/Ejercicio 2 TP/Servidor/Servidor.c
+	<errno.h>
+	<fcntl.h>
+	<netinet/in.h>
+	<pthread.h>
+	<signal.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<sys/socket.h>
+	<unistd.h>
+

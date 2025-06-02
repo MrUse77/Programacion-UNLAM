@@ -9,7 +9,7 @@ int crearVentas(Venta *venta) {
   srand(time(NULL));
   for (int i = 0; i < nVentas; i++) {
     venta[i].id = rand() % 1000;
-    venta[i].monto = (double)(rand() % 1000 / 10);
+    venta[i].monto = ((double)(rand() % 1000) / 10);
     venta[i].montoModificado = venta[i].monto;
   }
   return nVentas;

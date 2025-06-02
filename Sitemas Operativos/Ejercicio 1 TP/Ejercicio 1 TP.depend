@@ -20,3 +20,22 @@
 	<sys/shm.h>
 	<time.h>
 
+1748882519 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Sitemas Operativos/Ejercicio 1 TP/src/main.c
+	"includes/venta.h"
+	<stdio.h>
+	<stdlib.h>
+	<sys/ipc.h>
+	<sys/sem.h>
+	<sys/shm.h>
+	<sys/wait.h>
+	<unistd.h>
+
+1748882159 /home/agustin/Documentos/unlam/Programacion-UNLAM/Sitemas Operativos/Ejercicio 1 TP/src/includes/venta.h
+
+1748882366 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Sitemas Operativos/Ejercicio 1 TP/src/venta.c
+	"includes/venta.h"
+	<stdio.h>
+	<stdlib.h>
+	<sys/shm.h>
+	<time.h>
+

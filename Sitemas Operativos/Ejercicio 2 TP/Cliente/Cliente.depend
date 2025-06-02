@@ -15,3 +15,11 @@
 	<string.h>
 	<unistd.h>
 
+1748881589 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Sitemas Operativos/Ejercicio 2 TP/Cliente/Cliente.c
+	<arpa/inet.h>
+	<netdb.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<unistd.h>
+

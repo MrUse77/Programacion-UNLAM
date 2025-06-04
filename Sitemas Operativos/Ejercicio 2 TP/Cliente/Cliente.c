@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
   freeaddrinfo(res);
-  printf("Connected to %s:%s. Type messages, one per line. Ctrl+D to quit.\n",
+  printf("Connected to %s:%s. Escribe un mensaje. Ctrl+C o \"exit\" para salir.\n",
          argv[1], PORT);
 
   char sendbuf[BUF_SIZE];

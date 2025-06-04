@@ -1,5 +1,5 @@
 // server.c
-// Los comentarios tienen que estar en español
+#include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <netinet/in.h>
@@ -51,10 +51,11 @@ void enviar_a_todos(int emisor_fd, const char *mensaje, size_t len) {
   pthread_mutex_lock(&clientes_mutex);
   for (int i = 0; i < active_clients; i++) {
     int fd = clientes[i];
-    printf("Enviando mensaje a cliente %d\n", fd);
-    printf("Mensaje: %.*s\n", (int)len, mensaje);
-    printf("Emisor: %d\n", emisor_fd);
+
     if (fd > 0 && fd != emisor_fd) {
+      printf("Enviando mensaje a cliente %d\n", fd);
+      printf("Mensaje: %.*s\n", (int)len, mensaje);
+      printf("Emisor: %d\n", emisor_fd);
       if (send(fd, mensaje, len, 0) < 0) {
         perror("Error al enviar mensaje a cliente");
       }
@@ -119,7 +120,7 @@ int make_non_blocking(int fd) {
 int main() {
   struct sockaddr_in addr;
   socklen_t addrlen = sizeof(addr);
-
+  int b = 0;
   // Ignorar señales de tubería rota (SIGPIPE)
   signal(SIGPIPE, SIG_IGN);
 
@@ -160,6 +161,7 @@ int main() {
   printf("Server listening on port %d\n", PORT);
 
   // Aceptar conexiones entrantes
+  /*
   while (1) {
     int *pclient = malloc(sizeof(int));
     if (!pclient) {
@@ -206,12 +208,12 @@ int main() {
     pthread_detach(tid);
     break;
   }
-
+*/
   // Bucle principal para aceptar conexiones
-  while (1) {
+  do {
     // Verificar si hay clientes activos
     pthread_mutex_lock(&count_mutex);
-    if (active_clients == 0) {
+    if (active_clients == 0 && b == 1) {
       pthread_mutex_unlock(&count_mutex);
       printf("No more clients. Shutting down.\n");
       break;
@@ -224,6 +226,7 @@ int main() {
       continue;
     }
     *pclient = accept(listen_fd, (struct sockaddr *)&addr, &addrlen);
+    char *ip = inet_ntoa(addr.sin_addr);
     if (*pclient < 0) {
       free(pclient);
       if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -239,7 +242,7 @@ int main() {
     int added = 0;
     for (int i = 0; i < MAX_CLIENTES; i++) {
       if (clientes[i] == 0) {
-        printf("Cliente conectado: %d\n", *pclient);
+        printf("Cliente %d conectado desde: %s\n", *pclient, ip);
         clientes[i] = *pclient;
         added = 1;
         break;
@@ -260,7 +263,8 @@ int main() {
     pthread_t tid;
     pthread_create(&tid, NULL, client_handler, pclient);
     pthread_detach(tid);
-  }
+    b = 1;
+  } while (1);
 
   close(listen_fd);
   return 0;

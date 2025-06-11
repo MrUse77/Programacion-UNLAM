@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1749129607 source:/home/agustin/Documentos/unlam/Topicos/ConversorBinATexto/main.c
+	<stdio.h>
+	<stdlib.h>
+

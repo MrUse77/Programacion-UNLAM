@@ -1,5 +1,6 @@
 # depslib dependency file v1.0
-1749063848 source:/home/agustin/Documentos/unlam/Sitemas Operativos/Ejercicio 2 TP/Servidor/Servidor.c
+1749645085 source:/home/agustin/Documentos/unlam/Sitemas Operativos/Ejercicio 2 TP/Servidor/Servidor.c
+	<arpa/inet.h>
 	<errno.h>
 	<fcntl.h>
 	<netinet/in.h>

@@ -11,10 +11,11 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#define PORT 8080        // puerto del servidor
+#define PORT 1           // puerto del servidor
 #define BACKLOG 10       // Cantidad mexima de conexiones pendientes
 #define BUF_SIZE 1024    // Tamaño del buffer para recibir datos
 #define MAX_CLIENTES 100 // Máximo número de clientes permitidos
+
 static int clientes[MAX_CLIENTES];
 static int listen_fd;          // socket
 static int active_clients = 0; // Contador de clientes activos
@@ -109,6 +110,7 @@ void *client_handler(void *arg) {
 
   return NULL;
 }
+
 // Función para hacer un socket no bloqueante
 int make_non_blocking(int fd) {
   int flags = fcntl(fd, F_GETFL, 0);
@@ -117,7 +119,11 @@ int make_non_blocking(int fd) {
   return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+  if (argc != 2) {
+    fprintf(stderr, "Uso: %s <puerto>\n", argv[0]);
+    exit(EXIT_FAILURE);
+  }
   struct sockaddr_in addr;
   socklen_t addrlen = sizeof(addr);
   int b = 0;
@@ -137,7 +143,7 @@ int main() {
   memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
   addr.sin_addr.s_addr = INADDR_ANY;
-  addr.sin_port = htons(PORT);
+  addr.sin_port = htons(atoi(argv[PORT]));
 
   if (bind(listen_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
     perror("bind");
@@ -158,64 +164,15 @@ int main() {
     exit(EXIT_FAILURE);
   }
 
-  printf("Server listening on port %d\n", PORT);
+  printf("Servidor escuchando en el puerto: %d\n", atoi(argv[PORT]));
 
-  // Aceptar conexiones entrantes
-  /*
-  while (1) {
-    int *pclient = malloc(sizeof(int));
-    if (!pclient) {
-      perror("malloc");
-      continue;
-    }
-    *pclient = accept(listen_fd, (struct sockaddr *)&addr, &addrlen);
-    if (*pclient < 0) {
-      free(pclient);
-      if (errno == EAGAIN || errno == EWOULDBLOCK) {
-        // no hay nuevos clientes ahora
-        usleep(100000);
-        continue;
-      } else {
-        perror("accept");
-        break;
-      }
-    }
-    pthread_mutex_lock(&clientes_mutex);
-    int added = 0;
-    for (int i = 0; i < MAX_CLIENTES; i++) {
-      if (clientes[i] == 0) {
-        printf("Cliente conectado: %d\n", *pclient);
-        clientes[i] = *pclient;
-        added = 1;
-        break;
-      }
-    }
-    if (!added) {
-      fprintf(stderr, "Máximo de clientes alcanzado. Cerrando conexión.\n");
-      close(*pclient);
-      free(pclient);
-      continue;
-    }
-    pthread_mutex_unlock(&clientes_mutex);
-
-    // Hacer el socket del cliente no bloqueante
-    pthread_mutex_lock(&count_mutex);
-    active_clients++;
-    pthread_mutex_unlock(&count_mutex);
-
-    pthread_t tid;
-    pthread_create(&tid, NULL, client_handler, pclient);
-    pthread_detach(tid);
-    break;
-  }
-*/
   // Bucle principal para aceptar conexiones
-  do {
+  while (1) {
     // Verificar si hay clientes activos
     pthread_mutex_lock(&count_mutex);
     if (active_clients == 0 && b == 1) {
       pthread_mutex_unlock(&count_mutex);
-      printf("No more clients. Shutting down.\n");
+      printf("No hay mas clientes. Apagando...\n");
       break;
     }
     pthread_mutex_unlock(&count_mutex);
@@ -264,7 +221,7 @@ int main() {
     pthread_create(&tid, NULL, client_handler, pclient);
     pthread_detach(tid);
     b = 1;
-  } while (1);
+  }
 
   close(listen_fd);
   return 0;

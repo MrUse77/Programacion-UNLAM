@@ -1,0 +1,42 @@
+[Hijo 3] Aplicando descuento porcentual (PID=39384, PPID=39379)
+[Hijo 2] Aplicando descuento fijo (PID=39383, PPID=39379)
+[Hijo 2] Aplicando descuento porcentual (PID=39383, PPID=39379)
+[Hijo 1] Aplicando IVA (PID=39382, PPID=39379)
+[Hijo 1] Aplicando descuento fijo (PID=39382, PPID=39379)
+[Hijo 1] Aplicando descuento porcentual (PID=39382, PPID=39379)
+[Hijo 0] Aplicando recargo fijo (PID=39381, PPID=39379)
+[Hijo 0] Aplicando IVA (PID=39381, PPID=39379)
+[Hijo 0] Aplicando descuento fijo (PID=39381, PPID=39379)
+[Hijo 0] Aplicando descuento porcentual (PID=39381, PPID=39379)
+
+=== RESUMEN FINAL ===
+Día  1: Original: $18938.80 | Modificado: $ 6717.00
+Día  2: Original: $16028.30 | Modificado: $ 5684.74
+Día  3: Original: $ 9842.30 | Modificado: $ 3490.76
+Día  4: Original: $47300.75 | Modificado: $16776.08
+Día  5: Original: $49577.73 | Modificado: $17583.66
+Día  6: Original: $17690.30 | Modificado: $ 6274.20
+Día  7: Original: $ 4767.40 | Modificado: $ 1690.85
+Día  8: Original: $  507.90 | Modificado: $  180.14
+Día  9: Original: $35771.82 | Modificado: $12687.14
+Día 10: Original: $12700.50 | Modificado: $ 4504.47
+Día 11: Original: $47063.14 | Modificado: $16691.81
+Día 12: Original: $ 9019.30 | Modificado: $ 3198.86
+Día 13: Original: $14432.00 | Modificado: $ 5118.58
+Día 14: Original: $ 8025.10 | Modificado: $ 2846.25
+Día 15: Original: $10607.40 | Modificado: $ 3762.11
+Día 16: Original: $29188.81 | Modificado: $10352.36
+Día 17: Original: $47437.15 | Modificado: $16824.46
+Día 18: Original: $45252.25 | Modificado: $16049.54
+Día 19: Original: $40955.04 | Modificado: $14525.46
+Día 20: Original: $20096.31 | Modificado: $ 7127.53
+Día 21: Original: $45688.84 | Modificado: $16204.39
+Día 22: Original: $42771.04 | Modificado: $15169.54
+Día 23: Original: $27479.21 | Modificado: $ 9746.01
+Día 24: Original: $49378.63 | Modificado: $17513.05
+Día 25: Original: $30751.71 | Modificado: $10906.67
+Día 26: Original: $38290.02 | Modificado: $13580.27
+Día 27: Original: $39641.23 | Modificado: $14059.50
+Día 28: Original: $47590.75 | Modificado: $16878.94
+Día 29: Original: $45688.84 | Modificado: $16204.39
+Día 30: Original: $42771.04 | Modificado: $15169.54

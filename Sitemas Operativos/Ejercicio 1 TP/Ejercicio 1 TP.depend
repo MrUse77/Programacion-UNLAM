@@ -1,6 +1,7 @@
 # depslib dependency file v1.0
-1748193580 source:/home/agustin/Documentos/unlam/Sitemas Operativos/Ejercicio 1 TP/src/main.c
+1749673200 source:/home/agustin/Documentos/unlam/Sitemas Operativos/Ejercicio 1 TP/src/main.c
 	"includes/venta.h"
+	<signal.h>
 	<stdio.h>
 	<stdlib.h>
 	<sys/ipc.h>
@@ -11,9 +12,9 @@
 
 1748124521 source:/home/agustin/Documentos/unlam/Sitemas Operativos/Ejercicio 1 TP/src/ventas_paralelo.c
 
-1748192729 /home/agustin/Documentos/unlam/Sitemas Operativos/Ejercicio 1 TP/src/includes/venta.h
+1749087674 /home/agustin/Documentos/unlam/Sitemas Operativos/Ejercicio 1 TP/src/includes/venta.h
 
-1748192776 source:/home/agustin/Documentos/unlam/Sitemas Operativos/Ejercicio 1 TP/src/venta.c
+1749673328 source:/home/agustin/Documentos/unlam/Sitemas Operativos/Ejercicio 1 TP/src/venta.c
 	"includes/venta.h"
 	<stdio.h>
 	<stdlib.h>

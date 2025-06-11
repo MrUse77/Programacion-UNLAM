@@ -6,7 +6,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#define PORT "8080"
+#define PORT 2
+#define ADDRESS 1
 #define BUF_SIZE 1024
 
 char *fsgets(char t[], int n) {
@@ -22,15 +23,15 @@ char *fsgets(char t[], int n) {
   return t;
 }
 int main(int argc, char *argv[]) {
-  if (argc != 2) {
-    fprintf(stderr, "Usage: %s <server_ip>\n", argv[0]);
+  if (argc != 3) {
+    fprintf(stderr, "Uso: %s <ip_servidor> <puerto>\n", argv[0]);
     return 1;
   }
 
   // Obtener información de la dirección del servidor
   struct addrinfo hints = {.ai_family = AF_UNSPEC, .ai_socktype = SOCK_STREAM};
   struct addrinfo *res;
-  if (getaddrinfo(argv[1], PORT, &hints, &res) != 0) {
+  if (getaddrinfo(argv[ADDRESS], argv[PORT], &hints, &res) != 0) {
     perror("getaddrinfo");
     return 1;
   }
@@ -50,8 +51,9 @@ int main(int argc, char *argv[]) {
     return 1;
   }
   freeaddrinfo(res);
-  printf("Connected to %s:%s. Escribe un mensaje. Ctrl+C o \"exit\" para salir.\n",
-         argv[1], PORT);
+  printf(
+      "Conectado a %s:%s. Escribe un mensaje. Ctrl+C o \"exit\" para salir.\n",
+      argv[ADDRESS], argv[PORT]);
 
   char sendbuf[BUF_SIZE];
   char recvbuf[BUF_SIZE];
@@ -70,7 +72,8 @@ int main(int argc, char *argv[]) {
     }
     if (FD_ISSET(STDIN_FILENO, &readfds)) {
       // Leer del stdin
-      if (fsgets(sendbuf, BUF_SIZE) == NULL) {
+
+      if (fsgets(sendbuf, BUF_SIZE) == NULL || strcmp(sendbuf, "exit") == 0) {
         break; // Ctrl+D o error
       }
       size_t len = strlen(sendbuf);
@@ -93,6 +96,6 @@ int main(int argc, char *argv[]) {
   }
 
   close(sock);
-  printf("Client exiting.\n");
+  printf("Saliendo...\n");
   return 0;
 }

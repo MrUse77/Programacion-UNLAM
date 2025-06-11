@@ -5,8 +5,10 @@
 #include <time.h>
 
 int crearVentas(Venta *venta) {
-  int nVentas = rand() % MAX_VENTAS;
-  srand(time(NULL));
+
+  int nVentas = rand()% MAX_VENTAS;
+    srand(time(NULL));
+
   for (int i = 0; i < nVentas; i++) {
     venta[i].id = rand() % 1000;
     venta[i].monto = ((double)(rand() % 1000) / 10);

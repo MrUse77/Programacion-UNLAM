@@ -80,32 +80,32 @@
 	<string.h>
 	<time.h>
 
-1748144206 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/ej1.1/ej1_1.c
+1748477012 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/ej1.1/ej1_1.c
 	"../../headers/ejercicios.h"
 	<stdio.h>
 
-1748365548 /home/agustin/Documentos/unlam/Topicos/Ejercicios/src/headers/ejercicios.h
+1751405312 /home/agustin/Documentos/unlam/Topicos/Ejercicios/src/headers/ejercicios.h
 
-1748144206 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/ej1.c
+1748477012 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/ej1.c
 	"../headers/ejercicios.h"
 	<stdio.h>
 	<stdlib.h>
 
-1748144206 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/TDAPalabra/mainTDAPalabra.c
+1748477012 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/TDAPalabra/mainTDAPalabra.c
 	"../../headers/SecuenciaPalabra.h"
 	<stdio.h>
 
-1748144206 /home/agustin/Documentos/unlam/Topicos/Ejercicios/src/headers/SecuenciaPalabra.h
+1748477012 /home/agustin/Documentos/unlam/Topicos/Ejercicios/src/headers/SecuenciaPalabra.h
 	"TDAPalabra.h"
 	<stdbool.h>
 
-1748144206 /home/agustin/Documentos/unlam/Topicos/Ejercicios/src/headers/TDAPalabra.h
+1748477012 /home/agustin/Documentos/unlam/Topicos/Ejercicios/src/headers/TDAPalabra.h
 	<stdbool.h>
 
-1748144206 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/TDAPalabra/secuenciaPalabra.c
+1748477012 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/TDAPalabra/secuenciaPalabra.c
 	"../../headers/SecuenciaPalabra.h"
 
-1748144206 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/TDAPalabra/TDAPalabra.c
+1751405399 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/TDAPalabra/TDAPalabra.c
 	"../../headers/TDAPalabra.h"
 	<ctype.h>
 	<stdbool.h>
@@ -127,10 +127,10 @@
 	<stdio.h>
 	<stdlib.h>
 
-1748368448 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/main.c
+1751405313 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/main.c
 	"headers/ejercicios.h"
 
-1748370430 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/ej1.2/ej1_2.c
+1748477012 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/ej1.2/ej1_2.c
 	"../../headers/ejercicios.h"
 	<stdio.h>
 	<stdlib.h>
@@ -141,4 +141,45 @@
 	<stdio.h>
 	<stdlib.h>
 	<time.h>
+
+1751398561 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/ej1.6/ej1_6.c
+	"../../headers/ejercicios.h"
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	"../../headers/strings.h"
+
+1751398796 /home/agustin/Documentos/unlam/Topicos/Ejercicios/src/headers/strings.h
+	<stdbool.h>
+	<stddef.h>
+	<stdio.h>
+	<stdlib.h>
+
+1751403921 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/ej1.7/ej1_7.c
+	"../../headers/ejercicios.h"
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	"../../headers/strings.h"
+
+1751403914 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/ej1.8/ej1_8.c
+	"../../headers/ejercicios.h"
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	"../../headers/strings.h"
+
+1751404098 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/ej1.9/ej1_9.c
+	"../../headers/ejercicios.h"
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	"../../headers/strings.h"
+
+1751406173 source:/home/agustin/Documentos/unlam/Topicos/Ejercicios/src/codigos/ej1.10/ej1_10.c
+	"../../headers/ejercicios.h"
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	"../../headers/strings.h"
 

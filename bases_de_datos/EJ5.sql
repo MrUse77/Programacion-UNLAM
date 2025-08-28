@@ -42,8 +42,6 @@ create table EJ5.prestamo(
 	fechaPrest date not null,
 	fechaDev date,
 	constraint FKEjemplar foreign key(codEj, codPel) references EJ5.ejemplar(codEj, codPel),
-
-	constraint FKPelicula foreign key(codPel) references EJ5.pelicula(codPel),
 	constraint FKCliente foreign key(codCli) references EJ5.cliente(codCli),
 );
 
@@ -88,7 +86,7 @@ select month(pe.fechaPrest) as mes, p.titulo as pelicula, count(*) as cantidad f
 	group by month(pe.fechaPrest), p.titulo
 	having count(*) = (
 		select max(cantidad) from (
-			select count(*) as cantidad from EJ5.prestamo pe2
+	 		select count(*) as cantidad from EJ5.prestamo pe2
 			inner join EJ5.pelicula p2 on pe2.codPel = p2.codPel
 			where month(pe2.fechaPrest) = month(pe.fechaPrest)
 			group by p2.titulo
@@ -107,3 +105,24 @@ select * from EJ5.pelicula p where not exists(
 	select 1 from EJ5.prestamo pe where p.codPel = pe.codPel
 ) 
 
+---- 8. Listar los clientes que no han efectuado la devolución de ejemplares
+select distinct c.* from EJ5.cliente c
+	inner join EJ5.prestamo p on c.codCli = p.codCli
+	where p.fechaDev is NULL
+
+---- 9. Listar los títulos de las películas que tienen la mayor cantidad de préstamos.
+select p.titulo from EJ5.pelicula p inner join 
+	EJ5.prestamos pr on p.codPel = pr.codPel
+	group by p.titulo
+	having count(*)=(
+		select max(cantidad)from(
+			select count(*) as cantidad from EJ5.prestamo pr2 group by pr2.codPel 
+		)
+	)
+---- 10. Listar las películas que tienen todos los ejemplares prestados.
+select p.titulo as pelicula from EJ5.pelicula p inner join EJ5.ejemplar e on p.codPel = e.codPel
+	group by p.titulo, p.codPel
+	having count(*) = (
+		select count(*) from EJ5.ejemplar e2 where e2.estado = 'Ocupado'
+		group by e2.codPel
+	)

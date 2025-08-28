@@ -197,7 +197,6 @@ INSERT INTO EJ3.Detalle_venta (Nro_factura, Nro_detalle, Id_producto, Cantidad, 
 */
 
 -- Ver que productos no se vendieron
-
 SELECT id_producto FROM EJ3.Producto EXCEPT SELECT id_producto FROM EJ3.Detalle_Venta
 --otra manera
 SELECT id_producto FROM EJ3.Producto WHERE id_producto NOT IN (SELECT id_producto FROM EJ3.Detalle_Venta);

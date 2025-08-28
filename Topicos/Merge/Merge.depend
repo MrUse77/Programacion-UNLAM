@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1750881617 source:/home/agustin/Documentos/unlam/Topicos/Merge/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+

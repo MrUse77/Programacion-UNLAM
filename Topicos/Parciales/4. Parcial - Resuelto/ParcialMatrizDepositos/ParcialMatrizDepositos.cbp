@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="ParcialMatrizDepositos" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc-mingw64" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/ParcialMatrizDepositos" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc-mingw64" />
+				<Option parameters="Stocks.dat Movimientos.txt" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add library="lib/libSolucionMatrizDepositos.a" />
+					<Add library="lib/libMatriz.a" />
+					<Add library="lib/libVector.a" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/ParcialMatrizDepositos" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc-mingw64" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="../Comun/Comun.h" />
+		<Unit filename="../Matriz/Matriz.h" />
+		<Unit filename="../SolucionMatrizDepositos/SolucionMatrizDepositos.h" />
+		<Unit filename="../Vector/Vector.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

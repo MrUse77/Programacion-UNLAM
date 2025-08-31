@@ -1,0 +1,15 @@
+# depslib dependency file v1.0
+1756682732 source:/home/agustin/Documentos/unlam/Sitemas Operativos/Ejercicio 1 TP/Ejercicio/main.c
+	<errno.h>
+	<signal.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<sys/ipc.h>
+	<sys/sem.h>
+	<sys/shm.h>
+	<sys/types.h>
+	<sys/wait.h>
+	<time.h>
+	<unistd.h>
+

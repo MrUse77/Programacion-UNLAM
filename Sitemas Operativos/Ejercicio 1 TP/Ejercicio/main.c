@@ -88,7 +88,7 @@ void sigchld_handler(int sig) {
       int term_sig = WTERMSIG(status);
       // Solo si el hijo fue asesinado con SIGKILL ejecutamos la terminación controlada
       if (term_sig == SIGKILL) {
-        printf("\nHijo %d terminado por señal %d. Iniciando terminación controlada...\n", pid, term_sig);
+        printf("\nHijo %d terminado por señal %d. Iniciando terminación controlada...\n", pid, term_sig);	
         cleanup_resources();
         exit(0);
       }else{

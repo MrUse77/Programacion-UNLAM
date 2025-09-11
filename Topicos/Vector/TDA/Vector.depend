@@ -1,9 +1,12 @@
 # depslib dependency file v1.0
-1756388935 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Vector/TDA/vector.c
+1757598904 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Vector/TDA/vector.c
 	<stddef.h>
-	<vector.h>
+	"vector.h"
+	<stdlib.h>
+	<stdio.h>
+	<unistd.h>
 
-1756388818 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Vector/TDA/vector.h
+1757598901 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Vector/TDA/vector.h
 	<stdbool.h>
 	<stddef.h>
 	<stdio.h>

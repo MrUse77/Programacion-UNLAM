@@ -1,16 +1,29 @@
 #include <stddef.h>
-#include <vector.h>
+#include "vector.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
 
-void vectorCrear(Vector *v)
+//Sin static podria declarar un prototipo en otro .c y usarla sin problemas
+static bool redimensionarVector(Vector *v, float factor);
+
+bool vectorCrear(Vector *v)
 {
 	v->cantElem = 0;
+	v->vec = malloc(sizeof(int) * TAM_INIT);
+	if (v->vec == NULL) {
+		v->cap = 0;
+		return false;
+	}
+	v->cap = TAM_INIT;
+	return true;
 }
 
 int vectorInsertar(Vector *v, int elem)
 {
 	size_t ce = v->cantElem;
-	if (v->cantElem == TAM) {
-		return ERR_ESPACIO;
+	if (v->cantElem == v->cap) {
+		redimensionarVector(v, FACT_INC);
 	}
 	v->vec[ce] = elem;
 	v->cantElem++;
@@ -20,8 +33,8 @@ int vectorInsertar(Vector *v, int elem)
 int vectorOrdInsertar(Vector *v, int elem)
 {
 	size_t ce = v->cantElem;
-	if (ce == TAM) {
-		return ERR_ESPACIO;
+	if (ce == v->cap) {
+		redimensionarVector(v, FACT_INC);
 	}
 	int *i = v->vec;
 	int *ult = v->vec + (v->cantElem - 1);
@@ -81,8 +94,11 @@ bool vectorEliminarDePosicion(Vector *v, size_t pos)
 	int *ult = v->vec + v->cantElem - 1;
 	//puede no tener inicializacion
 	for (; i <= ult; i++) {
-		*(i - 1) = *i;
-		ult--;
+		*i = *(i + 1);
+	}
+	v->cantElem--;
+	if (((float)v->cantElem / v->cap) <= FACT_OCUP) {
+		redimensionarVector(v, FACT_DEC);
 	}
 	return true;
 }
@@ -96,6 +112,7 @@ bool vectorOrdEliminar(Vector *v, int elem)
 	vectorEliminarDePosicion(v, pos);
 	return true;
 }
+
 bool vectorEliminar(Vector *v, int elem)
 {
 	int *ult = v->vec + v->cantElem - 1;
@@ -112,4 +129,41 @@ bool vectorEliminar(Vector *v, int elem)
 		i++;
 	}
 	return eliminado;
+}
+
+void vectorVaciar(Vector *v)
+{
+	v->cantElem = 0;
+	v->cap = TAM_INIT;
+	v->vec = realloc(v->vec, TAM_INIT * sizeof(int));
+}
+
+void vectorDestruir(Vector *v)
+{
+	free(v->vec);
+	v->vec = NULL;
+}
+
+int vectorCE(Vector *v)
+{
+	return v->cantElem;
+}
+
+static bool redimensionarVector(Vector *v, float factor)
+{
+	size_t nuevaCap = v->cap * factor;
+	int *nuevoVec = realloc(v->vec, nuevaCap * sizeof(int));
+	//static int i = 0;
+	if (!nuevoVec) {
+		return false;
+	}
+	printf("Redimension de %zu a %zu\n", v->cap, nuevaCap);
+	v->cap = nuevaCap;
+	v->vec = nuevoVec;
+	/*
+	printf("Si pibe me redimensione: %d veces. Ahora a dormir\n", i);
+	i++;
+	sleep(1);
+	*/
+	return true;
 }

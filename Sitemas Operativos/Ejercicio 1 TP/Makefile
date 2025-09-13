@@ -8,6 +8,8 @@ TARGET = ./bin/DataGenerator
 SOURCES = main.c coordinator.c generators.c 
 OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
 
+REGISTERS = 321
+CHILDS = 4
 $(TARGET): $(OBJECTS)
 	$(CC) $(CFLAGS) $^ -o $@
 
@@ -23,3 +25,6 @@ clean:
 	rm -rf $(OBJDIR) $(TARGET)
 
 .PHONY: clean
+
+init: $(TARGET)
+	$(TARGET) $(CHILDS) $(REGISTERS)

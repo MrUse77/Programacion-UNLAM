@@ -8,7 +8,6 @@
 
 /***** Macros *****/
 
-
 /***** Estructuras *****/
 
 //String
@@ -25,7 +24,9 @@ typedef struct {
 /***** Primitivas *****/
 
 //String
+void stringCrear(String *str, const char *src);
 void stringATitulo(String *str);
+void stringConcat(String *dest, const String *src);
 
 //SecString
 void secStringCrear(SecString *sec, char *src);
@@ -33,7 +34,7 @@ bool secStringLeer(SecString *sec, String *str);
 bool secStringEscribir(SecString *sec, const String *str);
 bool secStringEscribirCaracter(SecString *sec, const char c);
 bool secStringFin(const SecString *sec);
-void secStringCerrar(SecString* sec);
+void secStringCerrar(SecString *sec);
 /***** No Primitivas *****/
 //String
 

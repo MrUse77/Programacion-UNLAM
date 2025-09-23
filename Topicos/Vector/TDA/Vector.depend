@@ -11,3 +11,16 @@
 	<stddef.h>
 	<stdio.h>
 
+1758552479 source:/home/agustin/Documentos/unlam/Topicos/Vector/TDA/vector.c
+	<stddef.h>
+	"vector.h"
+	<stdlib.h>
+	<stdio.h>
+	<unistd.h>
+	<string.h>
+
+1758549346 /home/agustin/Documentos/unlam/Topicos/Vector/TDA/vector.h
+	<stdbool.h>
+	<stddef.h>
+	<stdio.h>
+

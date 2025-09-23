@@ -2,7 +2,7 @@ OBJDIR = obj
 SRCDIR = src
 INCDIR = include
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c99 -g -I$(INCDIR)
+CFLAGS = -Wall -Wextra -g -I$(INCDIR)
 
 TARGET = ./bin/DataGenerator
 SOURCES = main.c coordinator.c generators.c 

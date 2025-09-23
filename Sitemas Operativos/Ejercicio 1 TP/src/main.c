@@ -127,13 +127,10 @@ void cleanup_resources()
 	printf("Limpiando recursos del sistema...\n");
 
 	if (data) {
-		printf("generadores activos: %d\n", data->genActivos);
 		data->shutdown_flag = 1;
 		shmdt(data);
 	}
-	printf("%d\n", shm_id);
 	if (shm_id != -1) {
-		printf("Eliminando memoria compartida...\n");
 		shmctl(shm_id, IPC_RMID, NULL);
 	}
 

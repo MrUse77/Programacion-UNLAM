@@ -43,7 +43,7 @@ void generator_process(int genId, sharedData *data)
 			}
 			//	printf("Generador %d: Registro %d generado y enviado al buffer\n",
 			//       genId, ids[i]);
-			//			sleep(DELAY);
+			//sleep(DELAY);
 		}
 	}
 	sem_operation(SEM_IDS, 1); // Liberar semáforo de IDs
@@ -79,19 +79,15 @@ int sendToBuffer(char *record, sharedData *data)
 int getNextIds(int *ids, int maxCount, sharedData *data)
 {
 	sem_operation(SEM_IDS, -1); // Esperar semáforo de IDs
-	if (data->nextId > data->total && data->shutdown_flag) {
+	if (data->nextId > data->total || data->shutdown_flag) {
 		sem_operation(SEM_IDS, 1); // Liberar semáforo de IDs
 		return 0; // No more IDs to generate
 	}
 	int assigned = 0;
-	printf("maxCount: %d, nextId: %d, total: %d\n", maxCount, data->nextId,
-	       data->total);
 	for (int i = 0; i < maxCount && data->nextId <= data->total; i++) {
 		ids[i] = data->nextId++;
 		assigned++;
-		printf("Generador %d asignado ID %d\n", getpid(), ids[i]);
 	}
-	printf("Generador %d solicitando IDs...\n", getpid());
 	sem_operation(SEM_IDS, 1); // Liberar semáforo de IDs
 	return assigned;
 }

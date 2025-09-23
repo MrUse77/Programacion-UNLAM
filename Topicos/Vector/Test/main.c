@@ -5,19 +5,18 @@
 
 int main(int argc, char *argv[])
 {
-	int tam = atoi(argv[1]);
 	srand(time(NULL));
 	Vector v;
-	vectorCrear(&v);
-	for (int i = 0; i < tam; i++) {
-		vectorInsertar(&v, rand() % 1000);
+	vectorCrear(&v, sizeof(int));
+	for (int i = 0; i < 10; i++) {
+		int random = rand() % 1000;
+		vectorInsertarAlInicio(&v, &random);
 	}
-	/*
-	while (vectorCE(&v) > 0) {
-		vectorEliminarDePosicion(&v, 0);
-	}*/
+	vectorMostrar(&v);
+	puts("\n");
+	vectorEliminarDePosicion(&v, 0);
 
-	//vectorMostrar(&v);
+	vectorMostrar(&v);
 	vectorDestruir(&v);
 	return 0;
 }

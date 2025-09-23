@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#define FILAS 4
-#define COLUMNAS 4
-#define ORDEN 4
+#include <time.h>
+#define FILAS 6
+#define COLUMNAS 6
+#define ORDEN 6
 void **crearMatriz(size_t tamElem, int fil, int col);
 void destruirMatriz(void **mat, int fil);
 void newMatriz(int fil, int col, int **mat);
@@ -18,6 +19,7 @@ int sumaTriangularSuperiorSecundaria(int orden, int **mat);
 int sumaTriangularSuperiorSecundariaCD(int orden, int **matriz);
 int sumaTriangularInferiorSecundaria(int orden, int **matriz);
 int sumaTriangularInferiorSecundariaCD(int orden, int **matriz);
+int sumaAbsolutaSuperior(int orden, int **matriz);
 bool esMatrizDiagonal(int orden, int **matriz);
 bool esMatrizIdentidad(int orden, int **matriz);
 
@@ -28,7 +30,7 @@ int main()
 	//     {5, 6, 7, 8},
 	//     {9, 10, 11, 12},
 	//     {13, 14, 15, 16}};
-
+	srand(time(NULL));
 	int orden = ORDEN;
 	// matriz con punteros
 	// int(*matriz)[COLUMNAS] = malloc(sizeof(int) * COLUMNAS * COLUMNAS); //
@@ -58,11 +60,13 @@ int main()
 	       sumaTriangularInferiorSecundaria(4, matriz));
 	printf("suma triangular inferior secundaria con diagonal: %d\n",
 	       sumaTriangularInferiorSecundariaCD(4, matriz));
+	printf("suma absoluta superior: %d\n", sumaAbsolutaSuperior(4, matriz));
 	if (esMatrizDiagonal(4, matriz)) {
 		printf("La matriz es diagonal\n");
 	} else {
 		printf("La matriz no es diagonal\n");
 	}
+
 	if (esMatrizIdentidad(4, matriz)) {
 		printf("La matriz es identidad\n");
 	} else {
@@ -108,7 +112,7 @@ void mostrarMatriz(int **mat, int filas)
 {
 	int i, j;
 
-	for (i = 0; i < filas; i++) {
+	for (i = 0; i < FILAS; i++) {
 		for (j = 0; j < COLUMNAS; j++) {
 			printf("%3d", mat[i][j]);
 		}
@@ -124,7 +128,6 @@ int sumaDiagonalPrincipal(int orden, int **mat)
 	}
 	return suma;
 }
-
 int sumaDiagonalSecundaria(int orden, int **matriz)
 {
 	int suma = 0;
@@ -133,15 +136,10 @@ int sumaDiagonalSecundaria(int orden, int **matriz)
 	}
 	return suma;
 }
-
 int sumaTriangularInferiorPrincipalCD(int orden, int **matriz)
 {
 	int suma = 0;
-	for (int i = 1; i < orden; i++) {
-		for (int j = 0; j < i; j++) {
-			suma += matriz[i][j];
-		}
-	}
+	suma += sumaTriangularInferiorPrincipal(orden, matriz);
 	suma += sumaDiagonalPrincipal(orden, matriz);
 	return suma;
 }
@@ -156,16 +154,11 @@ int sumaTriangularInferiorPrincipal(int orden, int **matriz)
 	}
 	return suma;
 }
-
 int sumaTriangularSuperiorPrincipalCD(int orden, int **matriz)
 {
 	int suma = 0;
 
-	for (int i = 1; i < orden; i++) {
-		for (int j = 0; j < i; j++) {
-			suma += matriz[j][i];
-		}
-	}
+	suma += sumaTriangularSuperiorPrincipal(orden, matriz);
 	suma += sumaDiagonalPrincipal(orden, matriz);
 	return suma;
 }
@@ -195,11 +188,7 @@ int sumaTriangularInferiorSecundariaCD(int orden, int **matriz)
 {
 	int suma = 0;
 
-	for (int i = orden - 1; i > 0; i--) {
-		for (int j = orden - 1; j > orden - i - 1; j--) {
-			suma += matriz[i][j];
-		}
-	}
+	suma += sumaTriangularInferiorSecundaria(orden, matriz);
 	suma += sumaDiagonalSecundaria(orden, matriz);
 	return suma;
 }
@@ -218,14 +207,23 @@ int sumaTriangularSuperiorSecundariaCD(int orden, int **matriz)
 {
 	int suma = 0;
 
-	for (int i = 0; i < orden; i++) {
-		for (int j = 0; j < orden - 1 - i; j++) {
-			suma += matriz[i][j];
-		}
-	}
+	suma += sumaTriangularSuperiorSecundaria(orden, matriz);
 	suma += sumaDiagonalSecundaria(orden, matriz);
 	return suma;
 }
+int sumaAbsolutaSuperior(int orden, int **matriz)
+{
+	int ult = ORDEN - 1;
+	int suma = 0;
+	for (int i = 0; i < ult - i; i++) {
+		for (int j = i + 1; j < ult - i; j++) {
+			printf("%d\n", matriz[i][j]);
+			suma += matriz[i][j];
+		}
+	}
+	return suma;
+}
+
 void newMatriz(int fil, int col, int **mat)
 {
 	int cont = 1;
@@ -236,7 +234,9 @@ void newMatriz(int fil, int col, int **mat)
 				mat[i][j] = cont++;
 			} else {
 				// Si es superior a la diagonal, asignar 0
-				mat[i][j] = 0;
+				mat[i][j] =
+					rand() %
+					10; // Asignar un valor aleatorio entre 0 y 9
 			}
 		}
 	}

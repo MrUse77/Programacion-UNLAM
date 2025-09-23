@@ -3,80 +3,98 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
 
 //Sin static podria declarar un prototipo en otro .c y usarla sin problemas
 static bool redimensionarVector(Vector *v, float factor);
 
-bool vectorCrear(Vector *v)
+bool vectorCrear(Vector *v, size_t tam)
 {
 	v->cantElem = 0;
-	v->vec = malloc(sizeof(int) * TAM_INIT);
+	v->vec = malloc(tam * TAM_INIT);
 	if (v->vec == NULL) {
 		v->cap = 0;
 		return false;
 	}
 	v->cap = TAM_INIT;
+	v->tamElem = tam;
 	return true;
 }
 
-int vectorInsertar(Vector *v, int elem)
+int vectorInsertar(Vector *v, void *elem)
 {
-	size_t ce = v->cantElem;
 	if (v->cantElem == v->cap) {
 		redimensionarVector(v, FACT_INC);
 	}
-	v->vec[ce] = elem;
+	void *posIns = v->vec + v->tamElem * v->cantElem;
+	memcpy(posIns, elem, v->tamElem);
 	v->cantElem++;
 	return OK;
 }
 
-int vectorOrdInsertar(Vector *v, int elem)
+/*Esperar a clase de funciones para terminarlo
+int vectorOrdInsertar(Vector *v, void *elem)
 {
 	size_t ce = v->cantElem;
 	if (ce == v->cap) {
 		redimensionarVector(v, FACT_INC);
 	}
-	int *i = v->vec;
-	int *ult = v->vec + (v->cantElem - 1);
-	while (elem > *i && i <= ult) {
-		i++;
+	void *posIns = v->vec;
+	void *ult = v->vec + (v->cantElem - 1) * v->tamElem;
+	while (posIns <= ult && cmp(posIns, elem) > 0) {
+		posIns += v->tamElem;
 	}
-	if (elem == *i) {
-		return ERR_REP;
-	}
-	for (int *j = ult; i <= j; j--) {
-		*(j + 1) = *j;
+	for (void *j = ult; j >= posIns; j -= v->tamElem) {
+		memcpy(j + v->tamElem, j, v->tamElem);
 	}
 
+	memcpy(posIns, elem, v->tamElem);
 	v->cantElem++;
-	*i = elem;
+	return OK;
+}
+*/
+
+int vectorInsertarAlInicio(Vector *v, void *elem)
+{
+	if (v->cantElem == v->cap)
+		redimensionarVector(v, FACT_INC);
+
+	void *ult = v->vec + (v->cantElem) * v->tamElem;
+
+	//Otra forma: memmvoe(v->vec,v->vec+1, v-tamElem * v->cantElem);
+	for (; ult > v->vec; ult -= v->tamElem) {
+		memcpy(ult, ult - v->tamElem, v->tamElem);
+	}
+
+	memcpy(v->vec, elem, v->tamElem);
+	v->cantElem++;
 	return OK;
 }
 
 void vectorMostrar(const Vector *v)
 {
-	for (int i = 0; i < v->cantElem; i++) {
-		printf("%d\n", v->vec[i]);
+	for (size_t i = 0; i < v->cantElem; i++) {
+		printf("%d\n", *(int *)(v->vec + i * v->tamElem));
 	}
 }
 
-int vectorOrdBuscar(const Vector *v, int elem)
+/*
+int vectorOrdBuscar(const Vector *v, void *elem, Cmp cmp)
 {
-	int *li = (int *)v->vec;
-	int *ls = (int *)v->vec + (v->cantElem - 1);
-	int *m;
+	void *li = v->vec;
+	void *ls = v->vec + (v->cantElem - 1);
+	void *m;
 	int comp;
 	bool encontrado = false;
 	int pos;
 
 	while (li <= ls && !encontrado) {
 		m = li + (ls - li) / 2;
-		comp = elem - *m;
-		if (comp == 0) {
+		if (cmp(elem, m) == 0) {
 			encontrado = true;
 			pos = m - v->vec;
 		}
-		if (elem > *m) {
+		if (cmp(elem, m) > 0) {
 			li = m + 1;
 		} else {
 			ls = m - 1;
@@ -84,18 +102,21 @@ int vectorOrdBuscar(const Vector *v, int elem)
 	}
 	return pos;
 }
+*/
 
 bool vectorEliminarDePosicion(Vector *v, size_t pos)
 {
 	if (pos < 0 || pos > v->cantElem) {
 		return false;
 	}
-	int *i = v->vec + pos + 1;
+	int *i = v->vec + (pos + 1) * v->tamElem;
 	int *ult = v->vec + v->cantElem - 1;
+	//Otra forma:
+	memmove(v->vec + pos, i, v->tamElem * v->cantElem);
 	//puede no tener inicializacion
-	for (; i <= ult; i++) {
-		*i = *(i + 1);
-	}
+	/*for (; i <= ult; i++) {
+		memcpy(i - 1, i, v->tamElem);
+	}*/
 	v->cantElem--;
 	if (((float)v->cantElem / v->cap) <= FACT_OCUP) {
 		redimensionarVector(v, FACT_DEC);
@@ -103,6 +124,7 @@ bool vectorEliminarDePosicion(Vector *v, size_t pos)
 	return true;
 }
 
+/*
 bool vectorOrdEliminar(Vector *v, int elem)
 {
 	int pos = vectorOrdBuscar(v, elem);
@@ -112,16 +134,18 @@ bool vectorOrdEliminar(Vector *v, int elem)
 	vectorEliminarDePosicion(v, pos);
 	return true;
 }
+*/
 
-bool vectorEliminar(Vector *v, int elem)
+/*
+bool vectorEliminar(Vector *v, void *elem, Cmp cmp)
 {
-	int *ult = v->vec + v->cantElem - 1;
-	int *i = v->vec;
+	void *ult = v->vec + v->cantElem - 1;
+	void *i = v->vec;
 	bool eliminado = false;
 	while (i < ult && !eliminado) {
-		if (*i == elem) {
-			for (int *j = i + 1; j <= ult; j++) {
-				*(j - 1) = *j;
+		if (cmp(i, elem) == 0) {
+			for (void *j = i + 1; j <= ult; j++) {
+				memcpy(j - 1, j, v->tamElem);
 				ult--;
 			}
 			eliminado = true;
@@ -130,18 +154,22 @@ bool vectorEliminar(Vector *v, int elem)
 	}
 	return eliminado;
 }
+*/
 
 void vectorVaciar(Vector *v)
 {
 	v->cantElem = 0;
 	v->cap = TAM_INIT;
-	v->vec = realloc(v->vec, TAM_INIT * sizeof(int));
+	v->vec = realloc(v->vec, TAM_INIT * v->tamElem);
 }
 
 void vectorDestruir(Vector *v)
 {
 	free(v->vec);
 	v->vec = NULL;
+	v->cantElem = 0;
+	v->tamElem = 0;
+	v->cap = 0;
 }
 
 int vectorCE(Vector *v)
@@ -152,7 +180,7 @@ int vectorCE(Vector *v)
 static bool redimensionarVector(Vector *v, float factor)
 {
 	size_t nuevaCap = v->cap * factor;
-	int *nuevoVec = realloc(v->vec, nuevaCap * sizeof(int));
+	void *nuevoVec = realloc(v->vec, nuevaCap * sizeof(void *));
 	//static int i = 0;
 	if (!nuevoVec) {
 		return false;

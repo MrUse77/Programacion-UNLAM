@@ -6,6 +6,10 @@
 #include <string.h>
 
 //Sin static podria declarar un prototipo en otro .c y usarla sin problemas
+static void ordenarBurbujeo(Vector *v);
+static void ordenarSeleccion(Vector *v);
+static void ordenarInsercion(Vector *v);
+static void intercambiar(void *a, void *b, size_t tamElem);
 static bool redimensionarVector(Vector *v, float factor);
 
 bool vectorCrear(Vector *v, size_t tam)
@@ -177,6 +181,23 @@ int vectorCE(Vector *v)
 	return v->cantElem;
 }
 
+void vectorOrdenar(Vector *vector, int metodo)
+{
+	switch (metodo) {
+	case BURBUJEO:
+		ordenarBurbujeo(vector);
+		break;
+
+	case SELECCION:
+		ordenarSeleccion(vector);
+		break;
+
+	case INSERCION:
+		ordenarInsercion(vector);
+		break;
+	}
+}
+
 static bool redimensionarVector(Vector *v, float factor)
 {
 	size_t nuevaCap = v->cap * factor;
@@ -194,4 +215,40 @@ static bool redimensionarVector(Vector *v, float factor)
 	sleep(1);
 	*/
 	return true;
+}
+
+static void ordenarBurbujeo(Vector *v)
+{
+	void *ult = v->vec + (v->cantElem - 1) * v->tamElem;
+	void *i, *j;
+	void *aux = malloc(v->tamElem);
+	if (!aux)
+		return;
+	for (i = v->vec; i < ult; i += v->tamElem) {
+		for (j = v->vec; j < ult - (i - v->vec); j += v->tamElem) {
+			if (*(int *)j > *(int *)(j + v->tamElem)) {
+				memcpy(aux, j, v->tamElem);
+				memcpy(j, j + v->tamElem, v->tamElem);
+				memcpy(j + v->tamElem, aux, v->tamElem);
+			}
+		}
+	}
+	free(aux);
+}
+
+static void ordenarSeleccion(Vector *v)
+{
+}
+static void ordenarInsercion(Vector *v)
+{
+}
+static void intercambiar(void *a, void *b, size_t tamElem)
+{
+	void *aux = malloc(tamElem);
+	if (!aux)
+		return;
+	memcpy(aux, a, tamElem);
+	memcpy(a, b, tamElem);
+	memcpy(b, aux, tamElem);
+	free(aux);
 }

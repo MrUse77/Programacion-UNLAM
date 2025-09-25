@@ -15,6 +15,9 @@
 #define ERR_REP 3
 #define ERR 4
 #define SIN_MEM 5
+#define BURBUJEO 6
+#define INSERCION 7
+#define SELECCION 8
 
 typedef struct {
 	void *vec;
@@ -37,7 +40,7 @@ int vectroBuscar(Vector *v, int elem);
 bool vectorOrdEliminar(Vector *v, int elem); //retorna exito o fallo
 bool vectorEliminar(Vector *v, int elem); //retorna exito o fallo
 bool vectorEliminarDePosicion(Vector *v, size_t pos);
-void vectorOrdenar(Vector *V);
+void vectorOrdenar(Vector *V, int meotodo);
 void vectorVaciar(Vector *V);
 void vectorMostrar(const Vector *v);
 int vectorOrdBuscar(const Vector *v, void *elem);

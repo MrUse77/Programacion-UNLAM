@@ -1,0 +1,132 @@
+# depslib dependency file v1.0
+1730771032 source:c:\users\laboratorios.unlmlab\desktop\panasiuk\parcialmatrizdepositos_entregable\parcialmatrizdepositos\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"../Matriz/Matriz.h"
+	"../Vector/Vector.h"
+	"../SolucionMatrizDepositos/SolucionMatrizDepositos.h"
+
+1751476929 onMatrizDepositos/SolucionMatrizDepositos.h"
+
+1730675791 c:\users\laboratorios.unlmlab\desktop\panasiuk\parcialmatrizdepositos_entregable\matriz\matriz.h
+	<stddef.h>
+
+1730675791 
+
+1730675791 c:\users\laboratorios.unlmlab\desktop\panasiuk\parcialmatrizdepositos_entregable\vector\vector.h
+	<stddef.h>
+	<stdbool.h>
+	"../Comun/Comun.h"
+
+1730675791 Comun.h"
+
+1730675791 c:\users\laboratorios.unlmlab\desktop\panasiuk\parcialmatrizdepositos_entregable\comun\comun.h
+
+1730675791 c:\users\laboratorios.unlmlab\desktop\panasiuk\parcialmatrizdepositos_entregable\solucionmatrizdepositos\solucionmatrizdepositos.h
+
+1751479164 source:/home/agustin/Documentos/unlam/Topicos/Parciales/4. Parcial - Resuelto/ParcialMatrizDepositos/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"../Matriz/Matriz.h"
+	"../Vector/Vector.h"
+	"../SolucionMatrizDepositos/SolucionMatrizDepositos.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"../Matriz/Matriz.h"
+	"../Vector/Vector.h"
+	"../SolucionMatrizDepositos/SolucionMatrizDepositos.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"../Matriz/Matriz.h"
+	"../Vector/Vector.h"
+	"../SolucionMatrizDepositos/SolucionMatrizDepositos.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"../Matriz/Matriz.h"
+	"../Vector/Vector.h"
+	"../SolucionMatrizDepositos/SolucionMatrizDepositos.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"../Matriz/Matriz.h"
+	"../Vector/Vector.h"
+	"../SolucionMatrizDepositos/SolucionMatrizDepositos.h"
+
+315543600 /home/agustin/Documentos/unlam/Topicos/Parciales/4. Parcial - Resuelto/Matriz/Matriz.h
+	<stddef.h>
+	<stddef.h>
+	<stddef.h>
+	<stddef.h>
+	<stddef.h>
+
+315543600 >
+
+315543600 /home/agustin/Documentos/unlam/Topicos/Parciales/4. Parcial - Resuelto/Vector/Vector.h
+	<stddef.h>
+	<stdbool.h>
+	"../Comun/Comun.h"
+	<stddef.h>
+	<stdbool.h>
+	"../Comun/Comun.h"
+	<stddef.h>
+	<stdbool.h>
+	"../Comun/Comun.h"
+	<stddef.h>
+	<stdbool.h>
+	"../Comun/Comun.h"
+	<stddef.h>
+	<stdbool.h>
+	"../Comun/Comun.h"
+
+315543600 /Comun.h"
+
+315543600 /home/agustin/Documentos/unlam/Topicos/Parciales/4. Parcial - Resuelto/Comun/Comun.h
+
+315543600 /home/agustin/Documentos/unlam/Topicos/Parciales/4. Parcial - Resuelto/SolucionMatrizDepositos/SolucionMatrizDepositos.h
+
+1751476929 source:c:\users\agustin\documents\unlam\topicos\parciales\4. parcial - resuelto\parcialmatrizdepositos\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"../Matriz/Matriz.h"
+	"../Vector/Vector.h"
+	"../SolucionMatrizDepositos/SolucionMatrizDepositos.h"
+
+315543600 c:\users\agustin\documents\unlam\topicos\parciales\4. parcial - resuelto\matriz\matriz.h
+	<stddef.h>
+
+315543600 c:\users\agustin\documents\unlam\topicos\parciales\4. parcial - resuelto\vector\vector.h
+	<stddef.h>
+	<stdbool.h>
+	"../Comun/Comun.h"
+
+315543600 c:\users\agustin\documents\unlam\topicos\parciales\4. parcial - resuelto\comun\comun.h
+
+315543600 c:\users\agustin\documents\unlam\topicos\parciales\4. parcial - resuelto\solucionmatrizdepositos\solucionmatrizdepositos.h
+
+1751498431 source:z:\topicos\parciales\4. parcial - resuelto\parcialmatrizdepositos\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"../Matriz/Matriz.h"
+	"../Vector/Vector.h"
+	"../SolucionMatrizDepositos/SolucionMatrizDepositos.h"
+
+315543600 z:\topicos\parciales\4. parcial - resuelto\matriz\matriz.h
+	<stddef.h>
+
+315543600 z:\topicos\parciales\4. parcial - resuelto\vector\vector.h
+	<stddef.h>
+	<stdbool.h>
+	"../Comun/Comun.h"
+
+1751485813 z:\topicos\parciales\4. parcial - resuelto\comun\comun.h
+
+1751487905 z:\topicos\parciales\4. parcial - resuelto\solucionmatrizdepositos\solucionmatrizdepositos.h
+	"../Vector/Vector.h"
+

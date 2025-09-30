@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1757064729 source:/home/agustin/Documentos/unlam/Topicos/Strings/TDA/string.c
+	"strings.h"
+
+1757064709 /home/agustin/Documentos/unlam/Topicos/Strings/TDA/strings.h
+	<stdbool.h>
+	<stddef.h>
+	<stdio.h>
+	<stdlib.h>
+

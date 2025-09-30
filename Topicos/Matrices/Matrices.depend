@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1747318601 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Matrices/main.c
+	<stdio.h>
+	<stdlib.h>
+
+1758210137 source:/home/agustin/Documentos/unlam/Topicos/Matrices/main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	<time.h>
+

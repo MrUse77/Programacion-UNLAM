@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1756134041 source:/home/agustin/Documentos/unlam/Topicos/TestFecha/main.c
+	<stdio.h>
+	<stdlib.h>
+	"../Fecha/Fecha.h"
+
+1756132945 /home/agustin/Documentos/unlam/Topicos/Fecha/Fecha.h
+	<stdbool.h>
+

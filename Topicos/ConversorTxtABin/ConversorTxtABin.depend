@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1749136303 source:/home/agustin/Documentos/unlam/Topicos/ConversorTxtABin/main.c
+	<stdbool.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+

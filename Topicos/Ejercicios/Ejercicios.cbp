@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Ejercicios" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/Ejercicios" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add library="src/lib/libTDAVector.a" />
+					<Add library="src/lib/libTDAStrings.a" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/Ejercicios" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="src/codigos/TDAPalabra/TDAPalabra.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/codigos/TDAPalabra/mainTDAPalabra.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/codigos/TDAPalabra/secuenciaPalabra.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/codigos/ej1.1/ej1_1.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/codigos/ej1.10/ej1_10.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/codigos/ej1.2/ej1_2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/codigos/ej1.6/ej1_6.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/codigos/ej1.7/ej1_7.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/codigos/ej1.8/ej1_8.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/codigos/ej1.9/ej1_9.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/codigos/ej1.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/headers/SecuenciaPalabra.h" />
+		<Unit filename="src/headers/TDAPalabra.h" />
+		<Unit filename="src/headers/ejercicios.h" />
+		<Unit filename="src/headers/strings.h" />
+		<Unit filename="src/headers/vector.h" />
+		<Unit filename="src/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>

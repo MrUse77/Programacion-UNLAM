@@ -19,23 +19,24 @@ typedef struct {
 	char region[REGION_TAM];
 	char periodo[PERIODO_TAM];
 } Registro;
-int comp(const void* a, const void* b);
-void formato(const void* reg);
-void quitarComillar(void* elem);
-void formatear(char* elem, void* reg);
-size_t longitudString(const char* str)
+int comp(const void *a, const void *b);
+void formato(const void *reg);
+void quitarComillar(void *elem);
+void formatear(char *elem, void *reg);
+void formatearATXT(FILE *f, void *reg);
+size_t longitudString(const char *str)
 {
-	const char* letraActual = str;
+	const char *letraActual = str;
 
 	while (*letraActual != '\0')
 		letraActual++;
 
 	return letraActual - str;
 }
-char* buscarEnStringReversa(const char* str, char c)
+char *buscarEnStringReversa(const char *str, char c)
 {
 	size_t longStr = longitudString(str);
-	char* letraActual = (char*)str + longStr - 1;
+	char *letraActual = (char *)str + longStr - 1;
 
 	while (letraActual >= str && *letraActual != c)
 		letraActual--;
@@ -46,14 +47,26 @@ char* buscarEnStringReversa(const char* str, char c)
 	return NULL;
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
 	//	srand(time(NULL));
 	int cod;
-	FILE* f = fopen("serie_ipc_divisiones.csv", "rt");
+	FILE *f = fopen("serie_ipc_divisiones.csv", "rt");
+	if (!f) {
+		perror("Error al abrir el archivo");
+		return ERR;
+	}
 	Vector v;
 	vectorCrear(&v, sizeof(Registro));
-	cod = vectorInsertarDeArchivoTXT(&v, f, formatear);
+	cod = vectorInsertarDeArchivoTXT(&v, f, formatear, 5);
+	FILE *f2 = fopen("serie_ipc_divisiones_out.csv", "wt");
+	if (!f2) {
+		perror("Error al abrir el archivo");
+		vectorDestruir(&v);
+		fclose(f);
+		return ERR;
+	}
+	cod = vectorGuardarAArchivoTXT(&v, f2, formatearATXT);
 	/*
 	for (int i = 0; i < 100000; i++) {
 		int random = rand() % 100000;
@@ -70,16 +83,17 @@ int main(int argc, char* argv[])
 
 	//vectorMostrar(&v, formato);
 	fclose(f);
+	fclose(f2);
 	vectorDestruir(&v);
 	return cod;
 }
 
-void formatear(char* elem, void* elemSal)
+void formatear(char *elem, void *elemSal)
 {
-	Registro* reg = (Registro*)elemSal;
+	Registro *reg = (Registro *)elemSal;
 
 	quitarComillar(elem);
-	char* act;
+	char *act;
 	act = buscarEnStringReversa(elem, '\n');
 	*act = '\0';
 	act = buscarEnStringReversa(elem, ';');
@@ -105,10 +119,10 @@ void formatear(char* elem, void* elemSal)
 	*act = '\0';
 	sscanf(elem, "%s", reg->codigo);
 }
-void quitarComillar(void* elem)
+void quitarComillar(void *elem)
 {
-	char* str = (char*)elem;
-	char* src = str, * dst = str;
+	char *str = (char *)elem;
+	char *src = str, *dst = str;
 	while (*src) {
 		if (*src != '"') {
 			*dst++ = *src;
@@ -117,15 +131,21 @@ void quitarComillar(void* elem)
 	}
 	*dst = '\0';
 }
-void formato(const void* elem)
+void formato(const void *elem)
 {
-	Registro* reg = (Registro*)elem;
+	Registro *reg = (Registro *)elem;
 	printf("%s %s %s %s %s %s %s %s\n", reg->codigo, reg->descripcion,
-				 reg->clasificador, reg->indice_icc, reg->var_mensual,
-				 reg->var_interanual, reg->region, reg->periodo);
-
+	       reg->clasificador, reg->indice_icc, reg->var_mensual,
+	       reg->var_interanual, reg->region, reg->periodo);
 }
-int comp(const void* a, const void* b)
+int comp(const void *a, const void *b)
 {
-	return *(int*)a - *(int*)b;
+	return *(int *)a - *(int *)b;
+}
+void formatearATXT(FILE *f, void *reg)
+{
+	Registro r = *(Registro *)reg;
+	fprintf(f, "\"%s\";\"%s\";\"%s\";%s;%s;%s;%s;%s\n", r.codigo,
+		r.descripcion, r.clasificador, r.indice_icc, r.var_mensual,
+		r.var_interanual, r.region, r.periodo);
 }

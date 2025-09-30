@@ -104,13 +104,18 @@ int vectorInsertarDeArchivoBIN(Vector *v, FILE *f)
 	free(elem);
 	return cod;
 }
-int vectorInsertarDeArchivoTXT(Vector *v, FILE *f, FmtInsert formatear)
+//La cabecera de, por ejemplo un csv, debera leerse antes de llamar a esta funcion
+int vectorInsertarDeArchivoTXT(Vector *v, FILE *f, FmtInsert formatear,
+			       int count)
 {
+	if (count <= 0) {
+		count = -1;
+	}
 	int cod = OK;
 	char *elem = malloc(v->tamElem);
 	if (!elem)
 		return ERR_MEM;
-	while (fgets(elem, v->tamElem, f)) {
+	while (fgets(elem, v->tamElem, f) && (count-- != 0)) {
 		void *elemFmt = malloc(v->tamElem);
 		formatear(elem, elemFmt);
 		cod = vectorInsertar(v, elemFmt);
@@ -120,6 +125,19 @@ int vectorInsertarDeArchivoTXT(Vector *v, FILE *f, FmtInsert formatear)
 			return cod;
 		}
 		free(elemFmt);
+	}
+	free(elem);
+	return cod;
+}
+//Funcion para guardar datos del vector, la cabecera del archivo, si es que lo desea, debera introducirse antes
+int vectorGuardarAArchivoTXT(Vector *v, FILE *f, FmtWrite formatear)
+{
+	int cod = OK;
+	void *ult = v->vec + (v->cantElem - 1) * v->tamElem;
+	void *i = v->vec;
+	char *elem = malloc(sizeof(v->tamElem));
+	for (; i < ult; i += v->tamElem) {
+		formatear(f, i);
 	}
 	free(elem);
 	return cod;

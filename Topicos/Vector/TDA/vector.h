@@ -37,6 +37,8 @@ typedef struct {
 typedef int (*Cmp)(const void *, const void *); //Puntero a funcion
 typedef void (*Fmt)(const void *);
 typedef void (*FmtInsert)(char *, void *);
+typedef void (*FmtRead)(char *, void *);
+typedef void (*FmtWrite)(FILE *, void *);
 
 //memmove: usar cuando entre destino y origen tocan una misma direccion de memoria, usa un buffer
 //memcpy: usar cuando entre destino y origen no tocan una misma direccion de memoria, no usa un buffer
@@ -52,8 +54,9 @@ int vectorOrdInsertar(Vector *v, void *elem, Cmp cmp);
 int vectorInsertar(Vector *v, void *elem);
 int vectorInsertarAlInicio(Vector *v, void *elem);
 int vectorInsertarDeArchivoBIN(Vector *v, FILE *f);
-int vectorInsertarDeArchivoTXT(Vector *v, FILE *f,
-			       FmtInsert insertar); //Probable csv
+int vectorInsertarDeArchivoTXT(Vector *v, FILE *f, FmtInsert insertar,
+			       int count); //Probable csv
+int vectorGuardarAArchivoTXT(Vector *v, FILE *f, FmtWrite formatear);
 
 //Busqueda
 void *vectorBuscar(Vector *v, int elem);

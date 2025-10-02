@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include "../TDA/vector.h"
 
 #define CODIGO_TAM 21
@@ -46,44 +45,30 @@ char *buscarEnStringReversa(const char *str, char c)
 
 	return NULL;
 }
-
 int main(int argc, char *argv[])
 {
-	//	srand(time(NULL));
 	int cod;
-	FILE *f = fopen("serie_ipc_divisiones.csv", "rt");
-	if (!f) {
-		perror("Error al abrir el archivo");
-		return ERR;
-	}
 	Vector v;
-	vectorCrear(&v, sizeof(Registro));
-	cod = vectorInsertarDeArchivoTXT(&v, f, formatear, 5);
-	FILE *f2 = fopen("serie_ipc_divisiones_out.csv", "wt");
-	if (!f2) {
-		perror("Error al abrir el archivo");
-		vectorDestruir(&v);
-		fclose(f);
-		return ERR;
-	}
-	cod = vectorGuardarAArchivoTXT(&v, f2, formatearATXT);
-	/*
-	for (int i = 0; i < 100000; i++) {
-		int random = rand() % 100000;
-		vectorInsertar(&v, &random);
+	vectorCrear(&v, sizeof(int));
+
+	for (int i = 0; i < 10; i++) {
+		int random = rand() % 100;
+		cod = vectorInsertar(&v, &random);
+		if (cod != OK) {
+			return cod;
+		}
 	}
 
+	//memcpy: 144ms para 10.000 elementos
+	//memmove: 17ms para 10.000 elementos
+	//memmove: 397ms para 100.000 elementos
+	//memcpy: 113052ms para 100.000 elementos
 	puts("\n");
-	int init = time(NULL);
-	qsort(v.vec, v.cantElem, v.tamElem, &comp); // La funcion qsort de la libreria estandar
-	//vectorOrdenar(&v, BURBUJEO);
-	int end = time(NULL);
-	printf("Tiempo de ordenacion: %d segundos\n", end - init);
-	*/
 
-	//vectorMostrar(&v, formato);
-	fclose(f);
-	fclose(f2);
+	//	vectorMostrar(&v, formato);
+	vectorOrdenar(&v, INSERCION, comp);
+
+	vectorMostrar(&v, formato);
 	vectorDestruir(&v);
 	return cod;
 }
@@ -131,12 +116,16 @@ void quitarComillar(void *elem)
 	}
 	*dst = '\0';
 }
-void formato(const void *elem)
+void formatoReg(const void *elem)
 {
 	Registro *reg = (Registro *)elem;
 	printf("%s %s %s %s %s %s %s %s\n", reg->codigo, reg->descripcion,
 	       reg->clasificador, reg->indice_icc, reg->var_mensual,
 	       reg->var_interanual, reg->region, reg->periodo);
+}
+void formato(const void *elem)
+{
+	printf("%d\n", *(int *)elem);
 }
 int comp(const void *a, const void *b)
 {

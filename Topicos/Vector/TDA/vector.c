@@ -4,14 +4,20 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <time.h>
 
+typedef void *(*busqueda)(void *init, void *fin, size_t tamElem, Cmp cmp);
+typedef bool (*funcCmp)(const void *a, const void *b, Cmp cmp);
 //Sin static podria declarar un prototipo en otro .c y usarla sin problemas
-static void ordenarBurbujeo(Vector *v);
-static void ordenarSeleccion(Vector *v);
-static void ordenarSeleccion2(Vector *v);
-static void ordenarInsercion(Vector *v);
-static void *buscarMenor(void *init, void *fin, size_t tamElem);
-static void *buscarMayor(void *init, void *fin, size_t tamElem);
+static void ordenarBurbujeo(Vector *v, Cmp cmp, int ord);
+static void ordenarSeleccion(Vector *v, Cmp cmp, busqueda b);
+static void ordenarSeleccion2(Vector *v, Cmp cmp, busqueda a, busqueda b);
+static void ordenarInsercion(Vector *v, Cmp cmp, int ord);
+static void *buscarMenor(void *init, void *fin, size_t tamElem, Cmp cmp);
+static void *buscarMayor(void *init, void *fin, size_t tamElem, Cmp cmp);
+static bool cmpAsc(const void *a, const void *b, Cmp cmp);
+static bool cmpDesc(const void *a, const void *b, Cmp cmp);
+
 static void intercambiar(void *a, void *b, size_t tamElem);
 static bool redimensionarVector(Vector *v, float factor);
 
@@ -56,33 +62,43 @@ int vectorInsertar(Vector *v, void *elem)
 int vectorOrdInsertar(Vector *v, void *elem, Cmp cmp)
 {
 	size_t ce = v->cantElem;
-	if (ce == v->cap)
-		if (redimensionarVector(v, FACT_INC))
+	int cod;
+	if (ce == v->cap) {
+		cod = redimensionarVector(v, FACT_INC);
+		if (cod != OK)
 			return SIN_MEM;
+	}
 
 	void *posIns = v->vec;
 	void *ult = v->vec + (v->cantElem - 1) * v->tamElem;
 	while (posIns <= ult && cmp(posIns, elem) > 0)
 		posIns += v->tamElem;
 
+	memmove(posIns + v->tamElem, posIns, (ult - posIns) + v->tamElem);
+	/*Otra forma:
 	for (void *j = ult; j >= posIns; j -= v->tamElem)
 		memcpy(j + v->tamElem, j, v->tamElem);
-
+	*/
 	memcpy(posIns, elem, v->tamElem);
 	v->cantElem++;
 	return OK;
 }
 int vectorInsertarAlInicio(Vector *v, void *elem)
 {
-	if (v->cantElem == v->cap)
-		redimensionarVector(v, FACT_INC);
-
+	int cod;
+	if (v->cantElem == v->cap) {
+		cod = redimensionarVector(v, FACT_INC);
+		if (cod != OK)
+			return SIN_MEM;
+	}
 	void *ult = v->vec + (v->cantElem) * v->tamElem;
 
-	//Otra forma: memmvoe(v->vec,v->vec+1, v-tamElem * v->cantElem);
-	for (; ult > v->vec; ult -= v->tamElem) {
+	//Otra forma:
+	memmove(v->vec, v->vec + 1, v->tamElem * v->cantElem);
+
+	/*for (; ult > v->vec; ult -= v->tamElem) {
 		memcpy(ult, ult - v->tamElem, v->tamElem);
-	}
+	}*/
 
 	memcpy(v->vec, elem, v->tamElem);
 	v->cantElem++;
@@ -118,7 +134,7 @@ int vectorInsertarDeArchivoTXT(Vector *v, FILE *f, FmtInsert formatear,
 	while (fgets(elem, v->tamElem, f) && (count-- != 0)) {
 		void *elemFmt = malloc(v->tamElem);
 		formatear(elem, elemFmt);
-		cod = vectorInsertar(v, elemFmt);
+		cod = vectorInsertarAlInicio(v, elemFmt);
 
 		if (cod != OK) {
 			free(elem);
@@ -166,10 +182,11 @@ void *vectorOrdBuscar(const Vector *v, void *elem, Cmp cmp)
 	int pos;
 
 	while (li <= ls && !encontrado) {
-		m = li + (ls - li) / 2;
+		m = li + ((ls - li) / v->tamElem / 2) * v->tamElem;
 		if (cmp(elem, m) == 0) {
 			encontrado = true;
-			pos = m - v->vec;
+			memcpy(elem, m, v->tamElem);
+			pos = (m - v->vec) * v->tamElem;
 		}
 		if (cmp(elem, m) > 0) {
 			li = m + 1;
@@ -228,81 +245,101 @@ bool vectorEliminar(Vector *v, void *elem, Cmp cmp)
 }
 
 //Ordenamiento
-void vectorOrdenar(Vector *vector, int metodo)
+//ord = 1 ascendente, -1 descendente
+int vectorOrdenar(Vector *vector, int metodo, Cmp cmp, int ord)
 {
+	void *a, *b;
+	if (ord != 1 && ord != -1)
+		return ERR_ORD;
+	if (ord == 1) {
+		a = buscarMayor;
+		b = buscarMenor;
+	} else if (ord == -1) {
+		a = buscarMenor;
+		b = buscarMayor;
+	}
 	switch (metodo) {
 	case BURBUJEO:
-		ordenarBurbujeo(vector);
+		ordenarBurbujeo(vector, cmp, ord);
 		break;
-
 	case SELECCION:
-		ordenarSeleccion(vector);
+		ordenarSeleccion(vector, cmp, a);
 		break;
-
 	case INSERCION:
-		ordenarInsercion(vector);
+		ordenarInsercion(vector, cmp, ord);
 		break;
 	case SELECCION2:
-		ordenarSeleccion2(vector);
+		ordenarSeleccion2(vector, cmp, a, b);
 		break;
 	}
+	return OK;
 }
-static void ordenarBurbujeo(Vector *v)
+
+static void ordenarBurbujeo(Vector *v, Cmp cmp, int ord)
 {
 	void *ult = v->vec + (v->cantElem - 1) * v->tamElem;
 	void *i, *j;
 	void *aux = malloc(v->tamElem);
+	funcCmp func;
+	if (ord == 1) {
+		func = cmpAsc;
+	} else {
+		func = cmpDesc;
+	}
 	if (!aux)
 		return;
+
 	for (i = v->vec; i < ult; i += v->tamElem) {
 		for (j = v->vec; j < ult - (i - v->vec); j += v->tamElem) {
-			if (*(int *)j > *(int *)(j + v->tamElem)) {
+			if (func(j, j + v->tamElem, cmp)) {
 				intercambiar(j, j + v->tamElem, v->tamElem);
 			}
 		}
 	}
 	free(aux);
 }
-static void ordenarSeleccion(Vector *v)
+static void ordenarSeleccion(Vector *v, Cmp cmp, busqueda b)
 {
 	void *ult = v->vec + (v->cantElem - 1) * v->tamElem;
-	void *i, *min;
+	void *i, *elem;
 	for (i = v->vec; i < ult; i += v->tamElem) {
-		min = buscarMenor(i, ult, v->tamElem);
-		if (min != i) {
-			intercambiar(i, min, v->tamElem);
+		elem = b(i, ult, v->tamElem, cmp);
+		if (elem != i) {
+			intercambiar(i, elem, v->tamElem);
 		}
 	}
 }
-static void ordenarSeleccion2(Vector *v)
+static void ordenarSeleccion2(Vector *v, Cmp cmp, busqueda a, busqueda b)
 {
 	void *ult = v->vec + (v->cantElem - 1) * v->tamElem;
-	void *i, *min, *max;
+	void *i, *e1, *e2;
 	for (i = v->vec; i < ult; i += v->tamElem, ult -= v->tamElem) {
-		min = buscarMenor(i, ult, v->tamElem);
-		max = buscarMayor(i, ult, v->tamElem);
-		if (min != i) {
-			intercambiar(i, min, v->tamElem);
+		e1 = a(i, ult, v->tamElem, cmp);
+		e2 = b(i, ult, v->tamElem, cmp);
+		if (e2 != i) {
+			intercambiar(i, e1, v->tamElem);
 		}
-		if (max != ult) {
-			intercambiar(ult, max, v->tamElem);
+		if (e1 != ult) {
+			intercambiar(ult, e2, v->tamElem);
 		}
 	}
 }
-static void ordenarInsercion(Vector *v)
+static void ordenarInsercion(Vector *v, Cmp cmpFunc)
 {
 	void *ult = v->vec + (v->cantElem - 1) * v->tamElem;
-	void *i, *j;
-	int elemAIns;
-	for (i = v->vec + 1; i < ult; i += v->tamElem) {
-		elemAIns = *(int *)i;
+	void *j;
+	void *elemAIns = malloc(v->tamElem);
+	for (void *i = v->vec + v->tamElem; i < ult + v->tamElem;
+	     i += v->tamElem) {
+		memcpy(elemAIns, i, v->tamElem);
 		j = i - v->tamElem;
-		while (j >= v->vec && *(int *)j > elemAIns) {
-			*(int *)(j + v->tamElem) = *(int *)j;
+		while (j >= v->vec && cmpFunc(j, elemAIns) > 0) {
+			memcpy(j + v->tamElem, j, v->tamElem);
 			j -= v->tamElem;
 		}
-		*(int *)(j + v->tamElem) = elemAIns;
+		memcpy(j + v->tamElem, elemAIns, v->tamElem);
 	}
+	free(elemAIns);
 }
 
 //varios
@@ -349,25 +386,25 @@ static bool redimensionarVector(Vector *v, float factor)
 	*/
 	return true;
 }
-static void *buscarMayor(void *init, void *fin, size_t tamElem)
+static void *buscarMayor(void *init, void *fin, size_t tamElem, Cmp cmp)
 {
-	void *j;
+	void *j, *elem = init;
 	for (j = init + tamElem; j <= fin; j += tamElem) {
-		if (*(int *)j > *(int *)init) {
-			init = j;
+		if (cmp(j, elem) > 0) {
+			elem = j;
 		}
 	}
-	return j;
+	return elem;
 }
-static void *buscarMenor(void *init, void *fin, size_t tamElem)
+static void *buscarMenor(void *init, void *fin, size_t tamElem, Cmp cmp)
 {
-	void *j;
+	void *j, *elem = init;
 	for (j = init + tamElem; j <= fin; j += tamElem) {
-		if (*(int *)j < *(int *)init) {
-			init = j;
+		if (cmp(j, elem) < 0) {
+			elem = j;
 		}
 	}
-	return j;
+	return elem;
 }
 static void intercambiar(void *a, void *b, size_t tamElem)
 {
@@ -378,4 +415,12 @@ static void intercambiar(void *a, void *b, size_t tamElem)
 	memcpy(a, b, tamElem);
 	memcpy(b, aux, tamElem);
 	free(aux);
+}
+static bool cmpAsc(const void *a, const void *b, Cmp cmp)
+{
+	return (cmp(a, b) > 0);
+}
+static bool cmpDesc(const void *a, const void *b, Cmp cmp)
+{
+	return (cmp(a, b) < 0);
 }

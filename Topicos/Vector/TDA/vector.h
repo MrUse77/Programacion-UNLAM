@@ -21,6 +21,7 @@
 #define ERR 4
 #define SIN_MEM 5
 #define ERR_MEM 6
+#define ERR_ORD 7
 
 //Tipos de ordenamiento
 #define BURBUJEO 1
@@ -39,6 +40,7 @@ typedef void (*Fmt)(const void *);
 typedef void (*FmtInsert)(char *, void *);
 typedef void (*FmtRead)(char *, void *);
 typedef void (*FmtWrite)(FILE *, void *);
+extern double tiempo;
 
 //memmove: usar cuando entre destino y origen tocan una misma direccion de memoria, usa un buffer
 //memcpy: usar cuando entre destino y origen no tocan una misma direccion de memoria, no usa un buffer
@@ -68,7 +70,7 @@ bool vectorEliminar(Vector *v, void *elem, Cmp cmp);
 bool vectorEliminarDePosicion(Vector *v, size_t pos);
 
 //Ordenamiento
-void vectorOrdenar(Vector *V, int metodo);
+int vectorOrdenar(Vector *V, int metodo, Cmp cmp, int ord);
 
 //varios
 void vectorVaciar(Vector *V);

@@ -1,0 +1,7 @@
+# Configuración del Servidor de Micro Base de Datos
+HOST=127.0.0.1
+PORT=8080
+MAX_CLIENTS=5
+QUEUE_SIZE=10
+DATABASE_FILE=database.csv
+LOG_LEVEL=INFO

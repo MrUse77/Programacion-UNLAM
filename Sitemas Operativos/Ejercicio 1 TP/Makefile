@@ -9,7 +9,7 @@ SOURCES = main.c coordinator.c generators.c
 OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
 
 REGISTERS = 321
-CHILDS = 4
+CHILDS = 10
 $(TARGET): $(OBJECTS)
 	$(CC) $(CFLAGS) $^ -o $@
 

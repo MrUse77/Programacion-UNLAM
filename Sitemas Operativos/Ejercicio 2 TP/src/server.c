@@ -145,6 +145,7 @@ void *handle_client(void *arg)
 				       "Base de datos bloqueada por transacción activa");
 			} else {
 				char values[MAX_FIELDS][MAX_FIELD_SIZE];
+				printf("value count: %d\n", cmd.param_count);
 				int value_count = cmd.param_count;
 				for (int i = 0; i < value_count; i++) {
 					strcpy(values[i], cmd.params[i]);
@@ -342,7 +343,7 @@ int start_server(server_config_t *config)
 	// Configurar dirección del servidor
 	memset(&server_addr, 0, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_addr.s_addr = inet_addr(config->host);
+	server_addr.sin_addr.s_addr = INADDR_ANY;
 	server_addr.sin_port = htons(config->port);
 
 	// Bind del socket

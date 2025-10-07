@@ -337,6 +337,9 @@ int run_interactive_client()
 			free(input);
 			continue;
 		}
+		printf("Procesando comando: %s\n", cmd.query);
+		printf("Tipo de comando: %d\n", cmd.type);
+		printf("Número de parámetros: %d\n", cmd.param_count);
 
 		// Enviar comando al servidor
 		if (send_command(client_state.socket_fd, &cmd) <= 0) {

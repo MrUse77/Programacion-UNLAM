@@ -11,14 +11,16 @@
 static int client_socket = -1;
 static volatile sig_atomic_t running = 1;
 
-void cleanup() {
+void cleanup()
+{
 	if (client_socket != -1) {
 		close(client_socket);
 		client_socket = -1;
 	}
 }
 
-void signal_handler(int sig) {
+void signal_handler(int sig)
+{
 	if (sig == SIGINT || sig == SIGTERM) {
 		printf("\nCerrando cliente...\n");
 		cleanup();
@@ -26,7 +28,8 @@ void signal_handler(int sig) {
 	}
 }
 
-void print_usage(const char* program) {
+void print_usage(const char* program)
+{
 	printf("Uso: %s -s <servidor> -p <puerto>\n", program);
 	printf("Opciones:\n");
 	printf("  -s <servidor>  Dirección IP o hostname del servidor (requerido)\n");
@@ -34,7 +37,8 @@ void print_usage(const char* program) {
 	printf("  -h             Mostrar esta ayuda\n");
 }
 
-void print_help() {
+void print_help()
+{
 	printf("\n=== AYUDA DE COMANDOS ===\n");
 	printf("Consultas:\n");
 	printf("  SELECT ALL                      - Mostrar todos los registros\n");
@@ -63,7 +67,8 @@ void print_help() {
 	printf("========================\n\n");
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
 	char* server_addr = NULL;
 	int port = -1;
 	int opt;
@@ -118,7 +123,8 @@ int main(int argc, char* argv[]) {
 
 	// Conectar al servidor
 	printf("Conectando a %s:%d...\n", server_addr, port);
-	if (connect(client_socket, (struct sockaddr*)&server, sizeof(server)) < 0) {
+	if (connect(client_socket, (struct sockaddr*)&server, sizeof(server)) <
+			0) {
 		perror("Error al conectar");
 		close(client_socket);
 		return 1;
@@ -127,7 +133,12 @@ int main(int argc, char* argv[]) {
 	printf("Conectado al servidor!\n");
 
 	// Recibir mensaje de bienvenida
-	char buffer[BUFFER_SIZE];
+	char* buffer = malloc(BUFFER_SIZE);
+	if (!buffer) {
+		perror("Error al asignar memoria");
+		close(client_socket);
+		return 1;
+	}
 	memset(buffer, 0, BUFFER_SIZE);
 	int bytes_received = recv(client_socket, buffer, BUFFER_SIZE - 1, 0);
 	if (bytes_received > 0) {
@@ -171,6 +182,27 @@ int main(int argc, char* argv[]) {
 		// Recibir respuesta
 		memset(buffer, 0, BUFFER_SIZE);
 		bytes_received = recv(client_socket, buffer, BUFFER_SIZE - 1, 0);
+		printf("Respuesta del servidor: %d %d\n", bytes_received, BUFFER_SIZE);
+		if (bytes_received > 0) {
+			buffer[bytes_received] = '\0';
+
+			// Verificar si hay más datos por recibir
+			while (bytes_received == BUFFER_SIZE - 1) {
+				char* new_buffer = realloc(buffer, strlen(buffer) + BUFFER_SIZE);
+				if (!new_buffer) {
+					perror("Error al realocar memoria");
+					break;
+				}
+				buffer = new_buffer;
+
+				int more_bytes = recv(client_socket, buffer + strlen(buffer), BUFFER_SIZE - 1, 0);
+				if (more_bytes <= 0) {
+					break;
+				}
+				buffer[strlen(buffer) + more_bytes] = '\0';
+				bytes_received = more_bytes;
+			}
+		}
 
 		if (bytes_received <= 0) {
 			if (bytes_received == 0) {
@@ -182,15 +214,13 @@ int main(int argc, char* argv[]) {
 			break;
 		}
 
-		buffer[bytes_received] = '\0';
 		printf("%s\n", buffer);
 
 		// Verificar si fue comando QUIT
-		if (strcasecmp(command, "QUIT") == 0) {
-			break;
-		}
-	}
 
+
+	}
+	free(buffer);
 	cleanup();
 	printf("Cliente cerrado\n");
 	return 0;

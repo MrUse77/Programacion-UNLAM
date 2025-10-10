@@ -10,7 +10,7 @@
 #include <netinet/in.h>
 
 #define BUFFER_SIZE 4096
-#define MAX_LINE 1024
+#define MAX_LINE 2048
 #define DB_FILE "database.csv"
 #define TEMP_FILE "database.tmp"
 
@@ -26,7 +26,7 @@ static int server_socket = -1;
 static int max_clients = 5;
 static int max_queue = 10;
 static int client_count = 0;
-static int transaction_owner = -1;  // ID del cliente con transacción activa
+static int transaction_owner = -1; // ID del cliente con transacción activa
 static pthread_mutex_t db_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t client_mutex = PTHREAD_MUTEX_INITIALIZER;
 static volatile sig_atomic_t server_running = 1;
@@ -43,7 +43,8 @@ int execute_delete(char* command, char* response);
 void print_usage(const char* program);
 
 // Limpieza de recursos
-void cleanup_resources() {
+void cleanup_resources()
+{
 	printf("\nCerrando servidor...\n");
 	server_running = 0;
 
@@ -62,7 +63,8 @@ void cleanup_resources() {
 }
 
 // Manejador de señales
-void signal_handler(int sig) {
+void signal_handler(int sig)
+{
 	if (sig == SIGINT || sig == SIGTERM) {
 		printf("\nSeñal recibida, cerrando servidor...\n");
 		cleanup_resources();
@@ -71,8 +73,10 @@ void signal_handler(int sig) {
 }
 
 // Mostrar ayuda
-void print_usage(const char* program) {
-	printf("Uso: %s -p <puerto> [-n <max_clientes>] [-m <max_cola>]\n", program);
+void print_usage(const char* program)
+{
+	printf("Uso: %s -p <puerto> [-n <max_clientes>] [-m <max_cola>]\n",
+				 program);
 	printf("Opciones:\n");
 	printf("  -p <puerto>         Puerto de escucha (requerido)\n");
 	printf("  -n <max_clientes>   Máximo de clientes concurrentes (default: 5)\n");
@@ -81,15 +85,17 @@ void print_usage(const char* program) {
 }
 
 // Ejecutar consulta SELECT
-int execute_query(char* command, char* response) {
+int execute_query(char* command, char* response)
+{
 	FILE* file = fopen(DB_FILE, "r");
 	if (!file) {
-		snprintf(response, BUFFER_SIZE, "ERROR: No se pudo abrir la base de datos\n");
+		snprintf(response, BUFFER_SIZE,
+						 "ERROR: No se pudo abrir la base de datos\n");
 		return -1;
 	}
 
 	char line[MAX_LINE];
-	char result[BUFFER_SIZE] = "";
+	char* result = malloc(BUFFER_SIZE);
 	int count = 0;
 	int first_line = 1;
 
@@ -100,8 +106,30 @@ int execute_query(char* command, char* response) {
 
 	if (token && strcmp(token, "ALL") == 0) {
 		// SELECT ALL - devolver todos los registros
+		size_t result_capacity = BUFFER_SIZE;
 		while (fgets(line, sizeof(line), file)) {
-			strncat(result, line, BUFFER_SIZE - strlen(result) - 1);
+			size_t needed_size = strlen(result) + strlen(line) + 1;
+
+			// Si no hay espacio suficiente, hacer realloc
+			if (needed_size > result_capacity) {
+				size_t new_capacity = result_capacity * 2;
+				while (new_capacity < needed_size) {
+					new_capacity *= 2;
+				}
+
+				char* new_result = realloc(result, new_capacity);
+				if (!new_result) {
+					free(result);
+					fclose(file);
+					snprintf(response, BUFFER_SIZE,
+									 "ERROR: Memoria insuficiente\n");
+					return -1;
+				}
+				result = new_result;
+				result_capacity = new_capacity;
+			}
+
+			strcat(result, line);
 			count++;
 		}
 	}
@@ -115,7 +143,8 @@ int execute_query(char* command, char* response) {
 
 			// Leer encabezado
 			if (fgets(line, sizeof(line), file)) {
-				strncat(result, line, BUFFER_SIZE - strlen(result) - 1);
+				strncat(result, line,
+								BUFFER_SIZE - strlen(result) - 1);
 
 				// Buscar índice del campo
 				int field_index = -1;
@@ -138,28 +167,41 @@ int execute_query(char* command, char* response) {
 
 				// Filtrar registros
 				if (field_index >= 0) {
-					while (fgets(line, sizeof(line), file)) {
+					while (fgets(line, sizeof(line),
+											 file)) {
 						char* line_copy = strdup(line);
-						char* l_token = strtok(line_copy, ",");
+						char* l_token =
+							strtok(line_copy, ",");
 						idx = 0;
 						int match = 0;
 
-						while (l_token && idx <= field_index) {
-							if (idx == field_index) {
-								char clean_value[64];
-								sscanf(l_token, "%s", clean_value);
-								if (strcmp(clean_value, value) == 0) {
+						while (l_token &&
+									 idx <= field_index) {
+							if (idx ==
+									field_index) {
+								char clean_value
+									[64];
+								sscanf(l_token,
+											 "%s",
+											 clean_value);
+								if (strcmp(clean_value,
+													 value) ==
+										0) {
 									match = 1;
 								}
 								break;
 							}
-							l_token = strtok(NULL, ",");
+							l_token = strtok(NULL,
+															 ",");
 							idx++;
 						}
 						free(line_copy);
 
 						if (match) {
-							strncat(result, line, BUFFER_SIZE - strlen(result) - 1);
+							strncat(result, line,
+											BUFFER_SIZE -
+											strlen(result) -
+											1);
 							count++;
 						}
 					}
@@ -171,45 +213,73 @@ int execute_query(char* command, char* response) {
 	fclose(file);
 
 	if (strlen(result) > 0) {
-		snprintf(response, BUFFER_SIZE, "OK\n%s\nRegistros encontrados: %d\n", result, count);
+		size_t result_len = strlen(result);
+		size_t prefix_len = strlen("OK\n");
+		size_t suffix_len = snprintf(NULL, 0, "\nRegistros encontrados: %d\n", count);
+		size_t total_needed = prefix_len + result_len + suffix_len + 1;
+
+
+		// Realloc response to fit the entire result
+		char* new_response = realloc(response, total_needed);
+		if (!new_response) {
+			free(result);
+			snprintf(response, BUFFER_SIZE,
+							 "ERROR: Memoria insuficiente\n");
+			return -1;
+		}
+		response = new_response;
+		snprintf(response, total_needed,
+						 "OK\n%s\nRegistros encontrados: %d\n", result, count);
+
 	}
 	else {
-		snprintf(response, BUFFER_SIZE, "OK\nNo se encontraron registros\n");
+		snprintf(response, BUFFER_SIZE,
+						 "OK\nNo se encontraron registros\n");
 	}
+	printf("Respuesta del servidor: %s\n", response);
 
+	free(result);
 	return 0;
 }
 
 // Ejecutar INSERT
-int execute_insert(char* command, char* response) {
+int execute_insert(char* command, char* response)
+{
 	// Formato: INSERT id,name,age,city,department,salary,experience
 	char* data = strchr(command, ' ');
 	if (!data) {
-		snprintf(response, BUFFER_SIZE, "ERROR: Formato incorrecto. Uso: INSERT campo1,campo2,...\n");
+		snprintf(
+			response, BUFFER_SIZE,
+			"ERROR: Formato incorrecto. Uso: INSERT campo1,campo2,...\n");
 		return -1;
 	}
 	data++; // Saltar el espacio
 
 	FILE* file = fopen(DB_FILE, "a");
 	if (!file) {
-		snprintf(response, BUFFER_SIZE, "ERROR: No se pudo abrir la base de datos\n");
+		snprintf(response, BUFFER_SIZE,
+						 "ERROR: No se pudo abrir la base de datos\n");
 		return -1;
 	}
 
 	fprintf(file, "%s\n", data);
 	fclose(file);
 
-	snprintf(response, BUFFER_SIZE, "OK\nRegistro insertado correctamente\n");
+	snprintf(response, BUFFER_SIZE,
+					 "OK\nRegistro insertado correctamente\n");
 	return 0;
 }
 
 // Ejecutar UPDATE
-int execute_update(char* command, char* response) {
+int execute_update(char* command, char* response)
+{
 	// Formato: UPDATE ID campo nuevo_valor
 	char id[64], field[64], value[256];
 
 	if (sscanf(command, "UPDATE %s %s %[^\n]", id, field, value) != 3) {
-		snprintf(response, BUFFER_SIZE, "ERROR: Formato incorrecto. Uso: UPDATE ID campo nuevo_valor\n");
+		snprintf(
+			response, BUFFER_SIZE,
+			"ERROR: Formato incorrecto. Uso: UPDATE ID campo nuevo_valor\n");
 		return -1;
 	}
 
@@ -217,9 +287,12 @@ int execute_update(char* command, char* response) {
 	FILE* temp = fopen(TEMP_FILE, "w");
 
 	if (!file || !temp) {
-		if (file) fclose(file);
-		if (temp) fclose(temp);
-		snprintf(response, BUFFER_SIZE, "ERROR: No se pudo abrir la base de datos\n");
+		if (file)
+			fclose(file);
+		if (temp)
+			fclose(temp);
+		snprintf(response, BUFFER_SIZE,
+						 "ERROR: No se pudo abrir la base de datos\n");
 		return -1;
 	}
 
@@ -261,7 +334,8 @@ int execute_update(char* command, char* response) {
 			int idx = 0;
 
 			while (original_token) {
-				if (idx > 0) strcat(new_line, ",");
+				if (idx > 0)
+					strcat(new_line, ",");
 
 				if (idx == field_index) {
 					strcat(new_line, value);
@@ -271,11 +345,14 @@ int execute_update(char* command, char* response) {
 					char clean_token[256];
 					int len = strlen(original_token);
 					if (original_token[len - 1] == '\n') {
-						strncpy(clean_token, original_token, len - 1);
+						strncpy(clean_token,
+										original_token,
+										len - 1);
 						clean_token[len - 1] = '\0';
 					}
 					else {
-						strcpy(clean_token, original_token);
+						strcpy(clean_token,
+									 original_token);
 					}
 					strcat(new_line, clean_token);
 				}
@@ -298,23 +375,27 @@ int execute_update(char* command, char* response) {
 	if (updated) {
 		remove(DB_FILE);
 		rename(TEMP_FILE, DB_FILE);
-		snprintf(response, BUFFER_SIZE, "OK\nRegistro actualizado correctamente\n");
+		snprintf(response, BUFFER_SIZE,
+						 "OK\nRegistro actualizado correctamente\n");
 	}
 	else {
 		remove(TEMP_FILE);
-		snprintf(response, BUFFER_SIZE, "ERROR: No se encontró el registro con ID %s\n", id);
+		snprintf(response, BUFFER_SIZE,
+						 "ERROR: No se encontró el registro con ID %s\n", id);
 	}
 
 	return updated ? 0 : -1;
 }
 
 // Ejecutar DELETE
-int execute_delete(char* command, char* response) {
+int execute_delete(char* command, char* response)
+{
 	// Formato: DELETE ID
 	char id[64];
 
 	if (sscanf(command, "DELETE %s", id) != 1) {
-		snprintf(response, BUFFER_SIZE, "ERROR: Formato incorrecto. Uso: DELETE ID\n");
+		snprintf(response, BUFFER_SIZE,
+						 "ERROR: Formato incorrecto. Uso: DELETE ID\n");
 		return -1;
 	}
 
@@ -322,9 +403,12 @@ int execute_delete(char* command, char* response) {
 	FILE* temp = fopen(TEMP_FILE, "w");
 
 	if (!file || !temp) {
-		if (file) fclose(file);
-		if (temp) fclose(temp);
-		snprintf(response, BUFFER_SIZE, "ERROR: No se pudo abrir la base de datos\n");
+		if (file)
+			fclose(file);
+		if (temp)
+			fclose(temp);
+		snprintf(response, BUFFER_SIZE,
+						 "ERROR: No se pudo abrir la base de datos\n");
 		return -1;
 	}
 
@@ -355,18 +439,21 @@ int execute_delete(char* command, char* response) {
 	if (deleted) {
 		remove(DB_FILE);
 		rename(TEMP_FILE, DB_FILE);
-		snprintf(response, BUFFER_SIZE, "OK\nRegistro eliminado correctamente\n");
+		snprintf(response, BUFFER_SIZE,
+						 "OK\nRegistro eliminado correctamente\n");
 	}
 	else {
 		remove(TEMP_FILE);
-		snprintf(response, BUFFER_SIZE, "ERROR: No se encontró el registro con ID %s\n", id);
+		snprintf(response, BUFFER_SIZE,
+						 "ERROR: No se encontró el registro con ID %s\n", id);
 	}
 
 	return deleted ? 0 : -1;
 }
 
 // Procesar comando del cliente
-int process_command(int client_id, char* command, char* response) {
+int process_command(int client_id, char* command, char* response)
+{
 	// Eliminar salto de línea
 	command[strcspn(command, "\n")] = 0;
 
@@ -378,7 +465,9 @@ int process_command(int client_id, char* command, char* response) {
 
 		if (transaction_owner != -1 && transaction_owner != client_id) {
 			pthread_mutex_unlock(&db_mutex);
-			snprintf(response, BUFFER_SIZE, "ERROR: Existe una transacción activa. Reintente más tarde.\n");
+			snprintf(
+				response, BUFFER_SIZE,
+				"ERROR: Existe una transacción activa. Reintente más tarde.\n");
 			return -1;
 		}
 
@@ -395,7 +484,8 @@ int process_command(int client_id, char* command, char* response) {
 
 		if (transaction_owner != client_id) {
 			pthread_mutex_unlock(&db_mutex);
-			snprintf(response, BUFFER_SIZE, "ERROR: No tiene una transacción activa\n");
+			snprintf(response, BUFFER_SIZE,
+							 "ERROR: No tiene una transacción activa\n");
 			return -1;
 		}
 
@@ -410,7 +500,9 @@ int process_command(int client_id, char* command, char* response) {
 	pthread_mutex_lock(&db_mutex);
 	if (transaction_owner != -1 && transaction_owner != client_id) {
 		pthread_mutex_unlock(&db_mutex);
-		snprintf(response, BUFFER_SIZE, "ERROR: Existe una transacción activa. Reintente más tarde.\n");
+		snprintf(
+			response, BUFFER_SIZE,
+			"ERROR: Existe una transacción activa. Reintente más tarde.\n");
 		return -1;
 	}
 
@@ -424,9 +516,11 @@ int process_command(int client_id, char* command, char* response) {
 	int result = 0;
 
 	if (strncmp(command, "SELECT", 6) == 0) {
-		if (!has_transaction) pthread_mutex_lock(&db_mutex);
+		if (!has_transaction)
+			pthread_mutex_lock(&db_mutex);
 		result = execute_query(command, response);
-		if (!has_transaction) pthread_mutex_unlock(&db_mutex);
+		if (!has_transaction)
+			pthread_mutex_unlock(&db_mutex);
 	}
 	else if (strncmp(command, "INSERT", 6) == 0) {
 		result = execute_insert(command, response);
@@ -458,39 +552,44 @@ int process_command(int client_id, char* command, char* response) {
 }
 
 // Manejar cliente
-void* handle_client(void* arg) {
+void* handle_client(void* arg)
+{
 	client_data_t* client = (client_data_t*)arg;
 	char buffer[BUFFER_SIZE];
-	char response[BUFFER_SIZE];
+	char* response = malloc(BUFFER_SIZE);
 
 	char client_ip[INET_ADDRSTRLEN];
-	inet_ntop(AF_INET, &client->address.sin_addr, client_ip, INET_ADDRSTRLEN);
+	inet_ntop(AF_INET, &client->address.sin_addr, client_ip,
+						INET_ADDRSTRLEN);
 
-	printf("Cliente %d conectado desde %s:%d\n",
-				 client->client_id, client_ip, ntohs(client->address.sin_port));
+	printf("Cliente %d conectado desde %s:%d\n", client->client_id,
+				 client_ip, ntohs(client->address.sin_port));
 
 	// Mensaje de bienvenida
-	snprintf(response, BUFFER_SIZE,
-					 "Bienvenido al servidor de base de datos\n"
-					 "Comandos disponibles:\n"
-					 "  SELECT ALL\n"
-					 "  SELECT campo valor\n"
-					 "  INSERT id,nombre,edad,ciudad,departamento,salario,experiencia\n"
-					 "  UPDATE id campo nuevo_valor\n"
-					 "  DELETE id\n"
-					 "  BEGIN TRANSACTION\n"
-					 "  COMMIT TRANSACTION\n"
-					 "  QUIT\n");
+	snprintf(
+		response, BUFFER_SIZE,
+		"Bienvenido al servidor de base de datos\n"
+		"Comandos disponibles:\n"
+		"  SELECT ALL\n"
+		"  SELECT campo valor\n"
+		"  INSERT id,nombre,edad,ciudad,departamento,salario,experiencia\n"
+		"  UPDATE id campo nuevo_valor\n"
+		"  DELETE id\n"
+		"  BEGIN TRANSACTION\n"
+		"  COMMIT TRANSACTION\n"
+		"  QUIT\n");
 	send(client->socket, response, strlen(response), 0);
 
 	// Bucle de comunicación
 	while (server_running) {
 		memset(buffer, 0, BUFFER_SIZE);
-		int bytes_received = recv(client->socket, buffer, BUFFER_SIZE - 1, 0);
+		int bytes_received =
+			recv(client->socket, buffer, BUFFER_SIZE - 1, 0);
 
 		if (bytes_received <= 0) {
 			if (bytes_received == 0) {
-				printf("Cliente %d desconectado\n", client->client_id);
+				printf("Cliente %d desconectado\n",
+							 client->client_id);
 			}
 			else {
 				perror("Error al recibir datos");
@@ -500,7 +599,9 @@ void* handle_client(void* arg) {
 
 		buffer[bytes_received] = '\0';
 
-		int cmd_result = process_command(client->client_id, buffer, response);
+		int cmd_result =
+			process_command(client->client_id, buffer, response);
+		printf("Respuesta del servidor: %s, %d\n", response, strlen(response));
 		send(client->socket, response, strlen(response), 0);
 
 		if (cmd_result == 1) { // QUIT
@@ -511,7 +612,8 @@ void* handle_client(void* arg) {
 	// Liberar transacción si el cliente la tenía
 	pthread_mutex_lock(&db_mutex);
 	if (transaction_owner == client->client_id) {
-		printf("Cliente %d tenía transacción activa, liberando lock\n", client->client_id);
+		printf("Cliente %d tenía transacción activa, liberando lock\n",
+					 client->client_id);
 		transaction_owner = -1;
 	}
 	pthread_mutex_unlock(&db_mutex);
@@ -522,12 +624,13 @@ void* handle_client(void* arg) {
 	client_count--;
 	printf("Clientes activos: %d\n", client_count);
 	pthread_mutex_unlock(&client_mutex);
-
+	free(response);
 	free(client);
 	return NULL;
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
 	int port = -1;
 	int opt;
 
@@ -567,7 +670,8 @@ int main(int argc, char* argv[]) {
 	// Verificar que existe el archivo de base de datos
 	FILE* db = fopen(DB_FILE, "r");
 	if (!db) {
-		fprintf(stderr, "Error: No se encuentra el archivo %s\n", DB_FILE);
+		fprintf(stderr, "Error: No se encuentra el archivo %s\n",
+						DB_FILE);
 		return 1;
 	}
 	fclose(db);
@@ -586,7 +690,8 @@ int main(int argc, char* argv[]) {
 
 	// Configurar opción SO_REUSEADDR
 	int reuse = 1;
-	if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
+	if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &reuse,
+								 sizeof(reuse)) < 0) {
 		perror("Error en setsockopt");
 		close(server_socket);
 		return 1;
@@ -600,7 +705,8 @@ int main(int argc, char* argv[]) {
 	server_addr.sin_port = htons(port);
 
 	// Bind
-	if (bind(server_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+	if (bind(server_socket, (struct sockaddr*)&server_addr,
+					 sizeof(server_addr)) < 0) {
 		perror("Error en bind");
 		close(server_socket);
 		return 1;
@@ -625,10 +731,13 @@ int main(int argc, char* argv[]) {
 		struct sockaddr_in client_addr;
 		socklen_t client_len = sizeof(client_addr);
 
-		int client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_len);
+		int client_socket = accept(server_socket,
+															 (struct sockaddr*)&client_addr,
+															 &client_len);
 
 		if (client_socket < 0) {
-			if (errno == EINTR) continue;
+			if (errno == EINTR)
+				continue;
 			perror("Error en accept");
 			continue;
 		}
@@ -638,7 +747,8 @@ int main(int argc, char* argv[]) {
 		if (client_count >= max_clients) {
 			pthread_mutex_unlock(&client_mutex);
 
-			char msg[] = "ERROR: Servidor lleno. Intente más tarde.\n";
+			char msg[] =
+				"ERROR: Servidor lleno. Intente más tarde.\n";
 			send(client_socket, msg, strlen(msg), 0);
 			close(client_socket);
 			printf("Conexión rechazada: servidor lleno\n");
@@ -660,7 +770,8 @@ int main(int argc, char* argv[]) {
 		pthread_attr_init(&attr);
 		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-		if (pthread_create(&thread, &attr, handle_client, client) != 0) {
+		if (pthread_create(&thread, &attr, handle_client, client) !=
+				0) {
 			perror("Error al crear thread");
 			close(client_socket);
 			free(client);

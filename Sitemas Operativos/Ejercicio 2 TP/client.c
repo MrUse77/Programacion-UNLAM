@@ -3,8 +3,11 @@
 #include <string.h>
 #include <unistd.h>
 #include <signal.h>
+#include <errno.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/select.h>
+#include <sys/time.h>
 
 #define BUFFER_SIZE 4096
 
@@ -65,6 +68,89 @@ void print_help()
 	printf("  HELP                            - Mostrar esta ayuda\n");
 	printf("  QUIT                            - Salir del cliente\n");
 	printf("========================\n\n");
+}
+
+// Recibir datos dinámicamente (lee en chunks y los concatena)
+char* recv_dynamic(int sock, ssize_t* out_len)
+{
+	const size_t CHUNK = 8192; // Chunk más grande para reducir llamadas
+	char* tmp = malloc(CHUNK);
+	if (!tmp) return NULL;
+
+	char* buf = NULL;
+	size_t len = 0;
+	size_t capacity = 0;
+
+	while (1) {
+		// Usar select para ver si hay datos disponibles (timeout de 100ms)
+		fd_set readfds;
+		struct timeval timeout;
+		FD_ZERO(&readfds);
+		FD_SET(sock, &readfds);
+		timeout.tv_sec = 0;
+		timeout.tv_usec = 100000; // 100ms
+
+		int select_result = select(sock + 1, &readfds, NULL, NULL, &timeout);
+		if (select_result < 0) {
+			if (errno == EINTR) continue;
+			free(buf);
+			free(tmp);
+			return NULL;
+		}
+
+		// Si no hay datos disponibles después del timeout, terminamos
+		if (select_result == 0) {
+			// Solo salir si ya leímos algo
+			if (len > 0) break;
+			// Si no hemos leído nada, seguir esperando (primera lectura)
+			continue;
+		}
+
+		ssize_t n = recv(sock, tmp, CHUNK, 0);
+		if (n < 0) {
+			if (errno == EINTR) continue; // reintentar si fue interrumpido
+			free(buf);
+			free(tmp);
+			return NULL;
+		}
+		if (n == 0) {
+			// conexión cerrada por el otro extremo
+			break;
+		}
+
+		// Expandir buffer si es necesario
+		if (len + n + 1 > capacity) {
+			size_t new_capacity = (capacity == 0) ? CHUNK : capacity * 2;
+			while (new_capacity < len + n + 1) {
+				new_capacity *= 2;
+			}
+			char* newbuf = realloc(buf, new_capacity);
+			if (!newbuf) {
+				free(buf);
+				free(tmp);
+				return NULL;
+			}
+			buf = newbuf;
+			capacity = new_capacity;
+		}
+
+		memcpy(buf + len, tmp, n);
+		len += n;
+	}
+
+	free(tmp);
+
+	if (!buf) {
+		buf = malloc(1);
+		if (!buf) return NULL;
+		buf[0] = '\0';
+	}
+	else {
+		buf[len] = '\0';
+	}
+
+	if (out_len) *out_len = (ssize_t)len;
+	return buf;
 }
 
 int main(int argc, char* argv[])
@@ -133,16 +219,14 @@ int main(int argc, char* argv[])
 	printf("Conectado al servidor!\n");
 
 	// Recibir mensaje de bienvenida
-	char* buffer = malloc(BUFFER_SIZE);
+	ssize_t bytes_received;
+	char* buffer = recv_dynamic(client_socket, &bytes_received);
 	if (!buffer) {
-		perror("Error al asignar memoria");
+		perror("Error al recibir bienvenida");
 		close(client_socket);
 		return 1;
 	}
-	memset(buffer, 0, BUFFER_SIZE);
-	int bytes_received = recv(client_socket, buffer, BUFFER_SIZE - 1, 0);
 	if (bytes_received > 0) {
-		buffer[bytes_received] = '\0';
 		printf("\n%s\n", buffer);
 	}
 
@@ -180,36 +264,16 @@ int main(int argc, char* argv[])
 		}
 
 		// Recibir respuesta
-		memset(buffer, 0, BUFFER_SIZE);
-		bytes_received = recv(client_socket, buffer, BUFFER_SIZE - 1, 0);
-		printf("Respuesta del servidor: %d %d\n", bytes_received, BUFFER_SIZE);
-		if (bytes_received > 0) {
-			buffer[bytes_received] = '\0';
-
-			// Verificar si hay más datos por recibir
-			while (bytes_received == BUFFER_SIZE - 1) {
-				char* new_buffer = realloc(buffer, strlen(buffer) + BUFFER_SIZE);
-				if (!new_buffer) {
-					perror("Error al realocar memoria");
-					break;
-				}
-				buffer = new_buffer;
-
-				int more_bytes = recv(client_socket, buffer + strlen(buffer), BUFFER_SIZE - 1, 0);
-				if (more_bytes <= 0) {
-					break;
-				}
-				buffer[strlen(buffer) + more_bytes] = '\0';
-				bytes_received = more_bytes;
-			}
+		free(buffer); // liberar buffer anterior
+		buffer = recv_dynamic(client_socket, &bytes_received);
+		if (!buffer) {
+			perror("Error al recibir respuesta");
+			break;
 		}
 
 		if (bytes_received <= 0) {
 			if (bytes_received == 0) {
 				printf("Servidor desconectado\n");
-			}
-			else {
-				perror("Error al recibir respuesta");
 			}
 			break;
 		}
@@ -217,8 +281,9 @@ int main(int argc, char* argv[])
 		printf("%s\n", buffer);
 
 		// Verificar si fue comando QUIT
-
-
+		if (strcasecmp(command, "QUIT") == 0) {
+			break;
+		}
 	}
 	free(buffer);
 	cleanup();

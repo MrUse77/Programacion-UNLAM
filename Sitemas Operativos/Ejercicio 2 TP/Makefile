@@ -45,7 +45,7 @@ distclean: clean
 # Ejecutar servidor con parámetros por defecto
 run-server: $(SERVER_BIN)
 	@echo "Iniciando servidor en puerto 8080..."
-	./$(SERVER_BIN) -p 8080 -n 5 -m 10
+	./$(SERVER_BIN) -p 4321 -n 5 -m 10
 
 # Ejecutar cliente conectándose a localhost
 run-client: $(CLIENT_BIN)

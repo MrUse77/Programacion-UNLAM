@@ -35,12 +35,13 @@ static volatile sig_atomic_t server_running = 1;
 void cleanup_resources();
 void signal_handler(int sig);
 void* handle_client(void* arg);
-int process_command(int client_id, char* command, char* response);
-int execute_query(char* command, char* response);
-int execute_insert(char* command, char* response);
-int execute_update(char* command, char* response);
-int execute_delete(char* command, char* response);
+int process_command(int client_id, char* command, char** response, size_t* response_size);
+int execute_query(char* command, char** response, size_t* response_size);
+int execute_insert(char* command, char** response, size_t* response_size);
+int execute_update(char* command, char** response, size_t* response_size);
+int execute_delete(char* command, char** response, size_t* response_size);
 void print_usage(const char* program);
+ssize_t send_all(int socket, const char* buffer, size_t length);
 
 // Limpieza de recursos
 void cleanup_resources()
@@ -84,20 +85,34 @@ void print_usage(const char* program)
 	printf("  -h                  Mostrar esta ayuda\n");
 }
 
+// Enviar todos los datos (maneja envíos parciales)
+ssize_t send_all(int socket, const char* buffer, size_t length)
+{
+	size_t total_sent = 0;
+	while (total_sent < length) {
+		ssize_t sent = send(socket, buffer + total_sent, length - total_sent, 0);
+		if (sent < 0) {
+			if (errno == EINTR) continue;
+			return -1;
+		}
+		total_sent += sent;
+	}
+	return total_sent;
+}
+
 // Ejecutar consulta SELECT
-int execute_query(char* command, char* response)
+int execute_query(char* command, char** response, size_t* response_size)
 {
 	FILE* file = fopen(DB_FILE, "r");
 	if (!file) {
-		snprintf(response, BUFFER_SIZE,
-						 "ERROR: No se pudo abrir la base de datos\n");
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"ERROR: No se pudo abrir la base de datos\n");
 		return -1;
 	}
 
 	char line[MAX_LINE];
 	char* result = malloc(BUFFER_SIZE);
 	int count = 0;
-	int first_line = 1;
 
 	// Parsear comando SELECT
 	// Formato: SELECT [campo] [valor] o SELECT ALL
@@ -121,8 +136,8 @@ int execute_query(char* command, char* response)
 				if (!new_result) {
 					free(result);
 					fclose(file);
-					snprintf(response, BUFFER_SIZE,
-									 "ERROR: Memoria insuficiente\n");
+					*response_size = snprintf(*response, BUFFER_SIZE,
+																		"ERROR: Memoria insuficiente\n");
 					return -1;
 				}
 				result = new_result;
@@ -218,38 +233,35 @@ int execute_query(char* command, char* response)
 		size_t suffix_len = snprintf(NULL, 0, "\nRegistros encontrados: %d\n", count);
 		size_t total_needed = prefix_len + result_len + suffix_len + 1;
 
-
 		// Realloc response to fit the entire result
-		char* new_response = realloc(response, total_needed);
+		char* new_response = realloc(*response, total_needed);
 		if (!new_response) {
 			free(result);
-			snprintf(response, BUFFER_SIZE,
-							 "ERROR: Memoria insuficiente\n");
+			*response_size = snprintf(*response, BUFFER_SIZE,
+																"ERROR: Memoria insuficiente\n");
 			return -1;
 		}
-		response = new_response;
-		snprintf(response, total_needed,
-						 "OK\n%s\nRegistros encontrados: %d\n", result, count);
-
+		*response = new_response;
+		*response_size = snprintf(*response, total_needed,
+															"OK\n%s\nRegistros encontrados: %d\n", result, count);
 	}
 	else {
-		snprintf(response, BUFFER_SIZE,
-						 "OK\nNo se encontraron registros\n");
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"OK\nNo se encontraron registros\n");
 	}
-	printf("Respuesta del servidor: %s\n", response);
 
 	free(result);
 	return 0;
 }
 
 // Ejecutar INSERT
-int execute_insert(char* command, char* response)
+int execute_insert(char* command, char** response, size_t* response_size)
 {
 	// Formato: INSERT id,name,age,city,department,salary,experience
 	char* data = strchr(command, ' ');
 	if (!data) {
-		snprintf(
-			response, BUFFER_SIZE,
+		*response_size = snprintf(
+			*response, BUFFER_SIZE,
 			"ERROR: Formato incorrecto. Uso: INSERT campo1,campo2,...\n");
 		return -1;
 	}
@@ -257,28 +269,28 @@ int execute_insert(char* command, char* response)
 
 	FILE* file = fopen(DB_FILE, "a");
 	if (!file) {
-		snprintf(response, BUFFER_SIZE,
-						 "ERROR: No se pudo abrir la base de datos\n");
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"ERROR: No se pudo abrir la base de datos\n");
 		return -1;
 	}
 
 	fprintf(file, "%s\n", data);
 	fclose(file);
 
-	snprintf(response, BUFFER_SIZE,
-					 "OK\nRegistro insertado correctamente\n");
+	*response_size = snprintf(*response, BUFFER_SIZE,
+														"OK\nRegistro insertado correctamente\n");
 	return 0;
 }
 
 // Ejecutar UPDATE
-int execute_update(char* command, char* response)
+int execute_update(char* command, char** response, size_t* response_size)
 {
 	// Formato: UPDATE ID campo nuevo_valor
 	char id[64], field[64], value[256];
 
 	if (sscanf(command, "UPDATE %s %s %[^\n]", id, field, value) != 3) {
-		snprintf(
-			response, BUFFER_SIZE,
+		*response_size = snprintf(
+			*response, BUFFER_SIZE,
 			"ERROR: Formato incorrecto. Uso: UPDATE ID campo nuevo_valor\n");
 		return -1;
 	}
@@ -291,8 +303,8 @@ int execute_update(char* command, char* response)
 			fclose(file);
 		if (temp)
 			fclose(temp);
-		snprintf(response, BUFFER_SIZE,
-						 "ERROR: No se pudo abrir la base de datos\n");
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"ERROR: No se pudo abrir la base de datos\n");
 		return -1;
 	}
 
@@ -375,27 +387,27 @@ int execute_update(char* command, char* response)
 	if (updated) {
 		remove(DB_FILE);
 		rename(TEMP_FILE, DB_FILE);
-		snprintf(response, BUFFER_SIZE,
-						 "OK\nRegistro actualizado correctamente\n");
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"OK\nRegistro actualizado correctamente\n");
 	}
 	else {
 		remove(TEMP_FILE);
-		snprintf(response, BUFFER_SIZE,
-						 "ERROR: No se encontró el registro con ID %s\n", id);
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"ERROR: No se encontró el registro con ID %s\n", id);
 	}
 
 	return updated ? 0 : -1;
 }
 
 // Ejecutar DELETE
-int execute_delete(char* command, char* response)
+int execute_delete(char* command, char** response, size_t* response_size)
 {
 	// Formato: DELETE ID
 	char id[64];
 
 	if (sscanf(command, "DELETE %s", id) != 1) {
-		snprintf(response, BUFFER_SIZE,
-						 "ERROR: Formato incorrecto. Uso: DELETE ID\n");
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"ERROR: Formato incorrecto. Uso: DELETE ID\n");
 		return -1;
 	}
 
@@ -407,8 +419,8 @@ int execute_delete(char* command, char* response)
 			fclose(file);
 		if (temp)
 			fclose(temp);
-		snprintf(response, BUFFER_SIZE,
-						 "ERROR: No se pudo abrir la base de datos\n");
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"ERROR: No se pudo abrir la base de datos\n");
 		return -1;
 	}
 
@@ -439,20 +451,20 @@ int execute_delete(char* command, char* response)
 	if (deleted) {
 		remove(DB_FILE);
 		rename(TEMP_FILE, DB_FILE);
-		snprintf(response, BUFFER_SIZE,
-						 "OK\nRegistro eliminado correctamente\n");
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"OK\nRegistro eliminado correctamente\n");
 	}
 	else {
 		remove(TEMP_FILE);
-		snprintf(response, BUFFER_SIZE,
-						 "ERROR: No se encontró el registro con ID %s\n", id);
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"ERROR: No se encontró el registro con ID %s\n", id);
 	}
 
 	return deleted ? 0 : -1;
 }
 
 // Procesar comando del cliente
-int process_command(int client_id, char* command, char* response)
+int process_command(int client_id, char* command, char** response, size_t* response_size)
 {
 	// Eliminar salto de línea
 	command[strcspn(command, "\n")] = 0;
@@ -465,8 +477,8 @@ int process_command(int client_id, char* command, char* response)
 
 		if (transaction_owner != -1 && transaction_owner != client_id) {
 			pthread_mutex_unlock(&db_mutex);
-			snprintf(
-				response, BUFFER_SIZE,
+			*response_size = snprintf(
+				*response, BUFFER_SIZE,
 				"ERROR: Existe una transacción activa. Reintente más tarde.\n");
 			return -1;
 		}
@@ -474,7 +486,7 @@ int process_command(int client_id, char* command, char* response)
 		transaction_owner = client_id;
 		pthread_mutex_unlock(&db_mutex);
 
-		snprintf(response, BUFFER_SIZE, "OK\nTransacción iniciada\n");
+		*response_size = snprintf(*response, BUFFER_SIZE, "OK\nTransacción iniciada\n");
 		return 0;
 	}
 
@@ -484,15 +496,15 @@ int process_command(int client_id, char* command, char* response)
 
 		if (transaction_owner != client_id) {
 			pthread_mutex_unlock(&db_mutex);
-			snprintf(response, BUFFER_SIZE,
-							 "ERROR: No tiene una transacción activa\n");
+			*response_size = snprintf(*response, BUFFER_SIZE,
+																"ERROR: No tiene una transacción activa\n");
 			return -1;
 		}
 
 		transaction_owner = -1;
 		pthread_mutex_unlock(&db_mutex);
 
-		snprintf(response, BUFFER_SIZE, "OK\nTransacción confirmada\n");
+		*response_size = snprintf(*response, BUFFER_SIZE, "OK\nTransacción confirmada\n");
 		return 0;
 	}
 
@@ -500,8 +512,8 @@ int process_command(int client_id, char* command, char* response)
 	pthread_mutex_lock(&db_mutex);
 	if (transaction_owner != -1 && transaction_owner != client_id) {
 		pthread_mutex_unlock(&db_mutex);
-		snprintf(
-			response, BUFFER_SIZE,
+		*response_size = snprintf(
+			*response, BUFFER_SIZE,
 			"ERROR: Existe una transacción activa. Reintente más tarde.\n");
 		return -1;
 	}
@@ -518,29 +530,29 @@ int process_command(int client_id, char* command, char* response)
 	if (strncmp(command, "SELECT", 6) == 0) {
 		if (!has_transaction)
 			pthread_mutex_lock(&db_mutex);
-		result = execute_query(command, response);
+		result = execute_query(command, response, response_size);
 		if (!has_transaction)
 			pthread_mutex_unlock(&db_mutex);
 	}
 	else if (strncmp(command, "INSERT", 6) == 0) {
-		result = execute_insert(command, response);
+		result = execute_insert(command, response, response_size);
 	}
 	else if (strncmp(command, "UPDATE", 6) == 0) {
-		result = execute_update(command, response);
+		result = execute_update(command, response, response_size);
 	}
 	else if (strncmp(command, "DELETE", 6) == 0) {
-		result = execute_delete(command, response);
+		result = execute_delete(command, response, response_size);
 	}
 	else if (strcmp(command, "QUIT") == 0) {
 		if (has_transaction) {
 			transaction_owner = -1;
 			pthread_mutex_unlock(&db_mutex);
 		}
-		snprintf(response, BUFFER_SIZE, "OK\nDesconectando...\n");
+		*response_size = snprintf(*response, BUFFER_SIZE, "OK\nDesconectando...\n");
 		return 1; // Señal de desconexión
 	}
 	else {
-		snprintf(response, BUFFER_SIZE, "ERROR: Comando desconocido\n");
+		*response_size = snprintf(*response, BUFFER_SIZE, "ERROR: Comando desconocido\n");
 		result = -1;
 	}
 
@@ -557,6 +569,8 @@ void* handle_client(void* arg)
 	client_data_t* client = (client_data_t*)arg;
 	char buffer[BUFFER_SIZE];
 	char* response = malloc(BUFFER_SIZE);
+	size_t response_capacity = BUFFER_SIZE;
+	size_t response_size;
 
 	char client_ip[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, &client->address.sin_addr, client_ip,
@@ -566,8 +580,8 @@ void* handle_client(void* arg)
 				 client_ip, ntohs(client->address.sin_port));
 
 	// Mensaje de bienvenida
-	snprintf(
-		response, BUFFER_SIZE,
+	response_size = snprintf(
+		response, response_capacity,
 		"Bienvenido al servidor de base de datos\n"
 		"Comandos disponibles:\n"
 		"  SELECT ALL\n"
@@ -578,7 +592,7 @@ void* handle_client(void* arg)
 		"  BEGIN TRANSACTION\n"
 		"  COMMIT TRANSACTION\n"
 		"  QUIT\n");
-	send(client->socket, response, strlen(response), 0);
+	send_all(client->socket, response, response_size);
 
 	// Bucle de comunicación
 	while (server_running) {
@@ -599,10 +613,25 @@ void* handle_client(void* arg)
 
 		buffer[bytes_received] = '\0';
 
+		// Asegurar que response tenga al menos BUFFER_SIZE
+		if (response_capacity < BUFFER_SIZE) {
+			char* new_response = realloc(response, BUFFER_SIZE);
+			if (new_response) {
+				response = new_response;
+				response_capacity = BUFFER_SIZE;
+			}
+		}
+
 		int cmd_result =
-			process_command(client->client_id, buffer, response);
-		printf("Respuesta del servidor: %s, %d\n", response, strlen(response));
-		send(client->socket, response, strlen(response), 0);
+			process_command(client->client_id, buffer, &response, &response_size);
+
+		// Actualizar capacidad si process_command realocó
+		if (response_size > response_capacity) {
+			response_capacity = response_size;
+		}
+
+		printf("Respuesta del servidor (%zu bytes): %s\n", response_size, response);
+		send_all(client->socket, response, response_size);
 
 		if (cmd_result == 1) { // QUIT
 			break;

@@ -35,7 +35,9 @@ Generar TA
 ## Flujo Normal
 
 1. El cajero ingresa la tarjeta de afinidad e inicia el caso de uso
+
 2. El sistema muestra los datos del cliente y habilita el lector.
+
 3. Por cada producto:
 
    3.1. El cajero pasa el codigo de barras del producto.
@@ -47,10 +49,15 @@ Generar TA
    3.4 El sistema agrega el/los productos, actualiza el subtotal y el total.
 
 4. El sistema muestra el importe a pagar aplicando los descuentos/promociones.
+
 5. El cajero selecciona 'Realizar pago' y genera un codigo QR
+
 6. El cliente escanea el codigo QR e inicia el caso de uso: Realizar Pago
+
 7. El sistema recibe la autorizacion del pago
+
 8. El cajero indica la cantidad de cuotas: 1, 2, 3 o 6
+
 9. El sistema registra las cuotas,finaliza la venta, imprime el ticket y finaliza el caso de uso.
 
 ## Post Condicion
@@ -61,28 +68,28 @@ Venta registrada y actuliza el stock del producto con el sistema de stock
 
 En cualquier momento antes del paso 4 (¿5?), el actor puede cancelar el caso de uso.
 
-### A2 (TA inexistente)
+### A0. (TA inexistente)
 
-A2.1 Se desprende del punto 1 del flujo Normal
+	1.1  [Se extiende del CU: Generar TA]
 
-A2.2 Se ejecuta el caso de uso: Generar TA y prosigue en el punto 2 del flujo normal
+	1.2  Continua en el punto 2 del flujo normal
 
-### A3.3 (Codigo de barras no reconocido)
+### A1. (Codigo de barras no reconocido)
 
-A3.3.1 Se desprende del punto 3.3 del flujo normal
+	3.1.1 El sistema muestra un mensaje: "Codigo de barras invalido"
 
-A3.3.2 El sistema muestra un mensaje: "Codigo de barras invalido"
+	3.1.2 El cajero ingresa el codigo manualmente.
+	
+	3.1.3 Continua en el punto 3.2 del flujo normal
 
-A3.3.3 El cajero ingresa el codigo manualmente y vuelve al punto 3.3 del flujo normal
+### A2. (Codigo invalido, ingrese nuevamente el codigo)
 
-### A3.3 (Codigo invalido, ingrese nuevamente el codigo)
+	3.1.3.1 El sistema muestra un mensaje: "Codigo ingresado manualmente no valido" 
 
-A3.3.3.1 Se desprende del punto A3.3.3 del flujo alternativo
+	3.1.3.2 Continua en el punto 3.1.2 del flujo normal
 
-A3.3.3.2 El sistema muestra un mensaje: "Codigo ingresado manualmente no valido" y vuelve al punto A3.3.3 del flujo alternativo
+### A3. (Pago rechazado)
 
-### A7 (Pago rechazado)
+	7.1 El sistema muestra un mensaje: "Pago rechazado" 
 
-A7.1 Se desprende del punto 7 del flujo normal
-
-A7.2 El sistema muestra un mensaje: "Pago rechazado" y vuelve al punto 6 del flujo normal
+	7.2 Continua en el punto 6 del flujo normal

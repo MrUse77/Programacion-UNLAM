@@ -34,31 +34,31 @@ Generar TA
 
 ## Flujo Normal
 
-1. El cajero ingresa la tarjeta de afinidad e inicia el caso de uso
+	1. El cajero ingresa la tarjeta de afinidad e inicia el caso de uso
 
-2. El sistema muestra los datos del cliente y habilita el lector.
+	2. El sistema muestra los datos del cliente y habilita el lector.
 
-3. Por cada producto:
+	3. Por cada producto:
 
-   3.1. El cajero pasa el codigo de barras del producto.
+	   3.1. El cajero pasa el codigo de barras del producto.
 
-   3.2 El sistema muestra el nombre del producto, codigo, precio, descuento y habilita ingresar la cantidad de productos.
+	   3.2 El sistema muestra el nombre del producto, codigo, precio, descuento y habilita ingresar la cantidad de productos.
 
-   3.3 El cajero indica la cantidad del producto.
+	   3.3 El cajero indica la cantidad del producto.
 
-   3.4 El sistema agrega el/los productos, actualiza el subtotal y el total.
+	   3.4 El sistema agrega el/los productos, actualiza el subtotal y el total.
 
-4. El sistema muestra el importe a pagar aplicando los descuentos/promociones.
+	4. El sistema muestra el importe a pagar aplicando los descuentos/promociones.
 
-5. El cajero selecciona 'Realizar pago' y genera un codigo QR
+	5. El cajero selecciona 'Realizar pago' y genera un codigo QR
 
-6. El cliente escanea el codigo QR e inicia el caso de uso: Realizar Pago
+	6. El cliente escanea el codigo QR e inicia el caso de uso: Realizar Pago
 
-7. El sistema recibe la autorizacion del pago
+	7. El sistema recibe la autorizacion del pago
 
-8. El cajero indica la cantidad de cuotas: 1, 2, 3 o 6
+	8. El cajero indica la cantidad de cuotas: 1, 2, 3 o 6
 
-9. El sistema registra las cuotas,finaliza la venta, imprime el ticket y finaliza el caso de uso.
+	9. El sistema registra las cuotas,finaliza la venta, imprime el ticket y finaliza el caso de uso.
 
 ## Post Condicion
 

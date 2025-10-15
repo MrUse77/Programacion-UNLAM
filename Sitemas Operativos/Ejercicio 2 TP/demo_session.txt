@@ -1,0 +1,6 @@
+SELECT
+INSERT VALUES ('Pedro','Martinez',29,'Ventas',44000)
+SELECT
+UPDATE SET salario=50000 WHERE nombre='Pedro'
+SELECT WHERE nombre='Pedro'
+QUIT

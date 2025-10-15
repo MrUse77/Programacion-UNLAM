@@ -1,0 +1,39 @@
+# Ejecutables
+server
+client
+
+# Archivos objeto
+*.o
+*.a
+*.so
+
+# Archivos temporales
+*.tmp
+database.tmp
+*.log
+
+# Backups
+*~
+*.bak
+database.csv.bak
+
+# Core dumps
+core
+core.*
+
+# Archivos de depuración
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema
+.DS_Store
+Thumbs.db

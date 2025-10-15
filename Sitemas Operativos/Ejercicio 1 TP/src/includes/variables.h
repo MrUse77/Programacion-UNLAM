@@ -8,10 +8,18 @@
 #include <sys/sem.h>
 #define MAX_GENERATORS 20
 #define MAX_RECORDS 100000
-#define RECORD_SIZE 256
 #define SHM_SIZE (RECORD_SIZE * 100)
 #define IDS_PER_REQUEST 10
-#define DELAY 1
+#define DELAY 5
+typedef struct {
+	int id;
+	char name[50];
+	int age;
+	char city[50];
+	char department[50];
+	int salary;
+	int experience;
+} Record;
 typedef struct {
 	int nextId;
 	int total;
@@ -19,6 +27,7 @@ typedef struct {
 	int shutdown_flag;
 	int genActivos;
 	char buffer[SHM_SIZE];
+	char* file;
 	int bufferCount;
 } sharedData;
 

@@ -7,9 +7,9 @@
 #include <sys/wait.h>
 #include <string.h>
 
-void coordinator_process(sharedData *data)
+void coordinator_process(sharedData* data, char* output_file)
 {
-	FILE *csv = fopen("generated_data.csv", "w");
+	FILE* csv = fopen(output_file, "w");
 	if (!csv) {
 		perror("Error abriendo archivo CSV");
 		cleanup_resources();
@@ -19,29 +19,23 @@ void coordinator_process(sharedData *data)
 	fflush(csv);
 
 	char localBuffer[SHM_SIZE];
-	int *regProcesados = malloc(sizeof(int) * data->total);
+	int* regProcesados = malloc(sizeof(int) * data->total);
 	memset(regProcesados, 0, sizeof(int) * data->total);
 
 	while (data->regEscritos < data->total &&
-	       (data->genActivos > 0 || strlen(data->buffer) > 0) &&
-	       !data->shutdown_flag) {
+				 (data->genActivos > 0 || strlen(data->buffer) > 0) &&
+				 !data->shutdown_flag) {
 		sem_operation(SEM_BUFFER, -1); // Wait for buffer access
-		if (strlen(data->buffer) > 0) {
-			strcpy(localBuffer, data->buffer);
-			memset(data->buffer, 0, SHM_SIZE);
+		if (data->bufferCount > 0) {
+			reg = data->buffer;
 			data->bufferCount = 0;
-
-			// Release buffer mutex immediately after copying data so
-			// generators can write while the coordinator processes the
-			// local copy. Previously the coordinator held the mutex
-			// during processing, causing generators to block indefinitely.
 			sem_operation(SEM_BUFFER, 1); // Release buffer access
-			char *line = strtok(localBuffer, "\n");
+			char* line = strtok(localBuffer, "\n");
 			while (line != NULL) {
 				int id;
 				if (sscanf(line, "%d,", &id) == 1) {
 					if (id >= 0 && id <= data->total &&
-					    !regProcesados[id]) {
+							!regProcesados[id]) {
 						sem_operation(
 							SEM_WRITE,
 							-1); // Wait for write access
@@ -57,7 +51,8 @@ void coordinator_process(sharedData *data)
 					line = strtok(NULL, "\n");
 				}
 			}
-		} else {
+		}
+		else {
 			sem_operation(SEM_BUFFER, 1); // Release buffer access
 		}
 		//sleep(DELAY);

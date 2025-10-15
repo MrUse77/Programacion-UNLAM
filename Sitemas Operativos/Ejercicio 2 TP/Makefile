@@ -1,196 +1,156 @@
-# Makefile para Sistema Cliente-Servidor de Micro Base de Datos
-# Compilador y opciones
-
-CC = gcc
-CFLAGS = -Wall -Wextra -std=c99 -g -O2 -D_GNU_SOURCE
-LDFLAGS = 
-
-# Bibliotecas
-SERVER_LIBS = -lpthread
-CLIENT_LIBS = -lreadline -lhistory
+# Makefile para el sistema cliente-servidor de base de datos
 
 # Directorios
-SRC_DIR = .
-OBJ_DIR = obj
-BIN_DIR = bin
+SRCDIR = src
+BINDIR = bin
+
+CC = gcc
+CFLAGS = -Wall -Wextra -pthread -g
+LDFLAGS = -pthread
 
 # Archivos fuente
-SERVER_SOURCES = src/server.c src/database/protocol.c src/database/database.c
-SERVER_COMMON_SOURCES = server.c protocol.c database.c
-CLIENT_COMMON_SOURCES = client.c protocol.c
-CLIENT_SOURCES = src/client.c database/protocol.c
-COMMON_SOURCES = src/database/protocol.c
-
-# Archivos objeto
-SERVER_OBJECTS = $(addprefix $(OBJ_DIR)/, $(SERVER_COMMON_SOURCES:.c=.o))
-CLIENT_OBJECTS = $(addprefix $(OBJ_DIR)/, $(CLIENT_COMMON_SOURCES:.c=.o))
+SERVER_SRC = $(SRCDIR)/server.c
+CLIENT_SRC = $(SRCDIR)/client.c
 
 # Ejecutables
-SERVER_TARGET = $(BIN_DIR)/microdb_server
-CLIENT_TARGET = $(BIN_DIR)/microdb_client
+SERVER_BIN = $(BINDIR)/server
+CLIENT_BIN = $(BINDIR)/client
 
-# Headers
-HEADERS = src/includes/microdb.h src/includes/protocol.h src/includes/database.h
-
-# Targets principales
-.PHONY: all clean install uninstall help test
-
-all: directories $(SERVER_TARGET) $(CLIENT_TARGET)
-
-# Crear directorios necesarios
-directories:
-	@mkdir -p $(OBJ_DIR) $(BIN_DIR)
+# Regla por defecto
+all: $(SERVER_BIN) $(CLIENT_BIN)
 
 # Compilar servidor
-$(SERVER_TARGET): $(SERVER_OBJECTS)
-	@echo "Enlazando servidor..."
-	$(CC) $(SERVER_OBJECTS) -o $@ $(SERVER_LIBS) $(LDFLAGS)
-	@echo "Servidor compilado: $@"
+$(SERVER_BIN): $(SERVER_SRC) | $(BINDIR)
+	@echo "Compilando servidor..."
+	$(CC) $(CFLAGS) -o $(SERVER_BIN) $(SERVER_SRC) $(LDFLAGS)
+	@echo "Servidor compilado: $(SERVER_BIN)"
 
 # Compilar cliente
-$(CLIENT_TARGET): $(CLIENT_OBJECTS)
-	@echo "Enlazando cliente..."
-	$(CC) $(CLIENT_OBJECTS) -o $@ $(CLIENT_LIBS) $(LDFLAGS)
-	@echo "Cliente compilado: $@"
+$(CLIENT_BIN): $(CLIENT_SRC) | $(BINDIR)
+	@echo "Compilando cliente..."
+	$(CC) $(CFLAGS) -o $(CLIENT_BIN) $(CLIENT_SRC) $(LDFLAGS)
+	@echo "Cliente compilado: $(CLIENT_BIN)"
 
-# Regla para archivos objeto del servidor
-$(OBJ_DIR)/server.o: src/server.c $(HEADERS)
-	@echo "Compilando $<..."
-	$(CC) $(CFLAGS) -c $< -o $@
+# Crear directorio bin si no existe
+$(BINDIR):
+	@echo "Creando directorio $(BINDIR)..."
+	@mkdir -p $(BINDIR)
 
-$(OBJ_DIR)/database.o: src/database/database.c $(HEADERS)
-	@echo "Compilando $<..."
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Regla para archivos objeto del cliente
-$(OBJ_DIR)/client.o: src/client.c $(HEADERS)
-	@echo "Compilando $<..."
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Regla para protocol.o (compartido)
-$(OBJ_DIR)/protocol.o: src/database/protocol.c $(HEADERS)
-	@echo "Compilando $<..."
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Limpiar archivos generados
+# Limpiar archivos compilados y temporales
 clean:
-	@echo "Limpiando archivos generados..."
-	rm -rf $(OBJ_DIR) $(BIN_DIR)
-	rm -f *.o *.core core
-	rm -f database_backup.csv
+	@echo "Limpiando archivos compilados..."
+	@rm -f $(SERVER_BIN) $(CLIENT_BIN)
+	@rm -f *.o
+	@rm -f database.tmp
+	@rm -f *.log
 	@echo "Limpieza completada"
 
-# Compilación en modo debug
-debug: CFLAGS += -DDEBUG -g3 -O0
-debug: all
+# Limpiar todo incluyendo backups y directorios
+distclean: clean
+	@echo "Limpieza completa..."
+	@rm -f *~
+	@rm -f $(SRCDIR)/*~
+	@rm -f database.csv.bak
+	@rm -rf $(BINDIR)
+	@echo "Limpieza completa finalizada"
 
-# Compilación en modo release
-release: CFLAGS += -DNDEBUG -O3
-release: clean all
+# Parámetros configurables para ejecución
+PORT = 8080
+MAX_CLIENTS = 5
+MAX_QUEUE = 10
+SERVER_HOST = 127.0.0.1
 
-# Test de compilación y verificación básica
-test: all
-	@echo "Ejecutando tests básicos..."
-	@echo "1. Verificando que los ejecutables existen..."
-	@test -f $(SERVER_TARGET) && echo "  ✓ Servidor compilado correctamente" || echo "  ✗ Error: servidor no encontrado"
-	@test -f $(CLIENT_TARGET) && echo "  ✓ Cliente compilado correctamente" || echo "  ✗ Error: cliente no encontrado"
-	@echo "2. Verificando permisos de ejecución..."
-	@test -x $(SERVER_TARGET) && echo "  ✓ Servidor es ejecutable" || echo "  ✗ Error: servidor no ejecutable"
-	@test -x $(CLIENT_TARGET) && echo "  ✓ Cliente es ejecutable" || echo "  ✗ Error: cliente no ejecutable"
-	@echo "3. Verificando archivos de configuración..."
-	@test -f config.txt && echo "  ✓ Archivo de configuración encontrado" || echo "  ✗ Error: config.txt no encontrado"
-	@test -f database.csv && echo "  ✓ Base de datos encontrada" || echo "  ✗ Error: database.csv no encontrado"
-	@echo "Tests básicos completados"
+# Ejecutar servidor con parámetros configurables
+run-server: $(SERVER_BIN)
+	@echo "Iniciando servidor en puerto $(PORT)..."
+	@echo "  Max clientes: $(MAX_CLIENTS)"
+	@echo "  Max cola: $(MAX_QUEUE)"
+	@echo ""
+	./$(SERVER_BIN) -p $(PORT) -n $(MAX_CLIENTS) -m $(MAX_QUEUE)
 
-# Crear backup de la base de datos
-backup:
-	@echo "Creando backup de la base de datos..."
-	@if [ -f database.csv ]; then \
-		cp database.csv database_backup_$(shell date +%Y%m%d_%H%M%S).csv; \
-		echo "Backup creado: database_backup_$(shell date +%Y%m%d_%H%M%S).csv"; \
-	else \
-		echo "Error: database.csv no encontrado"; \
-	fi
+# Ejecutar cliente conectándose al servidor
+run-client: $(CLIENT_BIN)
+	@echo "Conectando cliente a $(SERVER_HOST):$(PORT)..."
+	@echo ""
+	./$(CLIENT_BIN) -s $(SERVER_HOST) -p $(PORT)
 
-# Restaurar base de datos desde backup
-restore:
-	@echo "Restaurando base de datos desde backup..."
-	@if [ -f database_backup.csv ]; then \
-		cp database_backup.csv database.csv; \
-		echo "Base de datos restaurada desde database_backup.csv"; \
-	else \
-		echo "Error: database_backup.csv no encontrado"; \
-	fi
+# Recompilar completamente
+rebuild: clean all
+	@echo "Recompilación completa finalizada"
 
-# Mostrar información del sistema
+# Mostrar información del proyecto
 info:
-	@echo "=== Información del Sistema Micro Base de Datos ==="
-	@echo "Compilador: $(CC)"
-	@echo "Flags de compilación: $(CFLAGS)"
-	@echo "Bibliotecas del servidor: $(SERVER_LIBS)"
-	@echo "Bibliotecas del cliente: $(CLIENT_LIBS)"
-	@echo "Archivos fuente del servidor: $(SERVER_SOURCES)"
-	@echo "Archivos fuente del cliente: $(CLIENT_SOURCES)"
-	@echo "Ejecutable del servidor: $(SERVER_TARGET)"
-	@echo "Ejecutable del cliente: $(CLIENT_TARGET)"
-	@echo "================================================="
+	@echo "=== Información del Proyecto ==="
+	@echo ""
+	@echo "Proyecto: Sistema Cliente-Servidor de Micro Base de Datos"
+	@echo "Autor: Agustin"
+	@echo "Materia: Sistemas Operativos - UNLAM"
+	@echo ""
+	@echo "Directorios:"
+	@echo "  Fuentes:    $(SRCDIR)/"
+	@echo "  Binarios:   $(BINDIR)/"
+	@echo ""
+	@echo "Archivos:"
+	@echo "  Servidor:   $(SERVER_SRC) → $(SERVER_BIN)"
+	@echo "  Cliente:    $(CLIENT_SRC) → $(CLIENT_BIN)"
+	@echo ""
+	@echo "Compilador: $(CC) $(CFLAGS)"
+	@echo ""
 
-# Ejecutar servidor en modo desarrollo
-run-server: $(SERVER_TARGET)
-	@echo "Iniciando servidor en modo desarrollo..."
-	./$(SERVER_TARGET) config.txt
-
-# Ejecutar cliente de prueba
-run-client: $(CLIENT_TARGET)
-	@echo "Iniciando cliente..."
-	./$(CLIENT_TARGET)
-
-# Verificar la sintaxis de los archivos C
-check-syntax:
-	@echo "Verificando sintaxis de archivos fuente..."
-	@for file in *.c; do \
-		echo "  Verificando $$file..."; \
-		$(CC) $(CFLAGS) -fsyntax-only $$file && echo "    ✓ Sintaxis correcta" || echo "    ✗ Errores de sintaxis"; \
-	done
-
-# Generar documentación con doxygen (si está disponible)
-docs:
-	@if which doxygen > /dev/null; then \
-		echo "Generando documentación..."; \
-		doxygen Doxyfile 2>/dev/null || echo "Archivo Doxyfile no encontrado"; \
-	else \
-		echo "Doxygen no está instalado"; \
-	fi
-
-# Mostrar ayuda
+# Ayuda detallada
 help:
-	@echo "=== Sistema Cliente-Servidor de Micro Base de Datos ==="
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  Makefile - Sistema Cliente-Servidor de Base de Datos"
+	@echo "════════════════════════════════════════════════════════════════"
 	@echo ""
-	@echo "Targets disponibles:"
-	@echo "  all          - Compilar servidor y cliente (target por defecto)"
-	@echo "  clean        - Limpiar archivos generados"
-	@echo "  debug        - Compilar en modo debug"
-	@echo "  release      - Compilar en modo release optimizado"
-	@echo "  test         - Ejecutar tests básicos"
-	@echo "  backup       - Crear backup de la base de datos"
-	@echo "  restore      - Restaurar base de datos desde backup"
-	@echo "  info         - Mostrar información de configuración"
-	@echo "  run-server   - Ejecutar servidor en modo desarrollo"
-	@echo "  run-client   - Ejecutar cliente de prueba"
-	@echo "  check-syntax - Verificar sintaxis de archivos fuente"
-	@echo "  docs         - Generar documentación"
-	@echo "  help         - Mostrar esta ayuda"
+	@echo "📦 COMPILACIÓN:"
+	@echo "  make              - Compilar servidor y cliente"
+	@echo "  make all          - Compilar servidor y cliente (alias)"
+	@echo "  make server       - Compilar solo el servidor"
+	@echo "  make client       - Compilar solo el cliente"
+	@echo "  make rebuild      - Limpiar y recompilar todo"
+	@echo "  make clean        - Eliminar archivos compilados"
+	@echo "  make distclean    - Eliminar todo (compilados + temporales)"
 	@echo ""
-	@echo "Ejemplos de uso:"
-	@echo "  make                    # Compilar todo"
-	@echo "  make clean all          # Limpiar y compilar"
-	@echo "  make install            # Instalar sistema"
-	@echo "  make run-server         # Ejecutar servidor"
-	@echo "  make run-client         # Ejecutar cliente"
+	@echo "▶️  EJECUCIÓN:"
+	@echo "  make run-server   - Compilar y ejecutar servidor"
+	@echo "  make run-client   - Compilar y ejecutar cliente"
 	@echo ""
-	@echo "======================================================="
+	@echo "⚙️  PARÁMETROS CONFIGURABLES:"
+	@echo "  PORT=<puerto>           - Puerto del servidor (default: 8080)"
+	@echo "  MAX_CLIENTS=<num>       - Máximo de clientes (default: 5)"
+	@echo "  MAX_QUEUE=<num>         - Máximo en cola (default: 10)"
+	@echo "  SERVER_HOST=<host>      - Host del servidor (default: 127.0.0.1)"
+	@echo ""
+	@echo "📝 EJEMPLOS CON PARÁMETROS:"
+	@echo "  make run-server PORT=4321 MAX_CLIENTS=10 MAX_QUEUE=20"
+	@echo "  make run-client SERVER_HOST=192.168.1.100 PORT=4321"
+	@echo "  make run-client SERVER_HOST=miservidor.com PORT=9000"
+	@echo ""
+	@echo "⚡ UTILIDADES:"
+	@echo "  make info         - Mostrar información del proyecto"
+	@echo "  make help         - Mostrar esta ayuda"
+	@echo ""
+	@echo "📖 USO MANUAL:"
+	@echo "  $(SERVER_BIN) -p <puerto> [-n <max_clientes>] [-m <max_cola>]"
+	@echo "  $(CLIENT_BIN) -s <servidor> -p <puerto>"
+	@echo ""
+	@echo "  Ejemplos:"
+	@echo "    $(SERVER_BIN) -p 8080 -n 10 -m 20"
+	@echo "    $(CLIENT_BIN) -s 127.0.0.1 -p 8080"
+	@echo ""
+	@echo "📚 DOCUMENTACIÓN:"
+	@echo "  README.md                 - Manual completo"
+	@echo "  ARCHITECTURE.md           - Documentación técnica"
+	@echo "  QUICKSTART.md             - Guía rápida"
+	@echo "  RESUMEN.md                - Resumen ejecutivo"
+	@echo "  TESTING.md                - Guía de testing"
+	@echo "  INSTRUCCIONES_ENTREGA.md  - Para el evaluador"
+	@echo ""
+	@echo "════════════════════════════════════════════════════════════════"
 
-# Dependencias implícitas
-$(OBJ_DIR)/%.o: %.c $(HEADERS)
-	@echo "Compilando $<..."
-	$(CC) $(CFLAGS) -c $< -o $@
+# Alias
+server: $(SERVER_BIN)
+client: $(CLIENT_BIN)
+
+.PHONY: all clean distclean run-server run-client rebuild info help server client

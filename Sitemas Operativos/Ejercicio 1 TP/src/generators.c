@@ -8,17 +8,17 @@
 #include <time.h>
 #include <string.h>
 // Datos para generar registros aleatorios
-static const char *names[] = { "Juan", "Maria",	 "Carlos", "Ana",
-			       "Luis", "Carmen", "Pedro",  "Laura" };
-static const char *cities[] = { "Madrid",  "Barcelona", "Valencia",
+static const char* names[] = { "Juan", "Maria",	 "Carlos", "Ana",
+						 "Luis", "Carmen", "Pedro",  "Laura" };
+static const char* cities[] = { "Madrid",  "Barcelona", "Valencia",
 				"Sevilla", "Bilbao",	"Malaga" };
-static const char *departments[] = { "IT",	  "HR",	     "Sales",
-				     "Marketing", "Finance", "Operations" };
+static const char* departments[] = { "IT",	  "HR",	     "Sales",
+						 "Marketing", "Finance", "Operations" };
 
-int getNextIds(int *ids, int maxCount, sharedData *data);
-void generateRecord(int id, Record *record);
-int sendToBuffer(Record *record, sharedData *data);
-void generator_process(int genId, sharedData *data)
+int getNextIds(int* ids, int maxCount, sharedData* data);
+void generateRecord(int id, char* record);
+int sendToBuffer(char* record, sharedData* data);
+void generator_process(int genId, sharedData* data)
 {
 	printf("Generador %d iniciado (PID: %d)\n", genId, getpid());
 	int ids[IDS_PER_REQUEST];
@@ -34,9 +34,14 @@ void generator_process(int genId, sharedData *data)
 			while (!sendToBuffer(&reg, data)) {
 				//sleep(1); // Esperar 100ms antes de reintentar
 			}
+			if (attemps >= 100) {
+				printf("Generador %d: No se pudo enviar el registro %d después de múltiples intentos. Saliendo...\n",
+							 genId, ids[i]);
+				break;
+			}
 			//	printf("Generador %d: Registro %d generado y enviado al buffer\n",
 			//       genId, ids[i]);
-			//sleep(DELAY);
+			sleep(DELAY);
 		}
 	}
 	sem_operation(SEM_IDS, 1); // Liberar semáforo de IDs
@@ -45,21 +50,17 @@ void generator_process(int genId, sharedData *data)
 	printf("Generador %d finalizado\n", genId);
 }
 
-void generateRecord(int id, Record *record)
+void generateRecord(int id, char* record)
 {
 	srand(time(NULL) + getpid() + id);
 	int age = 18 + rand() % 48;
 	int salario = 30000 + rand() % 70000;
 	int experiencia = rand() % (age - 18 + 1);
-	record->id = id;
-	record->age = age;
-	record->experience = experiencia;
-	record->salary = salario;
-	strcpy(record->name, names[rand() % 8]);
-	strcpy(record->city, cities[rand() % 6]);
-	strcpy(record->department, departments[rand() % 6]);
+	snprintf(record, RECORD_SIZE, "%d,%s,%d,%s,%s,%d,%d\n", id,
+					 names[rand() % 8], age, cities[rand() % 6],
+					 departments[rand() % 6], salario, experiencia);
 }
-int sendToBuffer(Record *record, sharedData *data)
+int sendToBuffer(char* record, sharedData* data)
 {
 	sem_operation(SEM_BUFFER, -1); // Esperar espacio en buffer
 	if (data->bufferCount >= 1) {
@@ -71,7 +72,7 @@ int sendToBuffer(Record *record, sharedData *data)
 	sem_operation(SEM_BUFFER, 1); // Liberar espacio en buffer
 	return 1;
 }
-int getNextIds(int *ids, int maxCount, sharedData *data)
+int getNextIds(int* ids, int maxCount, sharedData* data)
 {
 	sem_operation(SEM_IDS, -1); // Esperar semáforo de IDs
 	if (data->nextId > data->total || data->shutdown_flag) {

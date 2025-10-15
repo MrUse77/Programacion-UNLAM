@@ -1,568 +1,820 @@
-#include "includes/microdb.h"
-#include "includes/protocol.h"
-#include "includes/database.h"
-#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <signal.h>
+#include <errno.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+#define BUFFER_SIZE 4096
+#define MAX_LINE 2048
+#define DB_FILE "database.csv"
+#define TEMP_FILE "database.tmp"
+
+// Estructura para datos del cliente
+typedef struct {
+	int socket;
+	int client_id;
+	struct sockaddr_in address;
+} client_data_t;
 
 // Variables globales
-server_t *global_server = NULL;
-database_t *global_database = NULL;
+static int server_socket = -1;
+static int max_clients = 5;
+static int max_queue = 10;
+static int client_count = 0;
+static int transaction_owner = -1; // ID del cliente con transacción activa
+static pthread_mutex_t db_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t client_mutex = PTHREAD_MUTEX_INITIALIZER;
+static volatile sig_atomic_t server_running = 1;
 
-// Función para leer configuración
-int load_config(server_config_t *config, const char *config_file)
+// Prototipos
+void cleanup_resources();
+void signal_handler(int sig);
+void* handle_client(void* arg);
+int process_command(int client_id, char* command, char** response, size_t* response_size);
+int execute_query(char* command, char** response, size_t* response_size);
+int execute_insert(char* command, char** response, size_t* response_size);
+int execute_update(char* command, char** response, size_t* response_size);
+int execute_delete(char* command, char** response, size_t* response_size);
+void print_usage(const char* program);
+ssize_t send_all(int socket, const char* buffer, size_t length);
+
+// Limpieza de recursos
+void cleanup_resources()
 {
-	FILE *file = fopen(config_file, "r");
-	if (!file) {
-		printf("No se pudo abrir archivo de configuración %s, usando valores por defecto\n",
-		       config_file);
-		if (config != NULL) {
-			log_message(
-				"WARN",
-				"No se detecto configuración, usando valores por defecto");
-			strcpy(config->host, DEFAULT_HOST);
-			config->port = DEFAULT_PORT;
-			config->max_clients = DEFAULT_MAX_CLIENTS;
-			config->queue_size = DEFAULT_QUEUE_SIZE;
-			strcpy(config->database_file, "database.csv");
-			config->log_level = 1;
-		}
-		return 0;
+	printf("\nCerrando servidor...\n");
+	server_running = 0;
+
+	if (server_socket != -1) {
+		close(server_socket);
+		server_socket = -1;
 	}
 
-	char line[256];
-	while (fgets(line, sizeof(line), file)) {
-		if (line[0] == '#' || line[0] == '\n')
-			continue;
+	pthread_mutex_destroy(&db_mutex);
+	pthread_mutex_destroy(&client_mutex);
 
-		char key[128], value[128];
-		if (sscanf(line, "%[^=]=%s", key, value) == 2) {
-			if (strcmp(key, "HOST") == 0) {
-				strcpy(config->host, value);
-			} else if (strcmp(key, "PORT") == 0) {
-				config->port = atoi(value);
-			} else if (strcmp(key, "MAX_CLIENTS") == 0) {
-				config->max_clients = atoi(value);
-			} else if (strcmp(key, "QUEUE_SIZE") == 0) {
-				config->queue_size = atoi(value);
-			} else if (strcmp(key, "DATABASE_FILE") == 0) {
-				strcpy(config->database_file, value);
-			} else if (strcmp(key, "LOG_LEVEL") == 0) {
-				config->log_level = atoi(value);
-			}
-		}
-	}
+	// Eliminar archivos temporales
+	remove(TEMP_FILE);
 
-	fclose(file);
-	log_message("INFO", "Configuración cargada desde %s", config_file);
-	return 1;
-}
-
-// Función de logging
-void log_message(const char *level, const char *format, ...)
-{
-	time_t now = time(NULL);
-	char timestamp[64];
-	strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S",
-		 localtime(&now));
-
-	printf("[%s] [%s] ", timestamp, level);
-
-	va_list args;
-	va_start(args, format);
-	vprintf(format, args);
-	va_end(args);
-
-	printf("\n");
-	fflush(stdout);
-}
-
-// Función para manejar comandos del cliente
-void *handle_client(void *arg)
-{
-	client_info_t *client = (client_info_t *)arg;
-	command_message_t cmd;
-	response_message_t resp;
-
-	log_message("INFO", "Cliente %d conectado desde %s", client->client_id,
-		    inet_ntoa(client->address.sin_addr));
-
-	// Mensaje de bienvenida
-	resp.code = RESP_OK;
-	strcpy(resp.message, "Conectado al servidor de Micro Base de Datos");
-	strcpy(resp.data, "Escriba HELP para ver los comandos disponibles");
-	resp.row_count = 0;
-	send_response(client->socket_fd, &resp);
-
-	while (client->is_active) {
-		memset(&cmd, 0, sizeof(cmd));
-		memset(&resp, 0, sizeof(resp));
-
-		// Recibir comando del cliente
-		if (receive_command(client->socket_fd, &cmd) <= 0) {
-			log_message("INFO", "Cliente %d desconectado",
-				    client->client_id);
-			break;
-		}
-
-		cmd.client_id = client->client_id;
-		printf("Comando recibido del cliente %d: %s\n",
-		       client->client_id, cmd.query);
-		// Procesar comando
-		printf("procesando comando...\n");
-		printf("transaccion activa: %d\n",
-		       is_transaction_active(global_database));
-		printf("cliente en transaccion: %d\n",
-		       is_client_in_transaction(global_database,
-						client->client_id));
-		switch (cmd.type) {
-		case CMD_SELECT:
-			if (is_transaction_active(global_database) &&
-			    !is_client_in_transaction(global_database,
-						      client->client_id)) {
-				resp.code = RESP_LOCKED;
-				strcpy(resp.message,
-				       "Base de datos bloqueada por transacción activa");
-			} else {
-				if (db_select(global_database, cmd.params[0],
-					      cmd.params[1], resp.data,
-					      MAX_BUFFER_SIZE) >= 0) {
-					resp.code = RESP_OK;
-					strcpy(resp.message,
-					       "Consulta ejecutada");
-				} else {
-					resp.code = RESP_ERROR;
-					strcpy(resp.message,
-					       "Error en consulta");
-				}
-			}
-			break;
-
-		case CMD_INSERT:
-			if (is_transaction_active(global_database) &&
-			    !is_client_in_transaction(global_database,
-						      client->client_id)) {
-				resp.code = RESP_LOCKED;
-				strcpy(resp.message,
-				       "Base de datos bloqueada por transacción activa");
-			} else {
-				char values[MAX_FIELDS][MAX_FIELD_SIZE];
-				printf("value count: %d\n", cmd.param_count);
-				int value_count = cmd.param_count;
-				for (int i = 0; i < value_count; i++) {
-					strcpy(values[i], cmd.params[i]);
-				}
-
-				if (db_insert(global_database, values,
-					      value_count) >= 0) {
-					resp.code = RESP_OK;
-					strcpy(resp.message,
-					       "Registro insertado correctamente");
-				} else {
-					resp.code = RESP_ERROR;
-					strcpy(resp.message,
-					       "Error al insertar registro");
-				}
-			}
-			break;
-
-		case CMD_UPDATE:
-			if (is_transaction_active(global_database) &&
-			    !is_client_in_transaction(global_database,
-						      client->client_id)) {
-				resp.code = RESP_LOCKED;
-				strcpy(resp.message,
-				       "Base de datos bloqueada por transacción activa");
-			} else {
-				int updated = db_update(global_database,
-							cmd.params[0],
-							cmd.params[1]);
-				if (updated >= 0) {
-					resp.code = RESP_OK;
-					sprintf(resp.message,
-						"%d registros actualizados",
-						updated);
-				} else {
-					resp.code = RESP_ERROR;
-					strcpy(resp.message,
-					       "Error en actualización");
-				}
-			}
-			break;
-
-		case CMD_DELETE:
-			if (is_transaction_active(global_database) &&
-			    !is_client_in_transaction(global_database,
-						      client->client_id)) {
-				resp.code = RESP_LOCKED;
-				strcpy(resp.message,
-				       "Base de datos bloqueada por transacción activa");
-			} else {
-				int deleted = db_delete(global_database,
-							cmd.params[0]);
-				if (deleted >= 0) {
-					resp.code = RESP_OK;
-					sprintf(resp.message,
-						"%d registros eliminados",
-						deleted);
-				} else {
-					resp.code = RESP_ERROR;
-					strcpy(resp.message,
-					       "Error en eliminación");
-				}
-			}
-			break;
-
-		case CMD_BEGIN_TRANSACTION:
-			if (begin_transaction(global_database,
-					      client->client_id,
-					      client->thread_id) == 0) {
-				client->transaction_state = TRANSACTION_ACTIVE;
-				resp.code = RESP_OK;
-				strcpy(resp.message, "Transacción iniciada");
-			} else {
-				resp.code = RESP_CONFLICT;
-				strcpy(resp.message,
-				       "Ya existe una transacción activa");
-			}
-			break;
-
-		case CMD_COMMIT_TRANSACTION:
-			if (commit_transaction(global_database,
-					       client->client_id) == 0) {
-				client->transaction_state =
-					TRANSACTION_COMMITTED;
-				resp.code = RESP_OK;
-				strcpy(resp.message, "Transacción confirmada");
-				save_database_to_csv(
-					global_database,
-					global_server->config.database_file);
-			} else {
-				resp.code = RESP_ERROR;
-				strcpy(resp.message,
-				       "Error al confirmar transacción");
-			}
-			break;
-
-		case CMD_DESCRIBE:
-			if (db_describe(global_database, resp.data,
-					MAX_BUFFER_SIZE) >= 0) {
-				resp.code = RESP_OK;
-				strcpy(resp.message, "Estructura de la tabla");
-			} else {
-				resp.code = RESP_ERROR;
-				strcpy(resp.message,
-				       "Error al obtener estructura");
-			}
-			break;
-
-		case CMD_HELP:
-			resp.code = RESP_OK;
-			strcpy(resp.message, "Comandos disponibles");
-			strcpy(resp.data,
-			       "SELECT [campos] WHERE [condición] - Consultar registros\n"
-			       "INSERT VALUES (val1,val2,...) - Insertar registro\n"
-			       "UPDATE SET campo=valor WHERE [condición] - Actualizar registros\n"
-			       "DELETE WHERE [condición] - Eliminar registros\n"
-			       "BEGIN TRANSACTION - Iniciar transacción\n"
-			       "COMMIT TRANSACTION - Confirmar transacción\n"
-			       "DESCRIBE - Mostrar estructura de tabla\n"
-			       "HELP - Mostrar esta ayuda\n"
-			       "QUIT - Desconectar del servidor\n");
-			break;
-
-		case CMD_QUIT:
-			resp.code = RESP_OK;
-			strcpy(resp.message, "Desconectando...");
-			send_response(client->socket_fd, &resp);
-			client->is_active = 0;
-			continue;
-
-		default:
-			resp.code = RESP_ERROR;
-			strcpy(resp.message, "Comando no reconocido");
-			break;
-		}
-
-		send_response(client->socket_fd, &resp);
-	}
-
-	// Limpiar transacción si estaba activa
-	if (client->transaction_state == TRANSACTION_ACTIVE) {
-		rollback_transaction(global_database, client->client_id);
-		log_message(
-			"INFO",
-			"Transacción del cliente %d cancelada por desconexión",
-			client->client_id);
-	}
-
-	// Cerrar socket y marcar cliente como inactivo
-	close(client->socket_fd);
-	client->is_active = 0;
-
-	pthread_mutex_lock(&global_server->clients_mutex);
-	global_server->active_clients--;
-	pthread_mutex_unlock(&global_server->clients_mutex);
-
-	log_message("INFO", "Cliente %d desconectado completamente",
-		    client->client_id);
-	return NULL;
+	printf("Recursos liberados correctamente.\n");
 }
 
 // Manejador de señales
 void signal_handler(int sig)
 {
-	log_message("INFO", "Recibida señal %d, cerrando servidor...", sig);
-	if (global_server) {
-		global_server->should_stop = 1;
+	if (sig == SIGINT || sig == SIGTERM) {
+		printf("\nSeñal recibida, cerrando servidor...\n");
+		cleanup_resources();
+		exit(0);
 	}
-	cleanup_resources();
-	exit(0);
 }
 
-// Función principal del servidor
-int start_server(server_config_t *config)
+// Mostrar ayuda
+void print_usage(const char* program)
 {
-	int server_socket, client_socket;
-	struct sockaddr_in server_addr, client_addr;
-	socklen_t client_len = sizeof(client_addr);
-	int client_id = 1;
+	printf("Uso: %s -p <puerto> [-n <max_clientes>] [-m <max_cola>]\n",
+				 program);
+	printf("Opciones:\n");
+	printf("  -p <puerto>         Puerto de escucha (requerido)\n");
+	printf("  -n <max_clientes>   Máximo de clientes concurrentes (default: 5)\n");
+	printf("  -m <max_cola>       Máximo de clientes en espera (default: 10)\n");
+	printf("  -h                  Mostrar esta ayuda\n");
+}
 
-	// Crear socket del servidor
-	server_socket = socket(AF_INET, SOCK_STREAM, 0);
-	if (server_socket < 0) {
-		log_message("ERROR", "No se pudo crear socket del servidor");
-		return -1;
-	}
-
-	// Configurar reutilización de dirección
-	int opt = 1;
-	if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &opt,
-		       sizeof(opt)) < 0) {
-		log_message("WARN", "No se pudo configurar SO_REUSEADDR");
-	}
-
-	// Configurar dirección del servidor
-	memset(&server_addr, 0, sizeof(server_addr));
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_addr.s_addr = INADDR_ANY;
-	server_addr.sin_port = htons(config->port);
-
-	// Bind del socket
-	if (bind(server_socket, (struct sockaddr *)&server_addr,
-		 sizeof(server_addr)) < 0) {
-		log_message("ERROR", "No se pudo hacer bind en %s:%d",
-			    config->host, config->port);
-		close(server_socket);
-		return -1;
-	}
-
-	// Escuchar conexiones
-	if (listen(server_socket, config->queue_size) < 0) {
-		log_message("ERROR", "Error al escuchar en socket");
-		close(server_socket);
-		return -1;
-	}
-
-	log_message("INFO", "Servidor iniciado en %s:%d", config->host,
-		    config->port);
-	log_message("INFO", "Máximo %d clientes concurrentes, cola de %d",
-		    config->max_clients, config->queue_size);
-
-	global_server->server_socket = server_socket;
-
-	// Bucle principal del servidor
-	while (!global_server->should_stop) {
-		client_socket = accept(server_socket,
-				       (struct sockaddr *)&client_addr,
-				       &client_len);
-		if (client_socket < 0) {
-			if (errno == EINTR)
-				continue; // Interrumpido por señal
-			log_message("ERROR", "Error al aceptar conexión");
-			continue;
+// Enviar todos los datos (maneja envíos parciales)
+ssize_t send_all(int socket, const char* buffer, size_t length)
+{
+	size_t total_sent = 0;
+	while (total_sent < length) {
+		ssize_t sent = send(socket, buffer + total_sent, length - total_sent, 0);
+		if (sent < 0) {
+			if (errno == EINTR) continue;
+			return -1;
 		}
+		total_sent += sent;
+	}
+	return total_sent;
+}
 
-		// Verificar límite de clientes
-		pthread_mutex_lock(&global_server->clients_mutex);
-		if (global_server->active_clients >= config->max_clients) {
-			pthread_mutex_unlock(&global_server->clients_mutex);
-			log_message(
-				"WARN",
-				"Cliente rechazado - límite alcanzado (%d/%d)",
-				global_server->active_clients,
-				config->max_clients);
-			close(client_socket);
-			continue;
+// Ejecutar consulta SELECT
+int execute_query(char* command, char** response, size_t* response_size)
+{
+	FILE* file = fopen(DB_FILE, "r");
+	if (!file) {
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"ERROR: No se pudo abrir la base de datos\n");
+		return -1;
+	}
+
+	char line[MAX_LINE];
+	char* result = malloc(BUFFER_SIZE);
+	int count = 0;
+
+	// Parsear comando SELECT
+	// Formato: SELECT [campo] [valor] o SELECT ALL
+	char* token = strtok(command, " ");
+	token = strtok(NULL, " "); // siguiente token después de SELECT
+
+	if (token && strcmp(token, "ALL") == 0) {
+		// SELECT ALL - devolver todos los registros
+		size_t result_capacity = BUFFER_SIZE;
+		while (fgets(line, sizeof(line), file)) {
+			size_t needed_size = strlen(result) + strlen(line) + 1;
+
+			// Si no hay espacio suficiente, hacer realloc
+			if (needed_size > result_capacity) {
+				size_t new_capacity = result_capacity * 2;
+				while (new_capacity < needed_size) {
+					new_capacity *= 2;
+				}
+
+				char* new_result = realloc(result, new_capacity);
+				if (!new_result) {
+					free(result);
+					fclose(file);
+					*response_size = snprintf(*response, BUFFER_SIZE,
+																		"ERROR: Memoria insuficiente\n");
+					return -1;
+				}
+				result = new_result;
+				result_capacity = new_capacity;
+			}
+
+			strcat(result, line);
+			count++;
 		}
+	}
+	else if (token) {
+		// SELECT campo valor
+		char field[64], value[64];
+		strncpy(field, token, sizeof(field) - 1);
+		token = strtok(NULL, " ");
+		if (token) {
+			strncpy(value, token, sizeof(value) - 1);
 
-		// Buscar slot libre para el cliente
-		int slot = -1;
-		for (int i = 0; i < 50; i++) {
-			if (!global_server->clients[i].is_active) {
-				slot = i;
-				break;
+			// Leer encabezado
+			if (fgets(line, sizeof(line), file)) {
+				strncat(result, line,
+								BUFFER_SIZE - strlen(result) - 1);
+
+				// Buscar índice del campo
+				int field_index = -1;
+				char* header = strdup(line);
+				char* h_token = strtok(header, ",");
+				int idx = 0;
+
+				while (h_token) {
+					// Eliminar espacios y saltos de línea
+					char clean_token[64];
+					sscanf(h_token, "%s", clean_token);
+					if (strcmp(clean_token, field) == 0) {
+						field_index = idx;
+						break;
+					}
+					h_token = strtok(NULL, ",");
+					idx++;
+				}
+				free(header);
+
+				// Filtrar registros
+				if (field_index >= 0) {
+					while (fgets(line, sizeof(line),
+											 file)) {
+						char* line_copy = strdup(line);
+						char* l_token =
+							strtok(line_copy, ",");
+						idx = 0;
+						int match = 0;
+
+						while (l_token &&
+									 idx <= field_index) {
+							if (idx ==
+									field_index) {
+								char clean_value
+									[64];
+								sscanf(l_token,
+											 "%s",
+											 clean_value);
+								if (strcmp(clean_value,
+													 value) ==
+										0) {
+									match = 1;
+								}
+								break;
+							}
+							l_token = strtok(NULL,
+															 ",");
+							idx++;
+						}
+						free(line_copy);
+
+						if (match) {
+							strncat(result, line,
+											BUFFER_SIZE -
+											strlen(result) -
+											1);
+							count++;
+						}
+					}
+				}
 			}
 		}
-
-		if (slot == -1) {
-			pthread_mutex_unlock(&global_server->clients_mutex);
-			log_message("WARN",
-				    "No hay slots disponibles para cliente");
-			close(client_socket);
-			continue;
-		}
-
-		// Configurar información del cliente
-		global_server->clients[slot].socket_fd = client_socket;
-		global_server->clients[slot].client_id = client_id++;
-		global_server->clients[slot].address = client_addr;
-		global_server->clients[slot].transaction_state =
-			TRANSACTION_NONE;
-		global_server->clients[slot].connect_time = time(NULL);
-		global_server->clients[slot].is_active = 1;
-		global_server->active_clients++;
-
-		// Crear thread para manejar el cliente
-		if (pthread_create(&global_server->clients[slot].thread_id,
-				   NULL, handle_client,
-				   &global_server->clients[slot]) != 0) {
-			log_message("ERROR",
-				    "No se pudo crear thread para cliente");
-			close(client_socket);
-			global_server->clients[slot].is_active = 0;
-			global_server->active_clients--;
-		}
-		pthread_mutex_unlock(&global_server->clients_mutex);
 	}
 
+	fclose(file);
+
+	if (strlen(result) > 0) {
+		size_t result_len = strlen(result);
+		size_t prefix_len = strlen("OK\n");
+		size_t suffix_len = snprintf(NULL, 0, "\nRegistros encontrados: %d\n", count);
+		size_t total_needed = prefix_len + result_len + suffix_len + 1;
+
+		// Realloc response to fit the entire result
+		char* new_response = realloc(*response, total_needed);
+		if (!new_response) {
+			free(result);
+			*response_size = snprintf(*response, BUFFER_SIZE,
+																"ERROR: Memoria insuficiente\n");
+			return -1;
+		}
+		*response = new_response;
+		*response_size = snprintf(*response, total_needed,
+															"OK\n%s\nRegistros encontrados: %d\n", result, count);
+	}
+	else {
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"OK\nNo se encontraron registros\n");
+	}
+
+	free(result);
 	return 0;
 }
 
-// Función de limpieza
-void cleanup_resources(void)
+// Ejecutar INSERT
+int execute_insert(char* command, char** response, size_t* response_size)
 {
-	log_message("INFO", "Iniciando limpieza de recursos...");
+	// Formato: INSERT id,name,age,city,department,salary,experience
+	char* data = strchr(command, ' ');
+	if (!data) {
+		*response_size = snprintf(
+			*response, BUFFER_SIZE,
+			"ERROR: Formato incorrecto. Uso: INSERT campo1,campo2,...\n");
+		return -1;
+	}
+	data++; // Saltar el espacio
 
-	if (global_server) {
-		// Cerrar socket del servidor
-		if (global_server->server_socket > 0) {
-			close(global_server->server_socket);
-			log_message("INFO", "Socket del servidor cerrado");
+	FILE* file = fopen(DB_FILE, "a");
+	if (!file) {
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"ERROR: No se pudo abrir la base de datos\n");
+		return -1;
+	}
+
+	fprintf(file, "%s\n", data);
+	fclose(file);
+
+	*response_size = snprintf(*response, BUFFER_SIZE,
+														"OK\nRegistro insertado correctamente\n");
+	return 0;
+}
+
+// Ejecutar UPDATE
+int execute_update(char* command, char** response, size_t* response_size)
+{
+	// Formato: UPDATE ID campo nuevo_valor
+	char id[64], field[64], value[256];
+
+	if (sscanf(command, "UPDATE %s %s %[^\n]", id, field, value) != 3) {
+		*response_size = snprintf(
+			*response, BUFFER_SIZE,
+			"ERROR: Formato incorrecto. Uso: UPDATE ID campo nuevo_valor\n");
+		return -1;
+	}
+
+	FILE* file = fopen(DB_FILE, "r");
+	FILE* temp = fopen(TEMP_FILE, "w");
+
+	if (!file || !temp) {
+		if (file)
+			fclose(file);
+		if (temp)
+			fclose(temp);
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"ERROR: No se pudo abrir la base de datos\n");
+		return -1;
+	}
+
+	char line[MAX_LINE];
+	int updated = 0;
+	int field_index = -1;
+
+	// Copiar encabezado y encontrar índice del campo
+	if (fgets(line, sizeof(line), file)) {
+		fprintf(temp, "%s", line);
+
+		char* header = strdup(line);
+		char* token = strtok(header, ",");
+		int idx = 0;
+
+		while (token) {
+			char clean_token[64];
+			sscanf(token, "%s", clean_token);
+			if (strcmp(clean_token, field) == 0) {
+				field_index = idx;
+				break;
+			}
+			token = strtok(NULL, ",");
+			idx++;
+		}
+		free(header);
+	}
+
+	// Procesar registros
+	while (fgets(line, sizeof(line), file)) {
+		char line_copy[MAX_LINE];
+		strncpy(line_copy, line, sizeof(line_copy));
+
+		char* token = strtok(line_copy, ",");
+		if (token && strcmp(token, id) == 0 && field_index >= 0) {
+			// Reconstruir línea con el nuevo valor
+			char new_line[MAX_LINE] = "";
+			char* original_token = strtok(line, ",");
+			int idx = 0;
+
+			while (original_token) {
+				if (idx > 0)
+					strcat(new_line, ",");
+
+				if (idx == field_index) {
+					strcat(new_line, value);
+				}
+				else {
+					// Eliminar salto de línea si es el último campo
+					char clean_token[256];
+					int len = strlen(original_token);
+					if (original_token[len - 1] == '\n') {
+						strncpy(clean_token,
+										original_token,
+										len - 1);
+						clean_token[len - 1] = '\0';
+					}
+					else {
+						strcpy(clean_token,
+									 original_token);
+					}
+					strcat(new_line, clean_token);
+				}
+
+				original_token = strtok(NULL, ",");
+				idx++;
+			}
+
+			fprintf(temp, "%s\n", new_line);
+			updated = 1;
+		}
+		else {
+			fprintf(temp, "%s", line);
+		}
+	}
+
+	fclose(file);
+	fclose(temp);
+
+	if (updated) {
+		remove(DB_FILE);
+		rename(TEMP_FILE, DB_FILE);
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"OK\nRegistro actualizado correctamente\n");
+	}
+	else {
+		remove(TEMP_FILE);
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"ERROR: No se encontró el registro con ID %s\n", id);
+	}
+
+	return updated ? 0 : -1;
+}
+
+// Ejecutar DELETE
+int execute_delete(char* command, char** response, size_t* response_size)
+{
+	// Formato: DELETE ID
+	char id[64];
+
+	if (sscanf(command, "DELETE %s", id) != 1) {
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"ERROR: Formato incorrecto. Uso: DELETE ID\n");
+		return -1;
+	}
+
+	FILE* file = fopen(DB_FILE, "r");
+	FILE* temp = fopen(TEMP_FILE, "w");
+
+	if (!file || !temp) {
+		if (file)
+			fclose(file);
+		if (temp)
+			fclose(temp);
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"ERROR: No se pudo abrir la base de datos\n");
+		return -1;
+	}
+
+	char line[MAX_LINE];
+	int deleted = 0;
+
+	// Copiar encabezado
+	if (fgets(line, sizeof(line), file)) {
+		fprintf(temp, "%s", line);
+	}
+
+	// Procesar registros
+	while (fgets(line, sizeof(line), file)) {
+		char line_copy[MAX_LINE];
+		strncpy(line_copy, line, sizeof(line_copy));
+
+		char* token = strtok(line_copy, ",");
+		if (token && strcmp(token, id) == 0) {
+			deleted = 1;
+			continue; // Saltar este registro
+		}
+		fprintf(temp, "%s", line);
+	}
+
+	fclose(file);
+	fclose(temp);
+
+	if (deleted) {
+		remove(DB_FILE);
+		rename(TEMP_FILE, DB_FILE);
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"OK\nRegistro eliminado correctamente\n");
+	}
+	else {
+		remove(TEMP_FILE);
+		*response_size = snprintf(*response, BUFFER_SIZE,
+															"ERROR: No se encontró el registro con ID %s\n", id);
+	}
+
+	return deleted ? 0 : -1;
+}
+
+// Procesar comando del cliente
+int process_command(int client_id, char* command, char** response, size_t* response_size)
+{
+	// Eliminar salto de línea
+	command[strcspn(command, "\n")] = 0;
+
+	printf("Cliente %d ejecuta: %s\n", client_id, command);
+
+	// BEGIN TRANSACTION
+	if (strcmp(command, "BEGIN TRANSACTION") == 0) {
+		pthread_mutex_lock(&db_mutex);
+
+		if (transaction_owner != -1 && transaction_owner != client_id) {
+			pthread_mutex_unlock(&db_mutex);
+			*response_size = snprintf(
+				*response, BUFFER_SIZE,
+				"ERROR: Existe una transacción activa. Reintente más tarde.\n");
+			return -1;
 		}
 
-		// Esperar a que terminen los threads de clientes
-		for (int i = 0; i < 50; i++) {
-			if (global_server->clients[i].is_active) {
-				global_server->clients[i].is_active = 0;
-				close(global_server->clients[i].socket_fd);
-				pthread_join(
-					global_server->clients[i].thread_id,
-					NULL);
+		transaction_owner = client_id;
+		pthread_mutex_unlock(&db_mutex);
+
+		*response_size = snprintf(*response, BUFFER_SIZE, "OK\nTransacción iniciada\n");
+		return 0;
+	}
+
+	// COMMIT TRANSACTION
+	if (strcmp(command, "COMMIT TRANSACTION") == 0) {
+		pthread_mutex_lock(&db_mutex);
+
+		if (transaction_owner != client_id) {
+			pthread_mutex_unlock(&db_mutex);
+			*response_size = snprintf(*response, BUFFER_SIZE,
+																"ERROR: No tiene una transacción activa\n");
+			return -1;
+		}
+
+		transaction_owner = -1;
+		pthread_mutex_unlock(&db_mutex);
+
+		*response_size = snprintf(*response, BUFFER_SIZE, "OK\nTransacción confirmada\n");
+		return 0;
+	}
+
+	// Verificar si hay transacción activa
+	pthread_mutex_lock(&db_mutex);
+	if (transaction_owner != -1 && transaction_owner != client_id) {
+		pthread_mutex_unlock(&db_mutex);
+		*response_size = snprintf(
+			*response, BUFFER_SIZE,
+			"ERROR: Existe una transacción activa. Reintente más tarde.\n");
+		return -1;
+	}
+
+	// Si el cliente tiene transacción activa, mantener el lock
+	int has_transaction = (transaction_owner == client_id);
+	if (!has_transaction) {
+		pthread_mutex_unlock(&db_mutex);
+	}
+
+	// Procesar otros comandos
+	int result = 0;
+
+	if (strncmp(command, "SELECT", 6) == 0) {
+		if (!has_transaction)
+			pthread_mutex_lock(&db_mutex);
+		result = execute_query(command, response, response_size);
+		if (!has_transaction)
+			pthread_mutex_unlock(&db_mutex);
+	}
+	else if (strncmp(command, "INSERT", 6) == 0) {
+		result = execute_insert(command, response, response_size);
+	}
+	else if (strncmp(command, "UPDATE", 6) == 0) {
+		result = execute_update(command, response, response_size);
+	}
+	else if (strncmp(command, "DELETE", 6) == 0) {
+		result = execute_delete(command, response, response_size);
+	}
+	else if (strcmp(command, "QUIT") == 0) {
+		if (has_transaction) {
+			transaction_owner = -1;
+			pthread_mutex_unlock(&db_mutex);
+		}
+		*response_size = snprintf(*response, BUFFER_SIZE, "OK\nDesconectando...\n");
+		return 1; // Señal de desconexión
+	}
+	else {
+		*response_size = snprintf(*response, BUFFER_SIZE, "ERROR: Comando desconocido\n");
+		result = -1;
+	}
+
+	if (has_transaction) {
+		pthread_mutex_unlock(&db_mutex);
+	}
+
+	return result;
+}
+
+// Manejar cliente
+void* handle_client(void* arg)
+{
+	client_data_t* client = (client_data_t*)arg;
+	char buffer[BUFFER_SIZE];
+	char* response = malloc(BUFFER_SIZE);
+	size_t response_capacity = BUFFER_SIZE;
+	size_t response_size;
+
+	char client_ip[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &client->address.sin_addr, client_ip,
+						INET_ADDRSTRLEN);
+
+	printf("Cliente %d conectado desde %s:%d\n", client->client_id,
+				 client_ip, ntohs(client->address.sin_port));
+
+	// Mensaje de bienvenida
+	response_size = snprintf(
+		response, response_capacity,
+		"Bienvenido al servidor de base de datos\n"
+		"Comandos disponibles:\n"
+		"  SELECT ALL\n"
+		"  SELECT campo valor\n"
+		"  INSERT id,nombre,edad,ciudad,departamento,salario,experiencia\n"
+		"  UPDATE id campo nuevo_valor\n"
+		"  DELETE id\n"
+		"  BEGIN TRANSACTION\n"
+		"  COMMIT TRANSACTION\n"
+		"  QUIT\n");
+	send_all(client->socket, response, response_size);
+
+	// Bucle de comunicación
+	while (server_running) {
+		memset(buffer, 0, BUFFER_SIZE);
+		int bytes_received =
+			recv(client->socket, buffer, BUFFER_SIZE - 1, 0);
+
+		if (bytes_received <= 0) {
+			if (bytes_received == 0) {
+				printf("Cliente %d desconectado\n",
+							 client->client_id);
+			}
+			else {
+				perror("Error al recibir datos");
+			}
+			break;
+		}
+
+		buffer[bytes_received] = '\0';
+
+		// Asegurar que response tenga al menos BUFFER_SIZE
+		if (response_capacity < BUFFER_SIZE) {
+			char* new_response = realloc(response, BUFFER_SIZE);
+			if (new_response) {
+				response = new_response;
+				response_capacity = BUFFER_SIZE;
 			}
 		}
 
-		pthread_mutex_destroy(&global_server->clients_mutex);
-		free(global_server);
-		global_server = NULL;
-		log_message("INFO", "Recursos del servidor liberados");
+		int cmd_result =
+			process_command(client->client_id, buffer, &response, &response_size);
+
+		// Actualizar capacidad si process_command realocó
+		if (response_size > response_capacity) {
+			response_capacity = response_size;
+		}
+
+		printf("Respuesta del servidor (%zu bytes): %s\n", response_size, response);
+		send_all(client->socket, response, response_size);
+
+		if (cmd_result == 1) { // QUIT
+			break;
+		}
 	}
 
-	if (global_database) {
-		cleanup_database(global_database);
-		global_database = NULL;
-		log_message("INFO", "Base de datos cerrada");
+	// Liberar transacción si el cliente la tenía
+	pthread_mutex_lock(&db_mutex);
+	if (transaction_owner == client->client_id) {
+		printf("Cliente %d tenía transacción activa, liberando lock\n",
+					 client->client_id);
+		transaction_owner = -1;
 	}
+	pthread_mutex_unlock(&db_mutex);
 
-	log_message("INFO", "Limpieza completada");
+	close(client->socket);
+
+	pthread_mutex_lock(&client_mutex);
+	client_count--;
+	printf("Clientes activos: %d\n", client_count);
+	pthread_mutex_unlock(&client_mutex);
+	free(response);
+	free(client);
+	return NULL;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
+	int port = -1;
+	int opt;
+
+	// Parsear argumentos
+	while ((opt = getopt(argc, argv, "p:n:m:h")) != -1) {
+		switch (opt) {
+		case 'p':
+			port = atoi(optarg);
+			break;
+		case 'n':
+			max_clients = atoi(optarg);
+			break;
+		case 'm':
+			max_queue = atoi(optarg);
+			break;
+		case 'h':
+			print_usage(argv[0]);
+			return 0;
+		default:
+			print_usage(argv[0]);
+			return 1;
+		}
+	}
+
+	// Validar parámetros
+	if (port < 0 || port > 65535) {
+		fprintf(stderr, "Error: Puerto inválido\n");
+		print_usage(argv[0]);
+		return 1;
+	}
+
+	if (max_clients <= 0) {
+		fprintf(stderr, "Error: Número de clientes inválido\n");
+		return 1;
+	}
+
+	// Verificar que existe el archivo de base de datos
+	FILE* db = fopen(DB_FILE, "r");
+	if (!db) {
+		fprintf(stderr, "Error: No se encuentra el archivo %s\n",
+						DB_FILE);
+		return 1;
+	}
+	fclose(db);
+
 	// Configurar manejadores de señales
 	signal(SIGINT, signal_handler);
 	signal(SIGTERM, signal_handler);
-	signal(SIGPIPE, SIG_IGN);
-	// Inicializar servidor
-	global_server = malloc(sizeof(server_t));
-	if (!global_server) {
-		fprintf(stderr,
-			"Error: no se pudo asignar memoria para el servidor\n");
+	signal(SIGPIPE, SIG_IGN); // Ignorar SIGPIPE
+
+	// Crear socket
+	server_socket = socket(AF_INET, SOCK_STREAM, 0);
+	if (server_socket < 0) {
+		perror("Error al crear socket");
 		return 1;
 	}
 
-	memset(global_server, 0, sizeof(server_t));
-	pthread_mutex_init(&global_server->clients_mutex, NULL);
-	// Verificar argumentos
-	const char *config_file = CONFIG_FILE;
-	int use_config_file = 1;
-
-	if (argc > 1) {
-		if (strcmp(argv[1], "--help") == 0 ||
-		    strcmp(argv[1], "-h") == 0) {
-			printf("Uso: %s [archivo_configuracion] o %s <host> <puerto> <clientes_concurrentes> <clientes_en_espera> <db_file> <log_level>\n",
-			       argv[0], argv[0]);
-			printf("  archivo_configuracion: archivo de configuración (por defecto: %s)\n",
-			       CONFIG_FILE);
-			return 0;
-		}
-		if (argc == 7) {
-			use_config_file = 0;
-
-			global_server->config.max_clients = atoi(argv[3]);
-			global_server->config.queue_size = atoi(argv[4]);
-			global_server->config.port = atoi(argv[2]);
-			strcpy(global_server->config.host, argv[1]);
-			strcpy(global_server->config.database_file, argv[5]);
-			global_server->config.log_level = atoi(argv[6]);
-			puts(global_server->config.database_file);
-
-			log_message(
-				"INFO",
-				"Configuración desde línea de comandos: %d clientes concurrentes, %d en espera, puerto %d",
-				global_server->config.max_clients,
-				global_server->config.queue_size,
-				global_server->config.port,
-				global_server->config.host);
-		} else if (argc != 2) {
-			fprintf(stderr,
-				"Uso incorrecto. Use --help para ayuda.\n");
-			return 1;
-		}
-		config_file = argv[1];
-	}
-
-	// Cargar configuración
-	if (use_config_file) {
-		if (!load_config(&global_server->config, config_file)) {
-			log_message("WARN", "Usando configuración por defecto");
-		}
-	}
-
-	// Inicializar base de datos
-	global_database = init_database();
-	if (!global_database) {
-		log_message("ERROR", "No se pudo inicializar la base de datos");
-		cleanup_resources();
+	// Configurar opción SO_REUSEADDR
+	int reuse = 1;
+	if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &reuse,
+								 sizeof(reuse)) < 0) {
+		perror("Error en setsockopt");
+		close(server_socket);
 		return 1;
 	}
 
-	// Cargar datos desde archivo CSV
-	if (load_database_from_csv(global_database,
-				   global_server->config.database_file) < 0) {
-		log_message("ERROR",
-			    "No se pudo cargar la base de datos desde %s",
-			    global_server->config.database_file);
-		cleanup_resources();
+	// Configurar dirección
+	struct sockaddr_in server_addr;
+	memset(&server_addr, 0, sizeof(server_addr));
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_addr.s_addr = INADDR_ANY;
+	server_addr.sin_port = htons(port);
+
+	// Bind
+	if (bind(server_socket, (struct sockaddr*)&server_addr,
+					 sizeof(server_addr)) < 0) {
+		perror("Error en bind");
+		close(server_socket);
 		return 1;
 	}
 
-	log_message("INFO", "Base de datos cargada: %d registros",
-		    global_database->num_records);
+	// Listen
+	if (listen(server_socket, max_queue) < 0) {
+		perror("Error en listen");
+		close(server_socket);
+		return 1;
+	}
 
-	// Iniciar servidor
-	int result = start_server(&global_server->config);
+	printf("Servidor iniciado en puerto %d\n", port);
+	printf("Máximo de clientes concurrentes: %d\n", max_clients);
+	printf("Máximo de clientes en espera: %d\n", max_queue);
+	printf("Esperando conexiones...\n");
 
-	// Limpieza final
+	int next_client_id = 1;
+
+	// Bucle principal
+	while (server_running) {
+		struct sockaddr_in client_addr;
+		socklen_t client_len = sizeof(client_addr);
+
+		int client_socket = accept(server_socket,
+															 (struct sockaddr*)&client_addr,
+															 &client_len);
+
+		if (client_socket < 0) {
+			if (errno == EINTR)
+				continue;
+			perror("Error en accept");
+			continue;
+		}
+
+		// Esperar hasta que haya espacio disponible
+		pthread_mutex_lock(&client_mutex);
+		while (client_count >= max_clients) {
+			if (!server_running) {
+				pthread_mutex_unlock(&client_mutex);
+				close(client_socket);
+				cleanup_resources();
+				return 0;
+			}
+			pthread_mutex_unlock(&client_mutex);
+			// Pequeña pausa antes de reintentar
+			usleep(100000); // 100ms
+			pthread_mutex_lock(&client_mutex);
+		}
+
+		client_count++;
+		pthread_mutex_unlock(&client_mutex);
+
+		// Crear estructura de datos del cliente
+		client_data_t* client = malloc(sizeof(client_data_t));
+		client->socket = client_socket;
+		client->client_id = next_client_id++;
+		client->address = client_addr;
+
+		// Crear thread para manejar el cliente
+		pthread_t thread;
+		pthread_attr_t attr;
+		pthread_attr_init(&attr);
+		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+		if (pthread_create(&thread, &attr, handle_client, client) !=
+				0) {
+			perror("Error al crear thread");
+			close(client_socket);
+			free(client);
+
+			pthread_mutex_lock(&client_mutex);
+			client_count--;
+			pthread_mutex_unlock(&client_mutex);
+		}
+
+		pthread_attr_destroy(&attr);
+	}
+
 	cleanup_resources();
-
-	return result == 0 ? 0 : 1;
+	return 0;
 }

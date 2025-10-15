@@ -1,451 +1,348 @@
-# Sistema Cliente-Servidor de Micro Base de Datos
+# Sistema Cliente-Servidor de Micro Base de Datos con Transacciones
 
-## Descripción
+Sistema de base de datos distribuida que utiliza sockets TCP/IP para permitir consultas y modificaciones remotas sobre un archivo CSV, con soporte para transacciones y control de concurrencia.
 
-Este proyecto implementa un sistema cliente-servidor que utiliza sockets TCP/IP para permitir consultas y modificaciones remotas sobre un archivo CSV que actúa como base de datos. El sistema soporta múltiples clientes concurrentes y transacciones con bloqueo exclusivo.
+## Características
 
-## Características Principales
+- **Arquitectura Cliente-Servidor**: Comunicación mediante sockets TCP/IP
+- **Concurrencia**: Soporte para múltiples clientes simultáneos usando threads POSIX
+- **Transacciones**: Sistema de transacciones con bloqueo exclusivo (BEGIN/COMMIT)
+- **Operaciones CRUD**: SELECT, INSERT, UPDATE, DELETE
+- **Control de acceso**: Gestión de locks durante transacciones
+- **Manejo de errores**: Respuestas controladas ante desconexiones inesperadas
+- **Configuración flexible**: Parámetros por línea de comandos
 
-### 🚀 Funcionalidades del Servidor
-- **Múltiples clientes concurrentes**: Hasta N clientes simultáneos con M en cola de espera (configurable)
-- **Base de datos CSV**: Utiliza archivos CSV como almacenamiento de datos
-- **Transacciones ACID**: Sistema completo de transacciones con BEGIN/COMMIT
-- **Bloqueo exclusivo**: Durante transacciones, solo el cliente activo puede modificar datos
-- **Protocolo personalizado**: Comunicación eficiente entre cliente y servidor
-- **Manejo robusto de errores**: Recuperación ante desconexiones inesperadas
-- **Configuración flexible**: Parámetros configurables via archivo o línea de comandos
+## Compilación
 
-### 📱 Funcionalidades del Cliente
-- **Interfaz interactiva**: Cliente con soporte para readline y historial de comandos
-- **Comandos SQL**: SELECT, INSERT, UPDATE, DELETE con sintaxis familiar
-- **Control de transacciones**: Comandos BEGIN TRANSACTION y COMMIT TRANSACTION
-- **Indicadores visuales**: Prompt que indica estado de conexión y transacciones
-- **Comandos especiales**: Comandos internos para estado y configuración
-
-### 🔒 Sistema de Transacciones
-- Cliente puede iniciar transacción con `BEGIN TRANSACTION`
-- Obtiene bloqueo exclusivo sobre la base de datos
-- Puede realizar múltiples modificaciones
-- Confirma con `COMMIT TRANSACTION`
-- Otros clientes reciben error de "base de datos bloqueada"
-
-## Instalación y Compilación
-
-### Requisitos del Sistema
 ```bash
-# Ubuntu/Debian
-sudo apt-get install gcc libc6-dev libreadline-dev net-tools lsof procps
-
-# CentOS/RHEL/Fedora
-sudo yum install gcc glibc-devel readline-devel net-tools lsof procps
-```
-
-### Compilación
-```bash
-# Compilar todo el proyecto
+# Compilar todo (servidor y cliente)
 make
 
-# Verificar dependencias
-make check-deps
+# Compilar solo el servidor
+make server
 
-# Instalar dependencias automáticamente (Ubuntu/Debian)
-make install-deps
+# Compilar solo el cliente
+make client
 
-# Compilar en modo debug
-make debug
-
-# Compilar optimizado para producción
-make release
-
-# Ejecutar tests básicos
-make test
+# Ver ayuda de compilación
+make help
 ```
 
-### Instalación del Sistema
+## Uso
+
+### Servidor
+
 ```bash
-# Instalar en el sistema
-sudo make install
-
-# Desinstalar
-sudo make uninstall
+./server -p <puerto> [-n <max_clientes>] [-m <max_cola>]
 ```
 
-## Configuración
+**Parámetros:**
 
-### Archivo de Configuración (`config.txt`)
-```ini
-# Configuración del Servidor de Micro Base de Datos
-HOST=127.0.0.1
-PORT=8080
-MAX_CLIENTS=5
-QUEUE_SIZE=10
-DATABASE_FILE=database.csv
-LOG_LEVEL=INFO
-```
+- `-p <puerto>`: Puerto de escucha (requerido)
+- `-n <max_clientes>`: Máximo de clientes concurrentes (default: 5)
+- `-m <max_cola>`: Máximo de clientes en espera (default: 10)
+- `-h`: Mostrar ayuda
 
-### Base de Datos CSV (`database.csv`)
-```csv
-id,nombre,apellido,edad,departamento,salario
-1,Juan,Perez,28,Ventas,45000
-2,Maria,Garcia,32,Marketing,52000
-3,Carlos,Lopez,25,IT,48000
-```
+**Ejemplo:**
 
-## Uso del Sistema
-
-### Iniciar el Servidor
 ```bash
-# Usando configuración por defecto
-./bin/microdb_server
-
-# Con archivo de configuración personalizado
-./bin/microdb_server mi_config.txt
-
-# Usando make
-make run-server
+./server -p 8080 -n 10 -m 20
 ```
 
-### Conectar Cliente
+### Cliente
+
 ```bash
-# Conectar a localhost:8080 (por defecto)
-./bin/microdb_client
-
-# Conectar a servidor específico
-./bin/microdb_client -h 192.168.1.100 -p 8080
-
-# Mostrar ayuda
-./bin/microdb_client --help
-
-# Usando make
-make run-client
+./client -s <servidor> -p <puerto>
 ```
 
-## Comandos SQL Soportados
+**Parámetros:**
+
+- `-s <servidor>`: Dirección IP o hostname del servidor (requerido)
+- `-p <puerto>`: Puerto del servidor (requerido)
+- `-h`: Mostrar ayuda
+
+**Ejemplos:**
+
+```bash
+# Conectar a servidor local
+./client -s 127.0.0.1 -p 8080
+
+# Conectar a servidor remoto
+./client -s 192.168.1.100 -p 8080
+```
+
+## Comandos del Cliente
 
 ### Consultas (SELECT)
+
 ```sql
--- Seleccionar todos los registros
-SELECT
+-- Mostrar todos los registros
+SELECT ALL
 
--- Seleccionar campos específicos
-SELECT nombre,apellido
-
--- Consulta con condiciones
-SELECT WHERE edad > 25
-
--- Consulta con condiciones complejas
-SELECT nombre,salario WHERE departamento = 'IT'
+-- Buscar por campo específico
+SELECT Name Carlos
+SELECT City Madrid
+SELECT Department IT
 ```
 
 ### Inserción (INSERT)
-```sql
--- Insertar nuevo registro (ID se asigna automáticamente)
-INSERT VALUES ('Pedro','Martinez',29,'Ventas',44000)
 
--- Con comillas para valores con espacios
-INSERT VALUES ('Ana Maria','Rodriguez Gomez',35,'Recursos Humanos',50000)
+```sql
+-- Formato: INSERT id,nombre,edad,ciudad,departamento,salario,experiencia
+INSERT 500,Juan,30,Madrid,IT,50000,5
+INSERT 501,Maria,28,Barcelona,Sales,45000,3
 ```
 
 ### Actualización (UPDATE)
+
 ```sql
--- Actualizar un campo
-UPDATE SET salario=50000 WHERE id=1
-
--- Actualizar múltiples campos
-UPDATE SET departamento='IT',salario=55000 WHERE nombre='Juan'
-
--- Actualizar con condiciones
-UPDATE SET salario=salario+5000 WHERE departamento='Ventas'
+-- Formato: UPDATE id campo nuevo_valor
+UPDATE 500 Salary 55000
+UPDATE 500 City Barcelona
+UPDATE 500 Name JuanCarlos
 ```
 
 ### Eliminación (DELETE)
+
 ```sql
--- Eliminar registro específico
-DELETE WHERE id=1
-
--- Eliminar por condición
-DELETE WHERE departamento='Marketing'
-
--- Eliminar múltiples registros
-DELETE WHERE edad < 25
+-- Formato: DELETE id
+DELETE 500
 ```
 
 ### Transacciones
+
 ```sql
--- Iniciar transacción
+-- Iniciar transacción (obtiene bloqueo exclusivo)
 BEGIN TRANSACTION
 
--- Realizar múltiples operaciones...
-INSERT VALUES ('Nuevo','Usuario',30,'IT',60000)
-UPDATE SET salario=salario*1.1 WHERE departamento='IT'
-DELETE WHERE edad > 60
+-- Realizar múltiples operaciones
+UPDATE 1 Salary 70000
+INSERT 600,Pedro,35,Valencia,HR,48000,7
+DELETE 400
 
--- Confirmar cambios
+-- Confirmar transacción (libera bloqueo)
 COMMIT TRANSACTION
 ```
 
-### Comandos de Información
+**Comportamiento durante transacciones:**
+
+- El cliente que inicia la transacción obtiene bloqueo exclusivo sobre la base de datos
+- Otros clientes recibirán error si intentan consultar o modificar datos
+- El bloqueo se mantiene hasta ejecutar COMMIT TRANSACTION
+- Si el cliente se desconecta, el bloqueo se libera automáticamente
+
+### Otros Comandos
+
 ```sql
--- Mostrar estructura de la tabla
-DESCRIBE
-
--- Mostrar ayuda
-HELP
-
--- Salir del cliente
-QUIT
-```
-
-## Comandos Especiales del Cliente
-
-```bash
-# Estado de la conexión
-.status
-
-# Limpiar pantalla
-.clear
-
-# Ayuda del cliente
-.help
+HELP  -- Mostrar ayuda de comandos
+QUIT  -- Salir del cliente
 ```
 
 ## Protocolo de Comunicación
 
-### Formato de Comandos
-```
-TIPO|QUERY|NUM_PARAMS|PARAM1|PARAM2|...\n
-```
+### Formato de Mensajes
 
-### Formato de Respuestas
-```
-CODIGO|MENSAJE|NUM_FILAS|DATOS\n
-```
+**Cliente → Servidor:**
+
+- Comandos en texto plano seguidos de newline
+- Ejemplos: `SELECT ALL\n`, `BEGIN TRANSACTION\n`
+
+**Servidor → Cliente:**
+
+- Respuestas en formato:
+  ```
+  OK|ERROR
+  [datos]
+  [mensaje informativo]
+  ```
 
 ### Códigos de Respuesta
-- `200`: OK - Operación exitosa
-- `400`: Error - Error en el comando o datos
-- `404`: No encontrado - Registro no existe
-- `409`: Conflicto - Error de concurrencia
-- `423`: Bloqueado - Base de datos en transacción
-- `500`: Error del servidor - Error interno
 
-## Monitoreo en Linux
-
-### Verificar Procesos del Servidor
-```bash
-# Procesos del servidor
-ps aux | grep microdb_server
-
-# Threads del servidor
-ps -eLf | grep microdb_server
-
-# Uso de recursos
-htop -p $(pgrep microdb_server)
-```
-
-### Verificar Conexiones de Red
-```bash
-# Sockets en escucha
-netstat -tlnp | grep :8080
-
-# Conexiones activas
-netstat -anp | grep microdb
-
-# Archivos abiertos por el servidor
-lsof -p $(pgrep microdb_server)
-
-# Puertos utilizados
-lsof -i :8080
-```
-
-### Verificar Concurrencia
-```bash
-# Número de conexiones activas
-netstat -an | grep :8080 | grep ESTABLISHED | wc -l
-
-# Clientes conectados
-netstat -anp | grep :8080 | grep ESTABLISHED
-```
-
-### Logs del Sistema
-```bash
-# Ver logs del servidor (si se usa syslog)
-tail -f /var/log/syslog | grep microdb
-
-# Monitorear archivo de base de datos
-watch -n 2 'wc -l database.csv'
-
-# Verificar bloqueos de archivos
-lsof database.csv
-```
+- `OK`: Operación exitosa
+- `ERROR`: Operación fallida (incluye descripción del error)
 
 ## Estructura del Proyecto
 
 ```
-microdb_server/
-├── README.md              # Esta documentación
-├── Makefile              # Reglas de compilación
-├── config.txt            # Configuración del servidor
-├── database.csv          # Base de datos de ejemplo
-├── microdb.h            # Definiciones principales
-├── protocol.h           # Protocolo de comunicación
-├── database.h           # Funciones de base de datos
-├── server.c             # Servidor principal
-├── client.c             # Cliente interactivo
-├── protocol.c           # Implementación del protocolo
-├── database.c           # Manejo de base de datos
-├── bin/                 # Ejecutables compilados
-│   ├── microdb_server
-│   └── microdb_client
-└── obj/                 # Archivos objeto
-    ├── server.o
-    ├── client.o
-    ├── protocol.o
-    └── database.o
+.
+├── server.c          # Código fuente del servidor
+├── client.c          # Código fuente del cliente
+├── Makefile          # Sistema de compilación
+├── database.csv      # Base de datos CSV
+└── README.md         # Este archivo
 ```
 
-## Ejemplos de Uso Completos
+## Estructura del CSV
 
-### Ejemplo 1: Operaciones Básicas
-```bash
-# Terminal 1: Iniciar servidor
-./bin/microdb_server
-
-# Terminal 2: Conectar cliente
-./bin/microdb_client
-microdb> SELECT
-microdb> INSERT VALUES ('Luis','Gonzalez',31,'Finanzas',52000)
-microdb> UPDATE SET salario=55000 WHERE nombre='Luis'
-microdb> DELETE WHERE id=1
-microdb> QUIT
+```csv
+ID,Name,Age,City,Department,Salary,Experience
+1,Carmen,45,Malaga,Finance,64665,6
+2,Luis,32,Malaga,HR,95307,0
+...
 ```
 
-### Ejemplo 2: Transacciones
+## Monitoreo en Linux
+
+### Ver conexiones activas
+
 ```bash
-./bin/microdb_client
-microdb> BEGIN TRANSACTION
-microdb [TX]> INSERT VALUES ('Test','User',25,'IT',45000)
-microdb [TX]> UPDATE SET salario=salario*1.1 WHERE departamento='IT'
-microdb [TX]> COMMIT TRANSACTION
-microdb> QUIT
-```
+# Ver sockets en escucha y conexiones establecidas
+netstat -tlnp | grep server
+netstat -tan | grep 8080
 
-### Ejemplo 3: Múltiples Clientes
-```bash
-# Cliente 1
-./bin/microdb_client
-microdb> BEGIN TRANSACTION
-microdb [TX]> UPDATE SET salario=60000 WHERE id=2
-# No hacer COMMIT aún...
-
-# Cliente 2 (en otra terminal)
-./bin/microdb_client
-microdb> SELECT WHERE id=2
-# Recibirá error: "Base de datos bloqueada por transacción activa"
-
-# Cliente 1: Confirmar transacción
-microdb [TX]> COMMIT TRANSACTION
-
-# Cliente 2: Ahora puede acceder
-microdb> SELECT WHERE id=2
-```
-
-## Troubleshooting
-
-### Problemas Comunes
-
-#### Servidor no inicia
-```bash
-# Verificar que el puerto no esté ocupado
-netstat -tlnp | grep :8080
-
-# Verificar permisos del archivo de base de datos
-ls -la database.csv
-
-# Verificar sintaxis del archivo de configuración
-cat config.txt
-```
-
-#### Cliente no se conecta
-```bash
-# Verificar que el servidor esté corriendo
-ps aux | grep microdb_server
-
-# Probar conectividad
-telnet localhost 8080
-
-# Verificar firewall
-sudo ufw status
-```
-
-#### Error "Permission denied"
-```bash
-# Dar permisos de ejecución
-chmod +x bin/microdb_server bin/microdb_client
-
-# Verificar propietario de archivos
-ls -la database.csv config.txt
-```
-
-#### Error "Address already in use"
-```bash
-# Encontrar proceso usando el puerto
+# Ver archivos abiertos por el servidor
+lsof -p $(pgrep server)
 lsof -i :8080
 
-# Terminar proceso anterior
-kill -9 $(lsof -t -i:8080)
+# Ver procesos y threads del servidor
+ps aux | grep server
+ps -eLf | grep server
 
-# O cambiar puerto en config.txt
-echo "PORT=8081" >> config.txt
+# Monitoreo interactivo
+htop -p $(pgrep server)
 ```
 
-### Debug y Desarrollo
+### Ejemplo de sesión de prueba
 
-#### Compilar en modo debug
+**Terminal 1 - Servidor:**
+
 ```bash
-make debug
-gdb ./bin/microdb_server
+$ ./server -p 8080 -n 3 -m 5
+Servidor iniciado en puerto 8080
+Máximo de clientes concurrentes: 3
+Máximo de clientes en espera: 5
+Esperando conexiones...
 ```
 
-#### Verificar memoria con Valgrind
+**Terminal 2 - Cliente 1:**
+
 ```bash
-valgrind --leak-check=full ./bin/microdb_server
+$ ./client -s 127.0.0.1 -p 8080
+Conectado al servidor!
+db> BEGIN TRANSACTION
+OK
+Transacción iniciada
+
+db> UPDATE 1 Salary 75000
+OK
+Registro actualizado correctamente
 ```
 
-#### Monitorear llamadas de sistema
+**Terminal 3 - Cliente 2:**
+
 ```bash
-strace -p $(pgrep microdb_server)
+$ ./client -s 127.0.0.1 -p 8080
+Conectado al servidor!
+db> SELECT ALL
+ERROR: Existe una transacción activa. Reintente más tarde.
 ```
 
-## Desarrollo y Contribución
+**Terminal 2 - Cliente 1:**
 
-### Compilar con información adicional
 ```bash
-# Verificar sintaxis
-make check-syntax
-
-# Información del sistema
-make info
-
-# Crear backup antes de modificar
-make backup
+db> COMMIT TRANSACTION
+OK
+Transacción confirmada
 ```
 
-### Testing
-```bash
-# Tests básicos
-make test
+**Terminal 3 - Cliente 2:**
 
-# Test de carga (múltiples clientes)
-for i in {1..5}; do ./bin/microdb_client -h localhost &; done
+```bash
+db> SELECT ALL
+OK
+ID,Name,Age,City,Department,Salary,Experience
+1,Carmen,45,Malaga,Finance,75000,6
+...
+```
+
+### Monitorear concurrencia
+
+```bash
+# En otra terminal mientras el servidor está corriendo
+watch -n 1 'netstat -an | grep 8080 | grep ESTABLISHED | wc -l'
+
+# Ver threads del servidor
+watch -n 1 'ps -eLf | grep server | grep -v grep'
+```
+
+## Manejo de Errores
+
+### Desconexión inesperada del cliente
+
+- El servidor detecta la desconexión
+- Si el cliente tenía transacción activa, se libera el bloqueo automáticamente
+- Los recursos del cliente se liberan correctamente
+
+### Desconexión del servidor
+
+- Los clientes detectan la desconexión
+- Se cierran los sockets de forma controlada
+- Se muestra mensaje informativo al usuario
+
+### Servidor lleno
+
+- Si se alcanza el máximo de clientes concurrentes
+- Nuevos clientes reciben mensaje de error
+- La conexión se rechaza inmediatamente
+
+## Limpieza de Recursos
+
+### Manual
+
+```bash
+# Limpiar archivos compilados
+make clean
+
+# Limpiar todo incluyendo backups
+make distclean
+
+# Verificar que no quedan recursos abiertos
+lsof | grep database
+ipcs -a
+```
+
+### Automática
+
+- Al cerrar el servidor con Ctrl+C, se ejecuta limpieza automática
+- Los mutexes se destruyen correctamente
+- Los archivos temporales se eliminan
+- Los sockets se cierran
+
+## Notas Importantes
+
+1. **Archivo database.csv**: Debe existir en el directorio de ejecución del servidor
+2. **Permisos**: Asegúrese de tener permisos de lectura/escritura sobre database.csv
+3. **Puerto**: Si el puerto está en uso, elija otro o espere a que se libere
+4. **Firewall**: Asegúrese de que el puerto elegido esté abierto en el firewall
+5. **Formato CSV**: Mantenga el formato consistente (7 campos por registro)
+
+## Solución de Problemas
+
+### Error: "Address already in use"
+
+```bash
+# Esperar unos segundos y reintentar, o usar otro puerto
+# O matar el proceso que usa el puerto:
+lsof -ti:8080 | xargs kill -9
+```
+
+### Error: "Connection refused"
+
+```bash
+# Verificar que el servidor está corriendo
+ps aux | grep server
+
+# Verificar que el puerto es correcto
+netstat -tlnp | grep server
+```
+
+### Error: "No se encuentra el archivo database.csv"
+
+```bash
+# Asegurarse de ejecutar el servidor desde el directorio correcto
+# O crear un archivo database.csv con el formato adecuado
 ```
 
 ## Licencia
 
-Proyecto desarrollado para fines educativos. Sistema de Micro Base de Datos con Cliente-Servidor usando sockets TCP/IP.
-
----
-
-**Autor**: Sistema desarrollado como ejercicio de programación en C con sockets y concurrencia.
-**Fecha**: 2025
-**Versión**: 1.0
+Este proyecto es parte de un trabajo práctico académico para Sistemas Operativos - UNLAM.

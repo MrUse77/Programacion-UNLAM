@@ -10,7 +10,7 @@
 #define MAX_RECORDS 100000
 #define SHM_SIZE (RECORD_SIZE * 100)
 #define IDS_PER_REQUEST 10
-#define DELAY 1
+#define DELAY 5
 typedef struct {
 	int id;
 	char name[50];
@@ -26,7 +26,8 @@ typedef struct {
 	int regEscritos;
 	int shutdown_flag;
 	int genActivos;
-	Record buffer;
+	char buffer[SHM_SIZE];
+	char* file;
 	int bufferCount;
 } sharedData;
 

@@ -441,10 +441,6 @@ En `variables.h` se pueden ajustar:
 - ✅ Limpieza de recursos IPC
 - ✅ Manejadores de señales para cleanup
 
-## Autor
-
-**Agustin**
-
 ## Materia
 
 Sistemas Operativos - UNLAM

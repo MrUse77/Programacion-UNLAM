@@ -12,8 +12,8 @@
 #include <unistd.h>
 
 // Variables globales para limpieza
-static sharedData *data = NULL;
-static pid_t *generador = NULL;
+static sharedData* data = NULL;
+static pid_t* generador = NULL;
 static pid_t coordinator_pid = -1;
 static int cantGen = 0;
 static int total;
@@ -21,7 +21,7 @@ static int shm_id = -1;
 static int sem_id = -1;
 
 //UTILS
-int validate_parameters(int argc, char *argv[], int *num_gen, int *total_rec);
+int validate_parameters(int argc, char* argv[], int* num_gen, int* total_rec);
 void asignarSignals();
 void cleanup_resources();
 
@@ -34,14 +34,14 @@ void initSemaforos();
 void crearMemoriaCompartida();
 void initMemoriaCompartida();
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	if (!validate_parameters(argc, argv, &cantGen, &total)) {
 		return 1;
 	}
 
 	printf("Iniciando sistema con %d generadores y %d registros\n", cantGen,
-	       total);
+				 total);
 	printf("PID del proceso principal: %d\n", getpid());
 
 	// Configurar manejadores de señales
@@ -66,13 +66,14 @@ int main(int argc, char *argv[])
 		if (generador[i] == 0) {
 			generator_process(i + 1, data);
 			exit(0);
-		} else if (generador[i] == -1) {
+		}
+		else if (generador[i] == -1) {
 			perror("Error creando generador");
 			break;
 		}
 	}
 
-	coordinator_process(data);
+	coordinator_process(data, argv[3]);
 	// Esperar a que terminen los generadores
 	for (int i = 0; i < cantGen; i++) {
 		if (generador[i] > 0) {
@@ -93,12 +94,12 @@ int main(int argc, char *argv[])
 }
 
 //UTILS
-int validate_parameters(int argc, char *argv[], int *num_gen, int *total_rec)
+int validate_parameters(int argc, char* argv[], int* num_gen, int* total_rec)
 {
-	if (argc != 3) {
-		printf("Uso: %s <num_generadores> <total_registros>\n",
-		       argv[0]);
-		printf("Ejemplo: %s 4 1000\n", argv[0]);
+	if (argc != 4) {
+		printf("Uso: %s <num_generadores> <total_registros> <dir_archivo_salida>\n",
+					 argv[0]);
+		printf("Ejemplo: %s 4 1000 salida.csv\n", argv[0]);
 		printf("\nParámetros:\n");
 		printf("  num_generadores: 1-%d\n", MAX_GENERATORS);
 		printf("  total_registros: 1-%d\n", MAX_RECORDS);
@@ -107,16 +108,17 @@ int validate_parameters(int argc, char *argv[], int *num_gen, int *total_rec)
 
 	*num_gen = atoi(argv[1]);
 	*total_rec = atoi(argv[2]);
+	puts(argv[3]); // Imprimir el nombre del archivo de salida
 
 	if (*num_gen <= 0 || *num_gen > MAX_GENERATORS) {
 		printf("Error: Número de generadores debe estar entre 1 y %d\n",
-		       MAX_GENERATORS);
+					 MAX_GENERATORS);
 		return 0;
 	}
 
 	if (*total_rec <= 0 || *total_rec > MAX_RECORDS) {
 		printf("Error: Total de registros debe estar entre 1 y %d\n",
-		       MAX_RECORDS);
+					 MAX_RECORDS);
 		return 0;
 	}
 
@@ -145,7 +147,7 @@ void cleanup_resources()
 void signal_handler(int sig)
 {
 	printf("\nSeñal %d recibida. Iniciando terminación controlada...\n",
-	       sig);
+				 sig);
 	cleanup_resources();
 	exit(0);
 }
@@ -162,11 +164,12 @@ void sigchld_handler()
 			// controlada
 			if (term_sig == SIGKILL) {
 				printf("\nHijo %d terminado por señal %d. Iniciando terminación "
-				       "controlada...\n",
-				       pid, term_sig);
+							 "controlada...\n",
+							 pid, term_sig);
 				cleanup_resources();
 				exit(0);
-			} else {
+			}
+			else {
 				exit(0);
 			}
 		}
@@ -219,8 +222,8 @@ void crearMemoriaCompartida()
 }
 void initMemoriaCompartida()
 {
-	data = (sharedData *)shmat(shm_id, NULL, 0);
-	if (data == (void *)-1) {
+	data = (sharedData*)shmat(shm_id, NULL, 0);
+	if (data == (void*)-1) {
 		perror("Error adjuntando memoria compartida");
 		cleanup_resources();
 		exit(1);

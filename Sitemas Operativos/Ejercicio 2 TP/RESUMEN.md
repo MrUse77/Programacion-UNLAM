@@ -2,11 +2,23 @@
 
 ## Ejercicio 2: Cliente-Servidor de Micro Base de Datos con Transacciones
 
-### Autor: Agustin
+### Autor: Grupo 10
+
+- ESPADA RODRIGUEZ, FEDERICO
+
+- DORICICH, AGUSTIN FRANCISCO
+
+- NIEVA, ALEJO NICOLAS
+
+- GATTI, GONZALO ALEJO
+
+- MACIEL, KEVIN DANIEL
+
+- DE ROGATIS, RAMIRO JAVIER
 
 ### Fecha: Octubre 2025
 
-### Materia: Sistemas Operativos - UNLAM
+### Materia: Comision 02-3900 - Sistemas Operativos - UNLAM
 
 ---
 
@@ -78,9 +90,9 @@ Sistema completo de base de datos distribuida implementado en C que permite múl
 ### Documentación
 
 - **README.md** (7.4 KB): Manual de usuario
-- **TESTING.md** (7.3 KB): Guía de pruebas y monitoreo
 - **ARCHITECTURE.md** (XX KB): Documentación técnica de arquitectura
 - **RESUMEN.md** (este archivo): Resumen ejecutivo
+- **QUICKSTART.md** (~5 KB): Guía rápida de inicio
 
 ### Scripts de Prueba
 
@@ -362,17 +374,14 @@ ipcs -a
 
 ```
 Ejercicio 2 TP/
-├── server.c              # Código servidor
-├── client.c              # Código cliente
+├── src/
+|   ├── server.c              # Código servidor
+|   ├── client.c              # Código cliente
 ├── Makefile              # Sistema de compilación
-├── database.csv          # Base de datos de ejemplo
 ├── README.md             # Manual de usuario
 ├── TESTING.md            # Guía de pruebas
 ├── ARCHITECTURE.md       # Documentación técnica
 ├── RESUMEN.md            # Este archivo
-├── test_server.sh        # Script de prueba servidor
-├── test_concurrent.sh    # Script de prueba concurrencia
-├── monitor.sh            # Script de monitoreo
 ├── server.conf           # Configuración opcional
 └── .gitignore           # Control de versiones
 
@@ -380,23 +389,6 @@ Ejecutables (generados por make):
 ├── server                # Binario del servidor
 └── client                # Binario del cliente
 ```
-
-## Contacto y Referencias
-
-**Estudiante**: Agustin
-**Universidad**: UNLAM
-**Materia**: Sistemas Operativos
-**Fecha**: Octubre 2025
-
-**Referencias utilizadas**:
-
-- POSIX Threads Programming (pthread)
-- Berkeley Sockets API
-- Linux System Programming
-- Stevens, W. Richard - "Unix Network Programming"
-- man pages: socket(2), pthread(3), mutex(3)
-
----
 
 ## Anexo: Comandos de Verificación Rápida
 
@@ -420,18 +412,3 @@ ps -eLf | grep server
 pkill server
 make clean
 ```
-
----
-
-**Este proyecto demuestra conocimientos prácticos de:**
-
-- Programación en C
-- Programación concurrente (threads)
-- Programación de redes (sockets)
-- Sistemas operativos Linux
-- Sincronización y control de concurrencia
-- Manejo de recursos del sistema
-- Testing y debugging
-- Documentación técnica
-
-✅ **Proyecto completado y listo para entrega**

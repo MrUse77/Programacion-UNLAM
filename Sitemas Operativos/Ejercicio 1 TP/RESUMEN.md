@@ -2,11 +2,23 @@
 
 ## Ejercicio 1: Sistema de Generación Distribuida de Datos CSV con IPC
 
-### Autor: Agustin
+### Autor: Grupo 10
+
+- ESPADA RODRIGUEZ, FEDERICO
+
+- DORICICH, AGUSTIN FRANCISCO
+
+- NIEVA, ALEJO NICOLAS
+
+- GATTI, GONZALO ALEJO
+
+- MACIEL, KEVIN DANIEL
+
+- DE ROGATIS, RAMIRO JAVIER
 
 ### Fecha: Octubre 2025
 
-### Materia: Sistemas Operativos - UNLAM
+### Materia: Comision 02-3900 - Sistemas Operativos - UNLAM
 
 ---
 
@@ -326,40 +338,6 @@ _Nota: Tiempos aproximados en hardware de referencia (4 cores, 2.5 GHz)_
 - Todos los generadores tienen igual acceso a recursos
 - IDs asignados en orden FIFO (approx)
 - Sin starvation de procesos
-
-## Validación y Testing
-
-### Tests Realizados
-
-1. ✅ Parámetros inválidos (rechazados correctamente)
-2. ✅ Configuración mínima (1 gen, 1 registro)
-3. ✅ Configuración máxima (20 gen, 100,000 registros)
-4. ✅ Interrupción con Ctrl+C (cleanup correcto)
-5. ✅ Kill -9 al padre (hijos terminan, IPC limpiado)
-6. ✅ Verificación de IDs únicos (sin duplicados)
-7. ✅ Conteo de registros (exactamente N)
-8. ✅ Formato CSV válido
-9. ✅ Sin recursos IPC huérfanos (ipcs limpio)
-10. ✅ Sin procesos zombie
-
-### Comandos de Verificación
-
-```bash
-# Verificar IDs únicos
-cut -d',' -f1 generated_data.csv | tail -n +2 | sort -n | uniq -d
-
-# Contar registros
-tail -n +2 generated_data.csv | wc -l
-
-# Verificar formato
-head generated_data.csv
-
-# Verificar IPC limpio
-ipcs -m -s
-
-# Verificar procesos
-ps aux | grep DataGenerator
-```
 
 ## Limitaciones Conocidas
 

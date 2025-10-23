@@ -771,17 +771,19 @@ int main(int argc, char* argv[])
 			continue;
 		}
 
-		// Verificar límite de clientes
+		// Esperar hasta que haya espacio disponible
 		pthread_mutex_lock(&client_mutex);
-		if (client_count >= max_clients) {
+		while (client_count >= max_clients) {
+			if (!server_running) {
+				pthread_mutex_unlock(&client_mutex);
+				close(client_socket);
+				cleanup_resources();
+				return 0;
+			}
 			pthread_mutex_unlock(&client_mutex);
-
-			char msg[] =
-				"ERROR: Servidor lleno. Intente más tarde.\n";
-			send(client_socket, msg, strlen(msg), 0);
-			close(client_socket);
-			printf("Conexión rechazada: servidor lleno\n");
-			continue;
+			// Pequeña pausa antes de reintentar
+			usleep(100000); // 100ms
+			pthread_mutex_lock(&client_mutex);
 		}
 
 		client_count++;

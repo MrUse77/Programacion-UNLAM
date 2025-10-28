@@ -39,8 +39,9 @@
 		7.3. El despachante ingresa el peso del bulto
 
 		7.4. El sistema imprimer la etiqueta con un codigo QR para el bulto
-	
+
 	8. El despachante presion "Finalizar despacho"
+
 	9. El sistema muestra un resumen del despacho, confirma la operacion, imprime el recibo y finaliza el CU
 
 # Postcondicion: El bulto queda registrado en el sistema y se actualiza el estado del boleto del pasajero
@@ -51,13 +52,17 @@
 	
 	A1.[No existen vuelos]
 
-		3.1. Se desprende del flujo normal en el paso 3
-
-		3.2. El sistema muestra un mensaje indicando que no hay vuelos proximos y finaliza el CU
+		2.1. El sistema muestra un mensaje indicando que no hay vuelos proximos y finaliza el CU
 	
 	A2.[Numero de boleto invalido]
+	
+		6.1 El sistema muestra un mensaje indicando que el numero de boleto es invalido 	
+
+		6.2 Vuelve al paso 5 del flujo normal
+
+	A3.[Peso del bulto excede limite permitido]
+
+		7.4.1 El sistema enciende una alarma luminica
 		
-		5.1. Se desprende del flujo normal en el paso 5
-		
-		5.2 El sistema muestra un mensaje indicando que el numero de boleto es invalido y vuelve al paso 5 del flujo normal
+		7.4.2 Vuelve al paso 7.1 del flujo normal
 

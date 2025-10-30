@@ -1,0 +1,46 @@
+# depslib dependency file v1.0
+1761229109 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/ActualizarPreciosProductos/main.c
+	<stddef.h>
+	<stdio.h>
+	<stdlib.h>
+	"vector.h"
+	"archivos.h"
+	"string.h"
+
+1761228622 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/ActualizarPreciosProductos/vector.h
+	<stdbool.h>
+	<stddef.h>
+	<stdio.h>
+
+1761226265 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/ActualizarPreciosProductos/archivos.h
+	<stdlib.h>
+	<string.h>
+	<stdio.h>
+	"vector.h"
+
+1761228813 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/ActualizarPreciosProductos/string.h
+	<stddef.h>
+	<stdbool.h>
+
+1761228966 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/ActualizarPreciosProductos/archivos.c
+	<stddef.h>
+	<stdlib.h>
+	"vector.h"
+	"string.h"
+	"archivos.h"
+
+1761227818 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/ActualizarPreciosProductos/vector.c
+	<stddef.h>
+	"vector.h"
+	<stdlib.h>
+	<stdio.h>
+	<unistd.h>
+	<string.h>
+	<time.h>
+
+1761228840 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/ActualizarPreciosProductos/string.c
+	"string.h"
+	<stddef.h>
+	<stdio.h>
+	"string.h"
+

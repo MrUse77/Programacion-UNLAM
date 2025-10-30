@@ -60,6 +60,7 @@ int vectorInsertarDeArchivoBIN(Vector *v, FILE *f);
 int vectorInsertarDeArchivoTXT(Vector *v, FILE *f, FmtInsert insertar,
 			       int count); //Probable csv
 int vectorGuardarAArchivoTXT(Vector *v, FILE *f, FmtWrite formatear);
+int vectorGuardarAArchivoBIN(Vector *v, char *nombArch);
 
 //Busqueda
 void *vectorBuscar(Vector *v, int elem);

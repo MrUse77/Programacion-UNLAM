@@ -36,6 +36,15 @@ typedef struct {
 	size_t cap;
 	size_t tamElem;
 } Vector;
+
+typedef struct {
+	void *act;
+	void *pri;
+	void *ult;
+	Vector *vector;
+	bool finIter;
+} VectorIterador;
+
 typedef int (*Cmp)(const void *, const void *); //Puntero a funcion
 typedef void (*Fmt)(const void *);
 typedef void (*FmtInsert)(char *, void *);
@@ -79,6 +88,14 @@ void vectorMostrar(const Vector *v, Fmt fmt);
 void vectorDestruir(Vector *v);
 int vectorCE(Vector *v);
 
+//Vector Iterador
+void vectorIteradorCrear(VectorIterador *it, const Vector *v);
+void *vectorIteradorPrimero(VectorIterador *it);
+void *vectorIteradorUltimo(VectorIterador *it);
+void *vectorIteradorSiguiente(VectorIterador *it);
+void *vectorIteradorDesplazamiento(VectorIterador *it, size_t cantidad);
+bool vectorIteradorFin(VectorIterador *it);
+void *vectorIteradorActual(VectorIterador *it);
 /*** No Primitivas ***/
 
 #endif // !VECTOR_H

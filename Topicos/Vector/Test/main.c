@@ -64,11 +64,18 @@ int main(int argc, char *argv[])
 	//memmove: 397ms para 100.000 elementos
 	//memcpy: 113052ms para 100.000 elementos
 	puts("\n");
+	VectorIterador it;
+	vectorIteradorCrear(&it, &v);
+	vectorIteradorPrimero(&it);
+	int *num = vectorIteradorDesplazamiento(&it, 10);
+	if (num) {
+		printf("%d", *num);
+	}
 
 	//	vectorMostrar(&v, formato);
-	vectorOrdenar(&v, INSERCION, comp);
+	//vectorOrdenar(&v, INSERCION, comp, 1);
 
-	vectorMostrar(&v, formato);
+	//vectorMostrar(&v, formato);
 	vectorDestruir(&v);
 	return cod;
 }

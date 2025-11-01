@@ -13,15 +13,16 @@
 	<stddef.h>
 	<stdio.h>
 
-1759224250 source:/home/agustin/Documentos/unlam/Topicos/Vector/TDA/vector.c
+1761832662 source:/home/agustin/Documentos/unlam/Topicos/Vector/TDA/vector.c
 	<stddef.h>
 	"vector.h"
 	<stdlib.h>
 	<stdio.h>
 	<unistd.h>
 	<string.h>
+	<time.h>
 
-1759182106 /home/agustin/Documentos/unlam/Topicos/Vector/TDA/vector.h
+1761829873 /home/agustin/Documentos/unlam/Topicos/Vector/TDA/vector.h
 	<stdbool.h>
 	<stddef.h>
 	<stdio.h>

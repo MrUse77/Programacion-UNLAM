@@ -446,3 +446,82 @@ static bool cmpDesc(const void *a, const void *b, Cmp cmp)
 {
 	return (cmp(a, b) < 0);
 }
+
+//Vector Iterador
+
+void vectorIteradorCrear(VectorIterador *it, const Vector *v)
+{
+	it->pri = it->ult = it->act = NULL;
+	it->finIter = true;
+	it->vector = (Vector *)v;
+}
+void *vectorIteradorPrimero(VectorIterador *it)
+{
+	if (it->vector->cantElem == 0) {
+		it->finIter = true;
+		return NULL;
+	}
+	it->pri = it->vector->vec;
+	it->ult = it->pri + (it->vector->cantElem - 1) * it->vector->tamElem;
+	it->act = it->pri;
+	it->finIter = false;
+	return it->act;
+}
+void *vectorIteradorUltimo(VectorIterador *it)
+{
+	if (it->vector->cantElem == 0) {
+		it->finIter = true;
+		return NULL;
+	}
+	it->pri = it->vector->vec;
+	it->ult = it->pri + (it->vector->cantElem - 1) * it->vector->cantElem;
+	it->act = it->ult;
+	it->finIter = false;
+	return it->act;
+}
+void *vectorIteradorDesplazamiento(VectorIterador *it, size_t cantidad)
+{
+	const Vector *v = it->vector;
+	if (it->act + v->tamElem * cantidad > it->ult) {
+		it->finIter = true;
+		return NULL;
+	}
+	void *cur = it->act + v->tamElem * (cantidad - 1);
+
+	if (cur < v->vec || cur > it->ult)
+		return NULL;
+
+	it->act = cur;
+
+	return it->act;
+}
+void *vectorIteradorAnterior(VectorIterador *it)
+{
+	if (it->act == it->pri) {
+		it->finIter = true;
+		return NULL;
+	}
+
+	it->act -= it->vector->tamElem;
+
+	return it->act;
+}
+
+void *vectorIteradorSiguiente(VectorIterador *it)
+{
+	if (it->act == it->ult) {
+		it->finIter = true;
+		return NULL;
+	}
+	it->act += it->vector->tamElem;
+
+	return it->act;
+}
+bool vectorIteradorFin(VectorIterador *it)
+{
+	return it->finIter;
+}
+void *vectorIteradorActual(VectorIterador *it)
+{
+	return it->act;
+}

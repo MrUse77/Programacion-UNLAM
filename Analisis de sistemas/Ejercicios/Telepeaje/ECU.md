@@ -35,25 +35,24 @@ No aplica
 
 ## Flujo Normal
 
-	1. El conductor pasa por la cabina del peaje e inicia el caso de uso.
+1. El conductor pasa por la cabina del peaje e inicia el caso de uso.
 
-	2. El sistema muestra la fecha y la hora.
+2. El sistema muestra la fecha y la hora.
 
-	3. El sensos escanea el TAG del vehiculo.
+3. El sensos escanea el TAG del vehiculo.
 
-	4. El sistema debita el saldo, y cede el paso al vehiculo.
-	
-	5. Fin del CU
-	
+4. El sistema debita el saldo, y cede el paso al vehiculo.
+
+5. Fin del CU
 
 ## Flujo alternativo
 
-	A0.[Saldo insuficiente]
+A0.[Saldo insuficiente]
 
-		4.1. El sistema muestra un mensaje: "Saldo insuficiente, por favor abone en efectivo"
-		
-		4.2. Se activa la alarma.
-		
-		4.3 El sistema no cede el paso al vehiculo.
-		
-		4.4. Fin del CU
+4.1. El sistema muestra un mensaje: "Saldo insuficiente, por favor abone en efectivo"
+
+4.2. Se activa la alarma.
+
+4.3 El sistema no cede el paso al vehiculo.
+
+4.4. Fin del CU

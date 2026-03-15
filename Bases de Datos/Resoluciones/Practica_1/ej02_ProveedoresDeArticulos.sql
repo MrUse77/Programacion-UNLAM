@@ -78,7 +78,7 @@ where p.categoria > (
 
 -- 9
 select p.nroProv from pedido p
-where p.nroArt between 1 and 100
+where p.nroArt between 'A001' and 'A100'
 group by p.nroProv
 having sum(p.cantidad) > 1000;
 

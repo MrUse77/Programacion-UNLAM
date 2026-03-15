@@ -89,6 +89,52 @@ WHERE NOT EXISTS (
     )
 );
 
+/*7. Hallar la cantidad de artículos diferentes provistos por cada proveedor que provee
+a todos los clientes de Junín.*/
+SELECT p.NroProv, COUNT(DISTINCT pe.NroArt) AS CantidadArtículos
+FROM Proveedor p WHERE NOT EXISTS (
+    SELECT 1
+    FROM Cliente c
+    WHERE c.CiudadCli = 'Junín'
+    AND NOT EXISTS (
+	SELECT 1
+	FROM Pedido pe
+	WHERE pe.NroProv = p.NroProv
+	AND pe.NroCli = c.NroCli
+    )
+)
+
+/*8. Hallar los nombres de los proveedores cuya categoría sea mayor que la de todos
+los proveedores que proveen el artículo “cuaderno”.*/
+SELECT p.NomProv FROM Proveedor p WHERE p.Categoria > ALL (
+    SELECT p2.Categoria FROM Proveedor p2
+    JOIN Pedido pe ON pe.NroProv = p2.NroProv
+    WHERE pe.NroArt = 'cuaderno'
+);
+
+/*9. Hallar los proveedores que han provisto más de 1000 unidades entre los artículos
+A001y A100.*/
+SELECT p.NroProv FROM Proveedor p JOIN Pedido pe ON pe.NroProv = p.NroProv
+WHERE pe.NroArt IN ('A001', 'A100') GROUP BY p.NroProv HAVING SUM(pe.Cantidad) > 1000;
+
+/*10. Listar la cantidad y el precio total de cada artículo que han pedido los Clientes a sus
+proveedores entre las fechas 01-01-2004 y 31-03-2004 (se requiere visualizar
+Cliente, Articulo, Proveedor, Cantidad y Precio).*/
+SELECT pe.NroCli, pe.NroArt, pe.NroProv, SUM(pe.Cantidad) AS Cantidad, SUM(pe.PrecioTotal) AS PrecioTotal
+FROM Pedido pe
+WHERE pe.FechaPedido BETWEEN '2004-01-01' AND '2004-03-31'
+GROUP BY pe.NroCli, pe.NroArt, pe.NroProv;
+
+/*11. Idem anterior y que además la Cantidad sea mayor o igual a 1000 o el Precio sea
+mayor a $ 1000.*/
+SELECT pe.NroCli, pe.NroArt, pe.NroProv, SUM(pe.Cantidad) AS Cantidad, SUM(pe.PrecioTotal) AS PrecioTotal
+FROM Pedido pe
+WHERE pe.FechaPedido BETWEEN '2004-01-01' AND '2004-03-31'
+GROUP BY pe.NroCli, pe.NroArt, pe.NroProv
+HAVING SUM(pe.Cantidad) >= 1000 OR SUM(pe.PrecioTotal) > 1000;
+
+
+
 
 
 

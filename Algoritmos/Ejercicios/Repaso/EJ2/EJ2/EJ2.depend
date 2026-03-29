@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1773847269 source:/home/agustin/Documentos/unlam/Algoritmos/Ejercicios/Repaso/EJ2/EJ2/main.c
+	<stdio.h>
+	<stdlib.h>
+

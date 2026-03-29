@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
 	for (int i = 0; i < 10; i++) {
 		int random = rand() % 100;
-		cod = vectorInsertar(&v, &random);
+		cod = vectorOrdInsertar(&v, &random, comp);
 		if (cod != OK) {
 			return cod;
 		}

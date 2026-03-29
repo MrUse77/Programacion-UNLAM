@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1774308432 source:/home/agustin/Documentos/unlam/Algoritmos/Ejercicios/Repaso/EJ3/main.c
+	<stdio.h>
+	<stdlib.h>
+	"include/vector.h"
+
+1774307444 /home/agustin/Documentos/unlam/Algoritmos/Ejercicios/Repaso/EJ3/include/vector.h
+	<stdbool.h>
+	<stddef.h>
+	<stdio.h>
+

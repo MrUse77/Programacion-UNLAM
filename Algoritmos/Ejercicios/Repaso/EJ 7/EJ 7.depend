@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1774461879 source:/home/agustin/Documentos/unlam/Algoritmos/Ejercicios/Repaso/EJ 7/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+

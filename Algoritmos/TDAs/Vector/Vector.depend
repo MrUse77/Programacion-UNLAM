@@ -1,0 +1,17 @@
+# depslib dependency file v1.0
+1773777518 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/Vector/main.c
+	"include/vector.h"
+	<stdlib.h>
+	<string.h>
+
+1774307223 /home/agustin/Documentos/unlam/Algoritmos/TDAs/Vector/include/vector.h
+	<stdbool.h>
+	<stddef.h>
+	<stdio.h>
+
+1774365828 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/Vector/vector.c
+	"include/vector.h"
+	<stddef.h>
+	<stdlib.h>
+	<string.h>
+

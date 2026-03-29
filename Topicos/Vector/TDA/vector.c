@@ -82,14 +82,14 @@ int vectorOrdInsertar(Vector *v, void *elem, Cmp cmp)
 	}
 
 	void *posIns = v->vec;
-	void *ult = v->vec + (v->cantElem - 1) * v->tamElem;
+	void *ult = v->vec + v->cantElem * v->tamElem;
 	while (posIns <= ult && cmp(posIns, elem) > 0)
 		posIns += v->tamElem;
 
-	memmove(posIns + v->tamElem, posIns, (ult - posIns) + v->tamElem);
+	memmove(posIns + v->tamElem, posIns, (ult - posIns));
 	/*Otra forma:
-	for (void *j = ult; j >= posIns; j -= v->tamElem)
-		memcpy(j + v->tamElem, j, v->tamElem);
+	for (void *j = ult; j > posIns; j -= v->tamElem)
+		memcpy(j, j - v->tamElem, v->tamElem);
 	*/
 	memcpy(posIns, elem, v->tamElem);
 	v->cantElem++;
@@ -103,11 +103,11 @@ int vectorInsertarAlInicio(Vector *v, void *elem)
 		if (cod != OK)
 			return SIN_MEM;
 	}
-	void *ult = v->vec + (v->cantElem) * v->tamElem;
+
+	memmove(v->vec + v->tamElem, v->vec, v->tamElem * v->cantElem);
 
 	//Otra forma:
-	memmove(v->vec, v->vec + 1, v->tamElem * v->cantElem);
-
+	//void *ult = v->vec + (v->cantElem) * v->tamElem;
 	/*for (; ult > v->vec; ult -= v->tamElem) {
 		memcpy(ult, ult - v->tamElem, v->tamElem);
 	}*/
@@ -147,12 +147,12 @@ int vectorInsertarDeArchivoTXT(Vector *v, FILE *f, FmtInsert formatear,
 		void *elemFmt = malloc(v->tamElem);
 		formatear(elem, elemFmt);
 		cod = vectorInsertarAlInicio(v, elemFmt);
+		free(elemFmt);
 
 		if (cod != OK) {
 			free(elem);
 			return cod;
 		}
-		free(elemFmt);
 	}
 	free(elem);
 	return cod;
@@ -161,9 +161,11 @@ int vectorInsertarDeArchivoTXT(Vector *v, FILE *f, FmtInsert formatear,
 int vectorGuardarAArchivoTXT(Vector *v, FILE *f, FmtWrite formatear)
 {
 	int cod = OK;
-	void *ult = v->vec + (v->cantElem - 1) * v->tamElem;
+	void *ult = v->vec + v->cantElem * v->tamElem;
 	void *i = v->vec;
-	char *elem = malloc(sizeof(v->tamElem));
+	char *elem = malloc(v->tamElem);
+	if (!elem)
+		return ERR_MEM;
 	for (; i < ult; i += v->tamElem) {
 		formatear(f, i);
 	}
@@ -184,35 +186,40 @@ int vectorGuardarAArchivoBIN(Vector *v, char *nombArch)
 //Busqueda
 void *vectorBuscar(Vector *v, int elem)
 {
-	void *ult = v->vec + (v->cantElem - 1) * v->tamElem;
+	void *ult = v->vec + v->cantElem * v->tamElem;
 	void *i = v->vec;
 	bool encontrado = false;
-	while (i <= ult && !encontrado) {
+	while (i < ult && !encontrado) {
 		if (*(int *)i == elem) {
 			encontrado = true;
+		} else {
+			i += v->tamElem;
 		}
-		i += v->tamElem;
 	}
-	return i;
+	return encontrado ? i : NULL;
 }
 void *vectorOrdBuscar(const Vector *v, void *elem, Cmp cmp)
 {
-	void *li = v->vec;
-	void *ls = v->vec + (v->cantElem - 1);
-	void *m;
+	if (v->cantElem == 0)
+		return NULL;
+	size_t li = 0;
+	size_t ls = v->cantElem - 1;
+	size_t m;
 	bool encontrado = false;
-	int pos;
+	int pos = 0;
 
 	while (li <= ls && !encontrado) {
-		m = li + ((ls - li) / v->tamElem / 2) * v->tamElem;
-		if (cmp(elem, m) == 0) {
+		m = li + (ls - li) / 2;
+		void *pm = v->vec + m * v->tamElem;
+		if (cmp(elem, pm) == 0) {
 			encontrado = true;
-			memcpy(elem, m, v->tamElem);
-			pos = (m - v->vec) * v->tamElem;
-		}
-		if (cmp(elem, m) > 0) {
+			memcpy(elem, pm, v->tamElem);
+			pos = m * v->tamElem;
+		} else if (cmp(elem, pm) > 0) {
 			li = m + 1;
 		} else {
+			if (m == 0)
+				break;
 			ls = m - 1;
 		}
 	}
@@ -222,17 +229,13 @@ void *vectorOrdBuscar(const Vector *v, void *elem, Cmp cmp)
 //Eliminacion
 bool vectorEliminarDePosicion(Vector *v, size_t pos)
 {
-	if (pos < 0 || pos > v->cantElem) {
+	if (pos >= v->cantElem) {
 		return false;
 	}
-	int *i = v->vec + (pos + 1) * v->tamElem;
-	/*int *ult = v->vec + v->cantElem - 1;
-	//puede no tener inicializacion
-	for (; i <= ult; i++) {
-		memcpy(i - 1, i, v->tamElem);
-	}*/
+	void *i = v->vec + (pos + 1) * v->tamElem;
 	//Otra forma:
-	memmove(v->vec + pos, i, v->tamElem * v->cantElem);
+	memmove(v->vec + pos * v->tamElem, i,
+		v->tamElem * (v->cantElem - pos - 1));
 	v->cantElem--;
 	if (((float)v->cantElem / v->cap) <= FACT_OCUP) {
 		redimensionarVector(v, FACT_DEC);
@@ -250,18 +253,25 @@ bool vectorOrdEliminar(Vector *v, void *elem, Cmp cmp)
 }
 bool vectorEliminar(Vector *v, void *elem, Cmp cmp)
 {
-	void *ult = v->vec + v->cantElem - 1;
+	if (v->cantElem == 0)
+		return false;
+	void *ult = v->vec + (v->cantElem - 1) * v->tamElem;
 	void *i = v->vec;
 	bool eliminado = false;
-	while (i < ult && !eliminado) {
+	while (i <= ult && !eliminado) {
 		if (cmp(i, elem) == 0) {
-			for (void *j = i + 1; j <= ult; j++) {
-				memcpy(j - 1, j, v->tamElem);
-				ult--;
+			for (void *j = i + v->tamElem; j <= ult;
+			     j += v->tamElem) {
+				memcpy(j - v->tamElem, j, v->tamElem);
 			}
 			eliminado = true;
+			v->cantElem--;
+			if (((float)v->cantElem / v->cap) <= FACT_OCUP) {
+				redimensionarVector(v, FACT_DEC);
+			}
+		} else {
+			i += v->tamElem;
 		}
-		i++;
 	}
 	return eliminado;
 }
@@ -270,6 +280,8 @@ bool vectorEliminar(Vector *v, void *elem, Cmp cmp)
 //ord = 1 ascendente, -1 descendente
 int vectorOrdenar(Vector *vector, int metodo, Cmp cmp, int ord)
 {
+	if (vector->cantElem < 2)
+		return OK;
 	void *a, *b;
 	if (ord != 1 && ord != -1)
 		return ERR_ORD;
@@ -474,7 +486,7 @@ void *vectorIteradorUltimo(VectorIterador *it)
 		return NULL;
 	}
 	it->pri = it->vector->vec;
-	it->ult = it->pri + (it->vector->cantElem - 1) * it->vector->cantElem;
+	it->ult = it->pri + (it->vector->cantElem - 1) * it->vector->tamElem;
 	it->act = it->ult;
 	it->finIter = false;
 	return it->act;

@@ -1,0 +1,22 @@
+# depslib dependency file v1.0
+1761226106 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Archivos/archivos.c
+	<stddef.h>
+	<stdlib.h>
+	"vector.h"
+	"string.h"
+	"archivos.h"
+
+1761224706 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Archivos/vector.h
+	<stdbool.h>
+	<stddef.h>
+	<stdio.h>
+
+1761225777 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Archivos/string.h
+	<stddef.h>
+
+1761226112 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/Archivos/archivos.h
+	<stdlib.h>
+	<string.h>
+	<stdio.h>
+	"vector.h"
+

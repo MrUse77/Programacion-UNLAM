@@ -1,0 +1,3 @@
+[submodule "Algoritmos/TP"]
+	path = Algoritmos/TP
+	url = git@github.com:MrUse77/TP-Algoritmos.git

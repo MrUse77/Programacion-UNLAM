@@ -17,6 +17,26 @@ Este repositorio contiene una colección de ejercicios prácticos realizados dur
 ├── .envrc
 └── README.md
 ```
+## Submodulos
+El repositorio cuenta con algunos submodulos (por algunos TPs o diferentes ejercicios que necesiten su propio Repositorio)
+Para traer todo junto:
+
+```bash
+git clone --recursive https://github.com/MrUse77/Programacion-UNLAM
+```
+
+Si ya tenes el repositorio bastara con hacer:
+
+```bash
+git submodule update --init --recursive
+```
+Tambien debe hacerse luego de un git pull o usar:
+
+```bash
+git config --global submodule.recurse true
+```
+
+
 
 ## 🛠️ Entorno de Desarrollo con Nix
 

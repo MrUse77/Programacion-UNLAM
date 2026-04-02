@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1775055040 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/PruebasTDAs/Pila/main.c
+	<stdio.h>
+	<stdlib.h>
+	"include/Pila.h"
+
+1775052358 /home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/PruebasTDAs/Pila/include/Pila.h
+	<stdlib.h>
+

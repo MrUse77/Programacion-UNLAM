@@ -1,7 +1,0 @@
-# depslib dependency file v1.0
-1775051908 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/TDAs/Pila/main.c
-	"Pila.h"
-
-1775051226 /home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/TDAs/Pila/Pila.h
-	<stdlib.h>
-

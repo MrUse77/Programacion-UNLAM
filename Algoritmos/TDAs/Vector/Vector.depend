@@ -4,12 +4,12 @@
 	<stdlib.h>
 	<string.h>
 
-1774307223 /home/agustin/Documentos/unlam/Algoritmos/TDAs/Vector/include/vector.h
+1775103128 /home/agustin/Documentos/unlam/Algoritmos/TDAs/Vector/include/vector.h
 	<stdbool.h>
 	<stddef.h>
 	<stdio.h>
 
-1774365828 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/Vector/vector.c
+1775103128 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/Vector/vector.c
 	"include/vector.h"
 	<stddef.h>
 	<stdlib.h>

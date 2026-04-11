@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="TDAs">
+		<Project filename="TDAs/Pila/Pila.cbp" />
+		<Project filename="TDAs/Vector/Vector.cbp" />
+	</Workspace>
+</CodeBlocks_workspace_file>

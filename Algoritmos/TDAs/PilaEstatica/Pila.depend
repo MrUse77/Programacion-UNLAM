@@ -22,7 +22,7 @@
 	<stdio.h>
 	<string.h>
 
-1775942305 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaEstatica/Pila.c
+1775946281 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaEstatica/Pila.c
 	"Pila.h"
 	<string.h>
 
@@ -35,7 +35,7 @@
 	"Pila.h"
 	"test_framework.h"
 
-1775942957 /home/agustin/Documentos/unlam/Algoritmos/TDAs/includes/Pila.h
+1775946650 /home/agustin/Documentos/unlam/Algoritmos/TDAs/includes/Pila.h
 	<stdlib.h>
 
 1775940806 /home/agustin/Documentos/unlam/Algoritmos/TDAs/includes/test_framework.h

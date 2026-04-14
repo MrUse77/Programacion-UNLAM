@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Ejercicio 3" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/Ejercicio 3" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="../../../TDAs/includes" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../../../TDAs/includes" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-lPila" />
+					<Add option="-lFecha" />
+					<Add directory="../../../TDAs/libs" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/Ejercicio 3" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="../../../TDAs" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../../../TDAs" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lPila" />
+					<Add directory="../../../TDAs" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<ResourceCompiler>
+			<Add directory="../../../TDAs/" />
+		</ResourceCompiler>
+		<Linker>
+			<Add option="-lPila" />
+			<Add directory="../../../TDAs" />
+		</Linker>
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>

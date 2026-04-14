@@ -9,3 +9,17 @@
 	<stddef.h>
 	<stdio.h>
 
+1775110097 source:/home/agustin/Documentos/unlam/Algoritmos/Ejercicios/src/Repaso/EJ1/main.c
+	<stdio.h>
+	<stdlib.h>
+	"include/vector.h"
+	"Pila.h"
+
+1775103128 /home/agustin/Documentos/unlam/Algoritmos/Ejercicios/src/Repaso/EJ1/include/vector.h
+	<stdbool.h>
+	<stddef.h>
+	<stdio.h>
+
+1775110014 /home/agustin/Documentos/unlam/Algoritmos/Ejercicios/include/Pila.h
+	<stdlib.h>
+

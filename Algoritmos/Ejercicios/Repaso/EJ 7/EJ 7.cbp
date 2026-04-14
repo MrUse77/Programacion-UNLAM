@@ -28,7 +28,13 @@
 				</Linker>
 			</Target>
 		</Build>
-		<Compiler>
+			<Add option="-Wall" />
+			<Add directory="../../../TDAs/Pila" />
+			<Add directory="../../../TDAs/Vector/include" />
+		</Compiler>
+		<Linker>
+			<Add directory="../../../TDAs/Pila/lib" />
+			<Add directory="../../../TDAs/Vector/lib" />
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="main.c">

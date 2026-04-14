@@ -13,14 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
-					<Add directory="include" />
 				</Compiler>
-				<ResourceCompiler>
-					<Add directory="include" />
-				</ResourceCompiler>
-				<Linker>
-					<Add library="lib/libvector.a" />
-				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/EJ3" prefix_auto="1" extension_auto="1" />
@@ -37,8 +30,13 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add directory="../../../TDAs/Pila" />
+			<Add directory="../../../TDAs/Vector/include" />
 		</Compiler>
-		<Unit filename="include/vector.h" />
+		<Linker>
+			<Add directory="../../../TDAs/Pila/lib" />
+			<Add directory="../../../TDAs/Vector/lib" />
+		</Linker>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -58,9 +58,6 @@
 		<Unit filename="Pila.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="Pila.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
 		<Unit filename="Test/test_pila.c">
 			<Option compilerVar="CC" />
 			<Option target="Test" />

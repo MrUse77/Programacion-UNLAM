@@ -26,9 +26,9 @@ int pilaLlena(const t_Pila *p, unsigned tam)
 }
 
 /** 
- * Revisa si la pila esta esta vacia
+ * Revisa si la pila esta vacia
  * @param *p - puntero a pila 
- * @returns {int} - Si hay espacio, devuelve FALSE, si no hay, devuelve TRUE
+ * @returns {int} - Si esta vacia, devuelve TRUE, si no hay, devuelve FALSE
  */
 int pilaVacia(const t_Pila *p)
 {
@@ -108,6 +108,6 @@ int verTope(const t_Pila *p, void *buffer, unsigned tamDato)
 	//Obtenemos tamaño del dato
 	memcpy(&tam, p->Vector + p->tope, sizeof(tam));
 	//Obtenemos el minimo entre tam y tamDato y lo pasamos al buffer
-	memcpy(buffer, p->Vector + p->tope + tam, MIN(tam, tamDato));
+	memcpy(buffer, p->Vector + p->tope + sizeof(tam), MIN(tam, tamDato));
 	return OK;
 }

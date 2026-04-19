@@ -1,7 +1,7 @@
 #include "Pila.h"
 #include <string.h>
-#define MIN(a, b) (a > b ? b : a)
 
+#define MIN(a, b) (a > b ? b : a)
 /** 
  * Crea una pila de tamaño definido 
  * @param *p - puntero a pila

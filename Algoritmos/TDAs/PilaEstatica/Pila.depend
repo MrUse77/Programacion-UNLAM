@@ -22,23 +22,22 @@
 	<stdio.h>
 	<string.h>
 
-1775946281 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaEstatica/Pila.c
+1776259953 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaEstatica/Pila.c
 	"Pila.h"
 	<string.h>
 
 1775940606 /home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaEstatica/Pila.h
 	<stdlib.h>
 
-1775943869 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaEstatica/Test/test_pila.c
+1775946281 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaEstatica/Test/test_pila.c
 	<stdio.h>
 	<string.h>
 	"Pila.h"
 	"test_framework.h"
 
-1775946650 /home/agustin/Documentos/unlam/Algoritmos/TDAs/includes/Pila.h
-	<stdlib.h>
+1776547454 /home/agustin/Documentos/unlam/Algoritmos/TDAs/includes/Pila.h
 
-1775940806 /home/agustin/Documentos/unlam/Algoritmos/TDAs/includes/test_framework.h
+1775946281 /home/agustin/Documentos/unlam/Algoritmos/TDAs/includes/test_framework.h
 	<stdio.h>
 	<string.h>
 

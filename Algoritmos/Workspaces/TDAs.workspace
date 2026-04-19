@@ -4,5 +4,7 @@
 		<Project filename="../TDAs/Fecha/Fecha.cbp" />
 		<Project filename="../TDAs/PilaEstatica/Pila.cbp" />
 		<Project filename="../TDAs/utils/utils.cbp" />
+		<Project filename="../TDAs/ColaEstatica/Cola.cbp" />
+		<Project filename="../TDAs/PilaDinamica/Pila Dinamica.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

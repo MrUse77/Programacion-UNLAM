@@ -3,5 +3,7 @@
 	<Workspace title="Unidad 2">
 		<Project filename="../Ejercicios/Unidad2/Ejercicio 3/Ejercicio 3.cbp" />
 		<Project filename="../Ejercicios/Unidad2/Ejercicio 4/Ejercicio 4.cbp" />
+		<Project filename="../Ejercicios/Unidad2/Ejercicio 6/Ejercicio 6.cbp" />
+		<Project filename="../Ejercicios/Unidad2/Ejercicio 5/Ejercicio 5.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

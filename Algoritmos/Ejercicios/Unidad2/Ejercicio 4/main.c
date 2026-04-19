@@ -34,7 +34,7 @@ int main()
 {
 	t_Pila p;
 	crearPila(&p);
-	int code = colocarProdEnPila_TXT(&p);
+	int code = colocarProdEnPila_BIN(&p);
 	if (code != 1) {
 		printf("No hay datos guardados\n");
 	}

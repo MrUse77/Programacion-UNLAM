@@ -1,0 +1,18 @@
+# depslib dependency file v1.0
+1776544858 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaDinamica/Test/test_pila_dinamica.c
+	<stdio.h>
+	<string.h>
+	"Pila.h"
+	"test_framework.h"
+
+1776547454 /home/agustin/Documentos/unlam/Algoritmos/TDAs/includes/Pila.h
+
+1775946281 /home/agustin/Documentos/unlam/Algoritmos/TDAs/includes/test_framework.h
+	<stdio.h>
+	<string.h>
+
+1776261525 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaDinamica/main.c
+	"Pila.h"
+	<string.h>
+	<stdlib.h>
+

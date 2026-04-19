@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1776559704 source:/home/agustin/Documentos/unlam/Algoritmos/Ejercicios/Unidad2/Ejercicio 7/main.c
+	<stdio.h>
+	"Pila.h"
+	<string.h>
+
+1776255668 /home/agustin/Documentos/unlam/Algoritmos/TDAs/includes/Pila.h
+	<stdlib.h>
+
+1776547454 /home/agustin/Documentos/unlam/Algoritmos/includes/Pila.h
+

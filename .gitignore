@@ -18,5 +18,7 @@ Topicos/TP
 
 Sitemas Operativos/Ejercicio 1 TP/bin/
 /.direnv
-/Algoritmos/Ejercicios/*/*/bin/Debug
-/Algoritmos/TDAs/*/.objs/Test
+/Algoritmos/Ejercicios/*/*/bin
+/Algoritmos/Ejercicios/*/*/obj
+/Algoritmos/TDAs/*/obj
+/Algoritmos/TDAs/*/bin

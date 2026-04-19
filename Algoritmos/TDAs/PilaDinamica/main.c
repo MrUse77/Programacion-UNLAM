@@ -48,7 +48,7 @@ void vaciarPila(t_Pila *p)
 int desapilar(t_Pila *p, void *buffer, unsigned tam)
 {
 	if (*p == NULL) {
-		return ERR_VACIA;
+		return ERR_PIL_VACIA;
 	}
 	t_Nodo *n = *p;
 	memcpy(buffer, n->dato, MIN(n->tamDato, tam));
@@ -61,7 +61,7 @@ int desapilar(t_Pila *p, void *buffer, unsigned tam)
 int verTope(const t_Pila *p, void *buffer, unsigned tam)
 {
 	if (*p == NULL) {
-		return ERR_VACIA;
+		return ERR_PIL_VACIA;
 	}
 	t_Nodo *n = *p;
 	memcpy(buffer, n->dato, MIN(n->tamDato, tam));

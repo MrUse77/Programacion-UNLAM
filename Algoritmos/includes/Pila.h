@@ -4,14 +4,15 @@
 #define TRUE 1
 #define FALSE 0
 #define OK 1
-#define ERR 2
-#define ERR_VACIA 3
-#define ERR_LLENA 4
-#define TAM_PILA 200000 // TAM para pila estatica
+#define ERR -1
+#define ERR_MEM 101
+#define ERR_PIL_VACIA 201
+#define ERR_PIL_LLENA 202
 
 // Definicion de si usa la estructura de la pila estatica o de la pila dinamica
 #ifdef PILA_ESTATICA
 // Version Estatica
+#define TAM_PILA 200 // TAM para pila estatica
 typedef struct {
   char Vector[TAM_PILA];
   unsigned tope;

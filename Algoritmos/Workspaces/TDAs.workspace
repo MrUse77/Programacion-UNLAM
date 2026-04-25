@@ -6,5 +6,6 @@
 		<Project filename="../TDAs/utils/utils.cbp" />
 		<Project filename="../TDAs/ColaEstatica/Cola.cbp" />
 		<Project filename="../TDAs/PilaDinamica/Pila Dinamica.cbp" />
+		<Project filename="../TDAs/UtilsPila/UtilsPila.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

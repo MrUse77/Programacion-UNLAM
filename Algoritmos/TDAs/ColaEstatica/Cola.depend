@@ -1,0 +1,16 @@
+# depslib dependency file v1.0
+1777139146 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/ColaEstatica/main.c
+	<Cola.h>
+	<stdlib.h>
+	<string.h>
+
+1777132398 /home/agustin/Documentos/unlam/Algoritmos/includes/Cola.h
+
+1777140610 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/ColaEstatica/Test/test_cola.c
+	"Cola.h"
+	"test_framework.h"
+
+1775946281 /home/agustin/Documentos/unlam/Algoritmos/includes/test_framework.h
+	<stdio.h>
+	<string.h>
+

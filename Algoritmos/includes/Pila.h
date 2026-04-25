@@ -8,7 +8,6 @@
 #define ERR_MEM 101
 #define ERR_PIL_VACIA 201
 #define ERR_PIL_LLENA 202
-
 // Definicion de si usa la estructura de la pila estatica o de la pila dinamica
 #ifdef PILA_ESTATICA
 // Version Estatica

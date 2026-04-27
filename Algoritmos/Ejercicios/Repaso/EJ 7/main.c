@@ -50,10 +50,10 @@ void printArrayCompleto(char *c)
 	if (*c == '\0') {
 		return;
 	}
-	static int cont=0;
+	static int cont = 0;
 	char *init = c - cont;
-	char *a = c ;
-	while (a>=init) {
+	char *a = c;
+	while (a >= init) {
 		printf("%c", *init);
 		init++;
 	}
@@ -67,12 +67,12 @@ void printArrayCompletoInverso(char *c)
 	if (*c == '\0') {
 		return;
 	}
-	static int cont=0;
+	static int cont = 0;
 	char *init = c - cont;
-	char *a = c ;
+	char *a = c;
 	cont++;
 	printArrayCompletoInverso(c + 1);
-	while (a>=init) {
+	while (a >= init) {
 		printf("%c", *init);
 		init++;
 	}
@@ -87,7 +87,6 @@ int main()
 
 	puts(" \n");
 	printInverso("Hola");
-
 
 	puts(" \n");
 	printArray("Hola");

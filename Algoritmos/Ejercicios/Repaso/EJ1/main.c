@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "include/vector.h"
+#include "Pila.h"
 
 typedef struct {
 	int num;
@@ -12,6 +13,9 @@ int cmpEl(const void *c1, const void *c2);
 
 int main()
 {
+t_Pila p;
+crearPila(&p);
+/*
 	Vector v;
 	crearVector(&v, sizeof(Ejemplo));
 	char a = 'a';
@@ -32,6 +36,7 @@ int main()
 	bool vacio = vectorVacio(&v);
 	printf("Vector: %b\n", vacio);
 	vectorDestruir(&v);
+	*/
 	return 0;
 }
 

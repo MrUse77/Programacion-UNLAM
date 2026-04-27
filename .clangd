@@ -1,0 +1,6 @@
+CompileFlags:
+  Add:
+    # Paths relativos desde la raíz del repo (/home/agustin/Documentos/unlam/)
+    - "-IAlgoritmos/TDAs/Pila"
+    - "-IAlgoritmos/TDAs/Vector"
+    - "-IAlgoritmos/TDAs/Vector/include"

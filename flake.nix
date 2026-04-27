@@ -18,6 +18,7 @@
           gdb
           gnumake
           binutils
+	  clang
           
           # El IDE que mencionaste
           codeblocks

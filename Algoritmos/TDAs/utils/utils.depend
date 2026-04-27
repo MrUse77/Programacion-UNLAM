@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1776008201 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/utils/main.c
+	"utils.h"
+	<stdio.h>
+	<stdlib.h>
+
+1776008219 /home/agustin/Documentos/unlam/Algoritmos/TDAs/includes/utils.h
+

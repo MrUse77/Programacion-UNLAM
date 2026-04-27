@@ -1,0 +1,7 @@
+CompileFlags:
+  Add:
+    - "-I./TDAs/PilaEstatica/include"
+    - "-I./TDAs/Vector/include"
+    - "-std=c11"
+    - "-Wall"
+    - "-Wextra"

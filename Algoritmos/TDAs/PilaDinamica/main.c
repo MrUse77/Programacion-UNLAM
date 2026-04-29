@@ -1,7 +1,7 @@
 #include "Pila.h"
 #include <string.h>
 #include <stdlib.h>
-#define MIN(a, b) (a > b ? b : a)
+#include "Comun.h"
 
 void crearPila(t_Pila *p)
 {
@@ -23,7 +23,7 @@ int apilar(t_Pila *p, const void *d, unsigned tam)
 	nue->dato = malloc(tam);
 	if (nue == NULL || nue->dato == NULL) {
 		free(nue);
-		return ERR;
+		return ERR_PIL_LLENA;
 	}
 	memcpy(nue->dato, d, tam);
 	nue->tamDato = tam;

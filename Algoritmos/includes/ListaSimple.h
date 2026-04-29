@@ -3,29 +3,106 @@
 #define LISTA_SIMPLE_H
 
 #include <stdbool.h>
-#define TRUE 1
-#define FALSE 0
-#define ERR_MEM_LLENA 101
-#define OK 200
-#define ERR_LISTA_VACIA 301
-#define ERR_ASIGNACION 302
 
-typedef struct sNodo {
+/**
+ * @def ERR_LISTA_VACIA
+ * @brief Error: Lista sin elementos
+ */
+#define ERR_LISTA_VACIA 301
+
+/**
+ * @struct s_Nodo
+ * @brief Representa un dato, con su tamaño y cual es el proximo nodo
+ */
+typedef struct s_Nodo {
   void *dato;
   unsigned tam;
   struct sNodo *sig;
 } t_Nodo;
+
+/**
+ * @brief Puntuero a puntero para poder formar la lista
+ */
 typedef t_Nodo *t_Lista;
 
+/**
+ * @brief Crea una lista de tamaño dinamico
+ * @param l puntero a lista
+ */
 void crearLista(t_Lista *l);
+
+/**
+ * @brief Revisa si la lista esta esta vacia
+ * @param l Puntero a lista
+ * @returns int Si esta vacia, devuelve TRUE, si no, devuelve FALSE
+ */
 int listaVacia(const t_Lista *l);
+
+/**
+ * @brief Revisa si no hay mas espacio disponible en la lista
+ * @param l Puntero a lista
+ * @param tam Tamaño del elemento
+ * @return int Si hay espacio disponible devuelve FALSE, si no hay mas espacio
+ * devuelve ERR_MEM_LLENA (`101`)
+ */
 int listaLlena(const t_Lista *l, const unsigned tam);
+
+/**
+ * @brief Vacia la lista entera
+ * @param l Puntero a lista
+ */
 void vaciarLista(t_Lista *l);
+
+/**
+ * @brief Coloca el elemento al inicio de la lista
+ * @param l Puntero a lista
+ * @param d Puntero a elemento
+ * @param tam Tamaño del elemento
+ * @return int Devuevle OK (`200`) si se realizo exitosamente, devuelve
+ * ERR_MEM_LLENA (`101`) si no hay espacio
+ */
 int ponerAlComienzoDeLista(t_Lista *l, const void *d, const unsigned tam);
-int ponerEnLista(t_Lista *l, const void *d, const unsigned tam);
+
+// int ponerEnLista(t_Lista *l, const void *d, const unsigned tam);
+
+/**
+ * @brief Se obtiene el primer elemento de la lista y se elimina de la lista
+ * @param l Puntero a lista
+ * @param d Puntero a elemento
+ * @param tam Tamaño del elemento
+ * @return int Devuevle OK (`200`) si se realizo exitosamente, devuelve
+ * ERR_LISTA_VACIA si no hay espacio
+ */
 int sacarPrimeroLista(t_Lista *l, void *buff, const unsigned tam);
+
+/**
+ * @brief Se coloca un elemento en la ultima posicion de la lista
+ * @param l Puntero a lista
+ * @param d Puntero a elemento
+ * @param tam Tamaño del elemento
+ * @return int Devuevle OK (`200`) si se realizo exitosamente, devuelve
+ * ERR_LISTA_VACIA si no hay espacio
+ */
 int ponerAlFinalDeLista(t_Lista *l, const void *d, const unsigned tam);
+
+/**
+ * @brief Se obtiene el ultimo elemento de la lista y se elimina de la lista
+ * @param l Puntero a lista
+ * @param d Puntero a elemento
+ * @param tam Tamaño del elemento
+ * @return int Devuevle OK (`200`) si se realizo exitosamente, devuelve
+ * ERR_LISTA_VACIA si no hay espacio
+ */
 int sacarUltimoDeLista(t_Lista *l, void *d, unsigned tam);
+
+/**
+ * @brief Se obtiene el ultimo elemento de la lista sin eliminarlo de la lista
+ * @param l Puntero a lista
+ * @param d Puntero a elemento
+ * @param tam Tamaño del elemento
+ * @return int Devuevle OK (`200`) si se realizo exitosamente, devuelve
+ * ERR_LISTA_VACIA si no hay espacio
+ */
 int verUltimoDeLista(t_Lista *l, void *buff, unsigned tam);
 
 #endif // FECHA_H

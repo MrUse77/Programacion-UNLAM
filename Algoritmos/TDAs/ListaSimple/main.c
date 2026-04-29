@@ -1,6 +1,7 @@
 #include <ListaSimple.h>
 #include <stdlib.h>
 #include <string.h>
+#include <Comun.h>
 #define MIN(a, b) (a > b ? b : a)
 
 void crearLista(t_Lista *l)
@@ -39,7 +40,7 @@ int ponerAlComienzoDeLista(t_Lista *l, const void *d, const unsigned tam)
 	n->dato = malloc(tam);
 	if (!n || !n->dato) {
 		free(n);
-		return ERR_ASIGNACION;
+		return ERR_MEM_LLENA;
 	}
 	n->sig = *l;
 	*l = n;

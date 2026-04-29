@@ -1,4 +1,5 @@
 #include "Pila.h"
+#include "Comun.h"
 #include <string.h>
 
 #define MIN(a, b) (a > b ? b : a)

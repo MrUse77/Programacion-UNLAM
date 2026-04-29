@@ -19,6 +19,8 @@
           gnumake
           binutils
 	  clang
+	  doxygen
+
           
           # El IDE que mencionaste
           codeblocks

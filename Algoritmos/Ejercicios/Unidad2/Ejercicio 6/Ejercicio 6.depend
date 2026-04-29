@@ -1,12 +1,12 @@
 # depslib dependency file v1.0
-1776172503 source:/home/agustin/Documentos/unlam/Algoritmos/Ejercicios/Unidad2/Ejercicio 6/main.c
+1776177464 source:/home/agustin/Documentos/unlam/Algoritmos/Ejercicios/Unidad2/Ejercicio 6/main.c
 	<stdio.h>
 	"Pila.h"
 	"Fecha.h"
 	<stdlib.h>
+	<string.h>
 
-1775950725 /home/agustin/Documentos/unlam/Algoritmos/TDAs/includes/Pila.h
-	<stdlib.h>
+1776260135 /home/agustin/Documentos/unlam/Algoritmos/TDAs/includes/Pila.h
 
 1759262962 /home/agustin/Documentos/unlam/Algoritmos/TDAs/includes/Fecha.h
 	<stdbool.h>

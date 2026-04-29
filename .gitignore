@@ -17,3 +17,16 @@ Topicos/TP
 .direnv/*
 
 Sitemas Operativos/Ejercicio 1 TP/bin/
+.direnv
+Algoritmos/Ejercicios/*/*/bin
+Algoritmos/Ejercicios/*/*/obj
+Algoritmos/TDAs/*/obj
+Algoritmos/TDAs/*/bin
+
+Algoritmos/Workspaces/TDAs.workspace.layout
+
+*.layout
+
+Algoritmos/html/
+
+Algoritmos/latex/

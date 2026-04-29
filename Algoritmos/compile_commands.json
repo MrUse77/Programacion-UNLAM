@@ -1,7 +1,7 @@
 [
   {
     "directory": "/home/agustin/Documentos/unlam/Algoritmos",
-    "command": "/usr/bin/gcc -ITDAs/includes/ -Wall -Wextra -std=c11 -c dummy.c",
+    "command": "/usr/bin/gcc -I./includes/ -Wall -Wextra -std=c11 -c dummy.c",
     "file": "dummy.c"
   }
 ]

@@ -1,6 +1,6 @@
 #include "Pila.h"
 #include <string.h>
-#include <stdlib.h>
+#include <string.h>
 #include "Comun.h"
 
 void crearPila(t_Pila *p)

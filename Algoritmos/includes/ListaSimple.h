@@ -4,11 +4,16 @@
 
 #include <stdbool.h>
 
+typedef int (*t_Cmp)(const void *a, const void *b);
+typedef void (*t_Accion)(void *param, const void *dato);
+
 /**
  * @def ERR_LISTA_VACIA
  * @brief Error: Lista sin elementos
  */
 #define ERR_LISTA_VACIA 301
+
+#define ERR_LISTA_NO_ENCONTRADO 302
 
 /**
  * @struct s_Nodo
@@ -17,7 +22,7 @@
 typedef struct s_Nodo {
   void *dato;
   unsigned tam;
-  struct sNodo *sig;
+  struct s_Nodo *sig;
 } t_Nodo;
 
 /**
@@ -61,7 +66,7 @@ void vaciarLista(t_Lista *l);
  * @return int Devuevle OK (`200`) si se realizo exitosamente, devuelve
  * ERR_MEM_LLENA (`101`) si no hay espacio
  */
-int ponerAlComienzoDeLista(t_Lista *l, const void *d, const unsigned tam);
+int insertarAlComienzoDeLista(t_Lista *l, const void *d, const unsigned tam);
 
 // int ponerEnLista(t_Lista *l, const void *d, const unsigned tam);
 
@@ -83,7 +88,7 @@ int sacarPrimeroLista(t_Lista *l, void *buff, const unsigned tam);
  * @return int Devuevle OK (`200`) si se realizo exitosamente, devuelve
  * ERR_LISTA_VACIA si no hay espacio
  */
-int ponerAlFinalDeLista(t_Lista *l, const void *d, const unsigned tam);
+int insertarAlFinalDeLista(t_Lista *l, const void *d, const unsigned tam);
 
 /**
  * @brief Se obtiene el ultimo elemento de la lista y se elimina de la lista
@@ -93,7 +98,7 @@ int ponerAlFinalDeLista(t_Lista *l, const void *d, const unsigned tam);
  * @return int Devuevle OK (`200`) si se realizo exitosamente, devuelve
  * ERR_LISTA_VACIA si no hay espacio
  */
-int sacarUltimoDeLista(t_Lista *l, void *d, unsigned tam);
+int sacarUltimoDeLista(t_Lista *l, void *d, const unsigned tam);
 
 /**
  * @brief Se obtiene el ultimo elemento de la lista sin eliminarlo de la lista
@@ -103,6 +108,22 @@ int sacarUltimoDeLista(t_Lista *l, void *d, unsigned tam);
  * @return int Devuevle OK (`200`) si se realizo exitosamente, devuelve
  * ERR_LISTA_VACIA si no hay espacio
  */
-int verUltimoDeLista(t_Lista *l, void *buff, unsigned tam);
+int verUltimoDeLista(t_Lista *l, void *buff, const unsigned tam);
 
+/**
+ * @brief Se inserta un elemento en la lista, eligiendo si se permite duplicado
+ y como se ordena
+ * @param l Puntero a lista
+ * @param d Puntero a dato
+ * @param tam Tamaño del elemento
+ * @param cmp Callback de comparacion
+ * @param conDup Define si se aceptan duplicados
+ * @param accion Callback de lo que se hace hay duplicados
+ * @return int Devuelve OK (`200`) si se realizo exitosamente, devuelve
+ * ERR_LISTA_VACIA si no hay espacio
+ */
+int insertarOrdenadoEnLista(t_Lista *l, const void *d, const unsigned tam,
+                            t_Cmp cmp, const int conDup, t_Accion accion);
+
+int elimminarPorClave(t_Lista *l, void *buff, const unsigned tam, t_Cmp cmp);
 #endif // FECHA_H

@@ -1,6 +1,7 @@
 #include <Cola.h>
 #include <stdlib.h>
 #include <string.h>
+#include <Comun.h>
 #define MIN(a, b) (a >= b ? b : a)
 
 void crearCola(t_Cola *c)
@@ -12,7 +13,7 @@ void crearCola(t_Cola *c)
 int ponerEnCola(t_Cola *c, const void *d, unsigned tamDato)
 {
 	if (colaLlena(c, tamDato)) {
-		return ERR_LLENA;
+		return ERR_COLA_LLENA;
 	}
 
 	unsigned ini, fin;
@@ -44,7 +45,7 @@ int colaLlena(t_Cola *c, unsigned tam)
 int verPrimero(t_Cola *c, void *buff, unsigned tamDato)
 {
 	if (colaVacia(c)) {
-		return ERR_VACIA;
+		return ERR_COLA_VACIA;
 	}
 
 	unsigned ini, fin, tam, pos = c->prim;
@@ -71,7 +72,7 @@ int verPrimero(t_Cola *c, void *buff, unsigned tamDato)
 int sacarDeCola(t_Cola *c, void *buff, unsigned tamDato)
 {
 	if (colaVacia(c)) {
-		return ERR_VACIA;
+		return ERR_COLA_VACIA;
 	}
 
 	unsigned ini, fin, tam;

@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1777914966 source:/home/agustin/Documentos/unlam/Algoritmos/Ejercicios/Unidad3/EJ6/main.c
+	<stdio.h>
+	<stdlib.h>
+	<Cola.h>
+
+1777914950 /home/agustin/Documentos/unlam/Algoritmos/includes/Cola.h
+	"Comun.h"
+
+1777422382 /home/agustin/Documentos/unlam/Algoritmos/includes/Comun.h
+

@@ -13,15 +13,16 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
-					<Add directory="../../../TDAs/includes" />
+					<Add option="-DPILA_ESTATICA=1" />
+					<Add directory="../../../includes" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="../../../TDAs/includes" />
+					<Add directory="../../../includes" />
 				</ResourceCompiler>
 				<Linker>
-					<Add option="-lPila" />
+					<Add option="-lPilaEstatica" />
 					<Add option="-lFecha" />
-					<Add directory="../../../TDAs/libs" />
+					<Add directory="../../../libs" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -50,7 +51,7 @@
 			<Add directory="../../../TDAs/" />
 		</ResourceCompiler>
 		<Linker>
-			<Add option="-lPila" />
+			<Add option="-lPilaEstatica" />
 			<Add directory="../../../TDAs" />
 		</Linker>
 		<Unit filename="main.c">

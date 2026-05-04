@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "Pila.h"
 #include "Fecha.h"
+#include <Comun.h>
 
 typedef struct {
 	char code[7];

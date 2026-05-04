@@ -2,40 +2,27 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="Ejercicio 4" />
+		<Option title="EJ3" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/Ejercicio 4" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Debug/EJ3" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
-					<Add option="-DPILA_ESTATICA=1" />
 					<Add directory="../../../includes" />
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="../../../includes" />
 				</ResourceCompiler>
 				<Linker>
-					<Add option="-lPilaEstatica" />
+					<Add option="-lColaDinamica" />
 					<Add option="-lFecha" />
 					<Add option="-lutils" />
 					<Add directory="../../../libs" />
-				</Linker>
-			</Target>
-			<Target title="Release">
-				<Option output="bin/Release/Ejercicio 4" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Release/" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-O2" />
-				</Compiler>
-				<Linker>
-					<Add option="-s" />
 				</Linker>
 			</Target>
 		</Build>

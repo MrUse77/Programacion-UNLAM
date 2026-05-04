@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <Comun.h>
-#define MIN(a, b) (a >= b ? b : a)
 
 void crearCola(t_Cola *c)
 {

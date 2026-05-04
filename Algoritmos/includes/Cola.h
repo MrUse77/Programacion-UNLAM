@@ -2,6 +2,7 @@
 #ifndef COLA_H_INCLUDED
 #define COLA_H_INCLUDED
 
+#include "Comun.h"
 /**
  * @def ERR_COLA_LLENA
  * @brief Error: cola sin lugar para el elemento (usado en Cola Estatica)
@@ -14,7 +15,7 @@
  * */
 #define ERR_COLA_VACIA 312
 
-// Definicion de si usa la estructura de la cola estatica o de la cola dinamica
+/* Definicion de si usa la estructura de la cola estatica o de la cola dinamica*/
 #ifdef COLA_ESTATICA
 
 /* Version Estatica */
@@ -23,7 +24,7 @@
  * @def TAM_COLA
  * @brief Define el tamaño de la cola estatica
  */
-#define TAM_COLA 10000
+#define TAM_COLA 100000
 
 /**
  * @struct t_Cola
@@ -41,11 +42,11 @@ typedef struct {
 
 /* Version Dinamica */
 
-typedef struct sNodo { // sNodo defino la estructura
+typedef struct sNodo { /* sNodo defino la estructura*/
   void *dato;
   unsigned tamDato;
   struct sNodo *sig;
-} t_Nodo; // inicializo el tipo de dato
+} t_Nodo;
 
 /**
  * @struct t_Cola

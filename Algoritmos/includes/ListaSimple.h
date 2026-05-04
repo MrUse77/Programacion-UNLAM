@@ -2,6 +2,7 @@
 #ifndef LISTA_SIMPLE_H
 #define LISTA_SIMPLE_H
 
+#include "Comun.h"
 #include <stdbool.h>
 
 typedef int (*t_Cmp)(const void *a, const void *b);
@@ -66,7 +67,7 @@ void vaciarLista(t_Lista *l);
  * @return int Devuevle OK (`200`) si se realizo exitosamente, devuelve
  * ERR_MEM_LLENA (`101`) si no hay espacio
  */
-int insertarAlComienzoDeLista(t_Lista *l, const void *d, const unsigned tam);
+int insertarAlPrincipioDeLista(t_Lista *l, const void *d, const unsigned tam);
 
 // int ponerEnLista(t_Lista *l, const void *d, const unsigned tam);
 
@@ -125,5 +126,54 @@ int verUltimoDeLista(t_Lista *l, void *buff, const unsigned tam);
 int insertarOrdenadoEnLista(t_Lista *l, const void *d, const unsigned tam,
                             t_Cmp cmp, const int conDup, t_Accion accion);
 
-int elimminarPorClave(t_Lista *l, void *buff, const unsigned tam, t_Cmp cmp);
+/**
+ * @brief Se obtiene el primer elemento de la lista sin eliminarlo de la lista
+ * @param l Puntero a lista
+ * @param d Puntero a elemento
+ * @param tam Tamaño del elemento
+ * @return int Devuevle OK (`200`) si se realizo exitosamente, devuelve
+ * ERR_LISTA_VACIA si no hay espacio
+ */
+int verPrimeroDeLista(t_Lista *l, void *buff, const unsigned tam);
+
+int eliminarPorClave(t_Lista *l, void *buff, const unsigned tam, t_Cmp cmp);
+
+int verElementoEnPosicion(t_Lista *l, void *buff, const unsigned tam, int pos);
+
+int longitudLista(t_Lista *l);
+
+int buscarEnLista(t_Lista *l, void *buff, const unsigned tam, t_Cmp cmp);
+
+int copiarLista(const t_Lista *l, t_Lista *lCopia);
+
+int clonarLista(const t_Lista *l, t_Lista *lClon);
+
+int insertarEnPosicion(t_Lista *l, const void *buff, const unsigned tam,
+                       const int pos);
+
+int insertarDespuesDeClave(t_Lista *l, const void *buff, const unsigned tam,
+                           const t_Cmp cmp);
+
+int insertarAntesDeClave(t_Lista *l, const void *buff, const unsigned tam,
+                         const t_Cmp cmp);
+
+int eliminarPorPosicion(t_Lista *l, void *buff, const unsigned int tam,
+                        const int pos);
+
+int eliminarAntesDeClave(t_Lista *l, void *buff, const unsigned int tam,
+                         const int pos);
+
+int eliminarDespuesDeClave(t_Lista *l, void *buff, const unsigned int tam,
+                           const int pos);
+
+int mostrarLista(const t_Lista *l);
+
+int invertirLista(t_Lista *l);
+
+int concatenarListas(t_Lista *l1, t_Lista *l2);
+
+int contarApariciones(t_Lista *l, int *res, const t_Cmp cmp);
+
+int listaContiene(t_Lista *l, const t_Cmp cmp);
+
 #endif // FECHA_H

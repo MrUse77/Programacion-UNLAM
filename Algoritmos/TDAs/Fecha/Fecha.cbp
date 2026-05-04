@@ -16,7 +16,11 @@
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
+					<Add directory="../../includes" />
 				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../../../includes" />
+				</ResourceCompiler>
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/Fecha" prefix_auto="1" extension_auto="1" />

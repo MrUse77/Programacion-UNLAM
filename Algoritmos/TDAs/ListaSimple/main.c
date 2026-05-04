@@ -68,11 +68,12 @@ int sacarPrimeroLista(t_Lista *l, void *buff, const unsigned tam)
 }
 int insertarAlFinalDeLista(t_Lista *l, const void *d, const unsigned tam)
 {
-	if (listaLlena(l, tam)) {
-		return ERR_LISTA_VACIA;
-	}
 	t_Nodo *n = (t_Nodo *)malloc(sizeof(t_Nodo));
 	n->dato = malloc(tam);
+	if (!n || !n->dato) {
+		free(n);
+		return ERR_MEM_LLENA;
+	}
 	memcpy(n->dato, d, tam);
 	n->tam = tam;
 	n->sig = NULL;
@@ -107,9 +108,10 @@ int verUltimoDeLista(t_Lista *l, void *buff, unsigned tam)
 	while (aux->sig != NULL) {
 		aux = aux->sig;
 	}
-	memcpy(aux->dato, buff, MIN(tam, aux->tam));
+	memcpy(buff, aux->dato, MIN(tam, aux->tam));
 	return OK;
 }
+
 int insertarOrdenadoEnLista(t_Lista *l, const void *d, const unsigned tam,
 			    t_Cmp cmp, const int conDup, t_Accion accion)
 {
@@ -128,6 +130,8 @@ int insertarOrdenadoEnLista(t_Lista *l, const void *d, const unsigned tam,
 	if (*l && cmp(n->dato, (*l)->dato) == 0) {
 		if (accion && conDup) {
 			accion(n->dato, (*l)->dato);
+			free(n->dato);
+			free(n);
 		}
 		return OK;
 	} else {
@@ -138,7 +142,7 @@ int insertarOrdenadoEnLista(t_Lista *l, const void *d, const unsigned tam,
 	return OK;
 }
 
-int elimminarPorClave(t_Lista *l, void *buff, const unsigned tam, t_Cmp cmp)
+int eliminarPorClave(t_Lista *l, void *buff, const unsigned tam, t_Cmp cmp)
 {
 	if (listaVacia(l)) {
 		return ERR_LISTA_VACIA;
@@ -156,3 +160,43 @@ int elimminarPorClave(t_Lista *l, void *buff, const unsigned tam, t_Cmp cmp)
 	free(elim);
 	return OK;
 }
+
+int eliminarPorClave(t_Lista *l, void *buff, const unsigned tam, t_Cmp cmp);
+
+int verElementoEnPosicion(t_Lista *l, void *buff, const unsigned tam, int pos);
+
+int longitudLista(t_Lista *l);
+
+int buscarEnLista(t_Lista *l, void *buff, const unsigned tam, t_Cmp cmp);
+
+int copiarLista(const t_Lista *l, t_Lista *lCopia);
+
+int clonarLista(const t_Lista *l, t_Lista *lClon);
+
+int insertarEnPosicion(t_Lista *l, const void *buff, const unsigned tam,
+		       const int pos);
+
+int insertarDespuesDeClave(t_Lista *l, const void *buff, const unsigned tam,
+			   const t_Cmp cmp);
+
+int insertarAntesDeClave(t_Lista *l, const void *buff, const unsigned tam,
+			 const t_Cmp cmp);
+
+int eliminarPorPosicion(t_Lista *l, void *buff, const unsigned int tam,
+			const int pos);
+
+int eliminarAntesDeClave(t_Lista *l, void *buff, const unsigned int tam,
+			 const int pos);
+
+int eliminarDespuesDeClave(t_Lista *l, void *buff, const unsigned int tam,
+			   const int pos);
+
+int mostrarLista(const t_Lista *l);
+
+int invertirLista(t_Lista *l);
+
+int concatenarListas(t_Lista *l1, t_Lista *l2);
+
+int contarApariciones(t_Lista *l, int *res, const t_Cmp cmp);
+
+int listaContiene(t_Lista *l, const t_Cmp cmp);

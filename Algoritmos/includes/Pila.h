@@ -1,6 +1,7 @@
 #ifndef PILA_H_INCLUDED
 #define PILA_H_INCLUDED
 
+#include <Comun.h>
 /**
  * @def ERR_PIL_VACIA
  * @brief Error: pila vacía.
@@ -22,7 +23,7 @@
  * @def TAM_PILA
  * @brief Define el tamaño de la pila estatica
  */
-#define TAM_PILA 200 // TAM para pila estatica
+#define TAM_PILA 200000 // TAM para pila estatica
 
 /**
  * @struct t_Pila

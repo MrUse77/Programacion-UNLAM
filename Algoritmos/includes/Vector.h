@@ -1,6 +1,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+#include "Comun.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
-	<Workspace title="Unidad 3">
-		<!-- Agregá acá los proyectos de la Unidad 3 -->
-		<!-- Ejemplo: <Project filename="Ejercicios/Unidad3/EJ1/EJ1.cbp" /> -->
+	<Workspace title="Workspace">
+		<Project filename="../Ejercicios/Unidad3/EJ3/EJ3.cbp" />
+		<Project filename="../Ejercicios/Unidad3/EJ4/EJ4.cbp" />
+		<Project filename="../Ejercicios/Unidad3/EJ5/EJ5.cbp" />
+		<Project filename="../Ejercicios/Unidad3/EJ6/EJ6.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

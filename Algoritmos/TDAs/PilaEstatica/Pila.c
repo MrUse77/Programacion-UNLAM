@@ -3,8 +3,8 @@
 #include <string.h>
 
 #define MIN(a, b) (a > b ? b : a)
-/** 
- * Crea una pila de tamaño definido 
+/**
+ * Crea una pila de tamaño definido
  * @param *p - puntero a pila
  */
 void crearPila(t_Pila *p)
@@ -12,7 +12,7 @@ void crearPila(t_Pila *p)
 	p->tope = TAM_PILA;
 }
 
-/** 
+/**
  * Revisa si la pila esta llena para el elemento que se quiera insertar
  * @param *p - puntero a pila
  * @param tam - tamaño del elemento
@@ -26,9 +26,9 @@ int pilaLlena(const t_Pila *p, unsigned tam)
 	return FALSE;
 }
 
-/** 
+/**
  * Revisa si la pila esta vacia
- * @param *p - puntero a pila 
+ * @param *p - puntero a pila
  * @returns {int} - Si esta vacia, devuelve TRUE, si no hay, devuelve FALSE
  */
 int pilaVacia(const t_Pila *p)
@@ -36,26 +36,26 @@ int pilaVacia(const t_Pila *p)
 	return p->tope == TAM_PILA ? TRUE : FALSE;
 }
 
-/** 
+/**
  * Vacia la pila entera
- * @param *p - puntero a pila 
+ * @param *p - puntero a pila
  */
 void vaciarPila(t_Pila *p)
 {
 	p->tope = TAM_PILA;
 }
 
-/** 
+/**
  * Coloca un elemento en el tope de la pila
- * @param *p - puntero a pila 
- * @param const *d - puntero a elemento 
+ * @param *p - puntero a pila
+ * @param const *d - puntero a elemento
  * @param tam - tamaño del elemento
  * @returns {int} - Si salio bien reotrna OK, si la pila esta llena devuelve ERR
  */
 int apilar(t_Pila *p, const void *d, unsigned tam)
 {
 	if (pilaLlena(p, tam)) {
-		return ERR;
+		return ERR_PIL_LLENA;
 	}
 	//De atras para adelante se apila, primero el dato
 	p->tope -= tam;
@@ -66,9 +66,9 @@ int apilar(t_Pila *p, const void *d, unsigned tam)
 	return OK;
 }
 
-/** 
+/**
  * Se obtiene el elemento del tope de la pila y se descarta
- * @param *p - puntero a pila 
+ * @param *p - puntero a pila
  * @param *buffer - puntero a buffer para obtener el elemento
  * @param tamDato - tamaño del buffer
  * Puede ocurrir que se obtenga un tamaño menor a tamDato;
@@ -79,7 +79,7 @@ int desapilar(t_Pila *p, void *buffer, unsigned tamDato)
 {
 	unsigned tam;
 	if (pilaVacia(p)) {
-		return ERR;
+		return ERR_PIL_VACIA;
 	}
 	//El mas cercano a la direccion incial, siempre va a ser el tamaño del dato
 	memcpy(&tam, p->Vector + p->tope, sizeof(tam));
@@ -93,9 +93,9 @@ int desapilar(t_Pila *p, void *buffer, unsigned tamDato)
 	return OK;
 }
 
-/** 
+/**
  *  Se obtiene el dato del tope de la pila sin eliminarlo
- * @param *p - puntero a pila 
+ * @param *p - puntero a pila
  * @param *buffer - puntero a buffer para obtener el elemento
  * @param tamDato - tamaño del buffer
  * @returns {int} - Si salio bien reotrna OK, si la pila esta vacia devuelve ERR
@@ -104,7 +104,7 @@ int verTope(const t_Pila *p, void *buffer, unsigned tamDato)
 {
 	unsigned tam;
 	if (p->tope == TAM_PILA) {
-		return FALSE;
+		return ERR_PIL_VACIA;
 	}
 	//Obtenemos tamaño del dato
 	memcpy(&tam, p->Vector + p->tope, sizeof(tam));

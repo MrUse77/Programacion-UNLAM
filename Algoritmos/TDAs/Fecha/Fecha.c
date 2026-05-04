@@ -1,5 +1,5 @@
 
-#include "Fecha.h"
+#include <Fecha.h>
 #include <stdio.h>
 
 int cantDiasMes(int m, int a);
@@ -49,7 +49,7 @@ int fechaDiferencia(const Fecha *f1, const Fecha *f2)
 	dif += fechaDiaDelAnio(f2);
 
 	/*
-	 * Otra forma (en el for debe estar anioAct <= f2->anio) 
+	 * Otra forma (en el for debe estar anioAct <= f2->anio)
 	 * (no combinar con el if del for)
 	 * (no combinar con la suma de la linea de arriba)
 	 * dif -= fechaDiasRestantesDelAnio(f2);

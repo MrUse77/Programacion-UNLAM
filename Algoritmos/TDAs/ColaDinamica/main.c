@@ -1,4 +1,5 @@
 #include <Cola.h>
+#include <Comun.h>
 #include <stdlib.h>
 #include <string.h>
 #define MIN(a, b) (a > b ? b : a)
@@ -13,13 +14,13 @@ int ponerEnCola(t_Cola *c, const void *d, unsigned tamDato)
 {
 	t_Nodo **ult = &c->ult;
 	if (colaLlena(c, tamDato) == TRUE) {
-		return ERR_LLENA;
+		return ERR_COLA_LLENA;
 	}
 	t_Nodo *n = (t_Nodo *)malloc(sizeof(t_Nodo));
 	n->dato = malloc(tamDato);
 	if (!n || !n->dato) {
 		free(n);
-		return ERR_MEM;
+		return ERR_MEM_LLENA;
 	}
 	memcpy(n->dato, d, tamDato);
 	n->tamDato = tamDato;
@@ -47,7 +48,7 @@ int colaLlena(t_Cola *c, unsigned tam)
 int verPrimero(t_Cola *c, void *buff, unsigned tamDato)
 {
 	if (colaVacia(c)) {
-		return ERR_VACIA;
+		return ERR_COLA_VACIA;
 	}
 	memcpy(buff, c->prim->dato, MIN(tamDato, c->prim->tamDato));
 	return OK;
@@ -55,7 +56,7 @@ int verPrimero(t_Cola *c, void *buff, unsigned tamDato)
 int sacarDeCola(t_Cola *c, void *buff, unsigned tamDato)
 {
 	if (colaVacia(c)) {
-		return ERR_VACIA;
+		return ERR_COLA_VACIA;
 	}
 	t_Nodo *prim = c->prim;
 	c->prim = prim->sig;

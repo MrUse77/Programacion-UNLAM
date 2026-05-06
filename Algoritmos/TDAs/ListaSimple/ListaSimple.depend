@@ -1,15 +1,18 @@
 # depslib dependency file v1.0
-1777407963 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/ListaSimple/main.c
+1777992834 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/ListaSimple/main.c
 	<ListaSimple.h>
 	<stdlib.h>
 	<string.h>
+	<Comun.h>
 
-1777401495 /home/agustin/Documentos/unlam/Algoritmos/includes/ListaSimple.h
+1777989698 /home/agustin/Documentos/unlam/Algoritmos/includes/ListaSimple.h
+	"Comun.h"
 	<stdbool.h>
 
-1777407356 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/ListaSimple/Test/test.c
+1777992921 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/ListaSimple/Test/test.c
 	<ListaSimple.h>
 	"test_framework.h"
+	<Comun.h>
 
 1775946281 /home/agustin/Documentos/unlam/Algoritmos/includes/test_framework.h
 	<stdio.h>
@@ -34,4 +37,6 @@
 	<stdlib.h>
 	<string.h>
 	<Comun.h>
+
+1777422382 /home/agustin/Documentos/unlam/Algoritmos/includes/Comun.h
 

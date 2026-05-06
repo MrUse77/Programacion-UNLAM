@@ -7,6 +7,7 @@
 
 typedef int (*t_Cmp)(const void *a, const void *b);
 typedef void (*t_Accion)(void *param, const void *dato);
+typedef void (*t_Prnt)(const void *dato);
 
 /**
  * @def ERR_LISTA_VACIA
@@ -15,6 +16,10 @@ typedef void (*t_Accion)(void *param, const void *dato);
 #define ERR_LISTA_VACIA 301
 
 #define ERR_LISTA_NO_ENCONTRADO 302
+
+#define MERGE 10
+#define RADIX 20
+#define QUICK 30
 
 /**
  * @struct s_Nodo
@@ -144,36 +149,36 @@ int longitudLista(t_Lista *l);
 
 int buscarEnLista(t_Lista *l, void *buff, const unsigned tam, t_Cmp cmp);
 
-int copiarLista(const t_Lista *l, t_Lista *lCopia);
-
-int clonarLista(const t_Lista *l, t_Lista *lClon);
+int copiarLista(t_Lista *l, t_Lista *lCopia);
 
 int insertarEnPosicion(t_Lista *l, const void *buff, const unsigned tam,
                        const int pos);
 
-int insertarDespuesDeClave(t_Lista *l, const void *buff, const unsigned tam,
-                           const t_Cmp cmp);
+int insertarDespuesDeClave(t_Lista *l, const void *d, const unsigned tam,
+                           const void *clave, const t_Cmp cmp);
 
-int insertarAntesDeClave(t_Lista *l, const void *buff, const unsigned tam,
-                         const t_Cmp cmp);
+int insertarAntesDeClave(t_Lista *l, const void *d, const unsigned tam,
+                         const void *clave, const t_Cmp cmp);
 
 int eliminarPorPosicion(t_Lista *l, void *buff, const unsigned int tam,
                         const int pos);
 
 int eliminarAntesDeClave(t_Lista *l, void *buff, const unsigned int tam,
-                         const int pos);
+                         const void *clave, const t_Cmp cmp);
 
 int eliminarDespuesDeClave(t_Lista *l, void *buff, const unsigned int tam,
-                           const int pos);
+                           const void *clave, const t_Cmp cmp);
 
-int mostrarLista(const t_Lista *l);
+void mostrarLista(const t_Lista *l, const t_Prnt prnt);
 
 int invertirLista(t_Lista *l);
 
 int concatenarListas(t_Lista *l1, t_Lista *l2);
 
-int contarApariciones(t_Lista *l, int *res, const t_Cmp cmp);
+int contarApariciones(t_Lista *l, const void *d, int *res, const t_Cmp cmp);
 
-int listaContiene(t_Lista *l, const t_Cmp cmp);
+int listaContiene(t_Lista *l, const void *d, const t_Cmp cmp);
+
+int ordenarLista(t_Lista *l, const int ordenamiento, const t_Cmp cmp);
 
 #endif // FECHA_H

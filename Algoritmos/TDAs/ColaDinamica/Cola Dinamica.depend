@@ -1,16 +1,20 @@
 # depslib dependency file v1.0
-1777151498 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/ColaDinamica/main.c
+1777751078 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/ColaDinamica/main.c
 	<Cola.h>
+	<Comun.h>
 	<stdlib.h>
 	<string.h>
 
-1777148274 /home/agustin/Documentos/unlam/Algoritmos/includes/Cola.h
+1777914950 /home/agustin/Documentos/unlam/Algoritmos/includes/Cola.h
+	"Comun.h"
 
-1777149447 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/ColaDinamica/Test/test_cola.c
+1777324421 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/ColaDinamica/Test/test_cola.c
 	"Cola.h"
 	"test_framework.h"
 
 1775946281 /home/agustin/Documentos/unlam/Algoritmos/includes/test_framework.h
 	<stdio.h>
 	<string.h>
+
+1777422382 /home/agustin/Documentos/unlam/Algoritmos/includes/Comun.h
 

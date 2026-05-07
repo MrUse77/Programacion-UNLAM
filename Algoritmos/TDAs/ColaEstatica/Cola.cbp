@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="../../libs/ColaEstatica" prefix_auto="1" extension_auto="1" />
+				<Option output="../../libs/ColaEstatica/Linux/ColaEstatica" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="obj/Debug/" />
 				<Option type="2" />
@@ -54,6 +54,20 @@
 					<Add directory="../../libs" />
 				</Linker>
 			</Target>
+			<Target title="Windows">
+				<Option output="../../libs/ColaEstatica/Windows/ColaEstatica" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option type="2" />
+				<Option compiler="mingw-w64_windows_cross-compiler" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DCOLA_ESTATICA=1" />
+					<Add directory="../../includes" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../../includes" />
+				</ResourceCompiler>
+			</Target>
 		</Build>
 		<Unit filename="Test/test_cola.c">
 			<Option compilerVar="CC" />
@@ -64,6 +78,7 @@
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Windows" />
 		</Unit>
 		<Extensions />
 	</Project>

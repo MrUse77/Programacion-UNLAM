@@ -8,5 +8,7 @@
 		<Project filename="../TDAs/PilaDinamica/Pila Dinamica.cbp" />
 		<Project filename="../TDAs/ColaDinamica/Cola Dinamica.cbp" />
 		<Project filename="../TDAs/ListaSimple/ListaSimple.cbp" />
+		<Project filename="../TDAs/ColaCircular/ColaCircular.cbp" />
+		<Project filename="../TDAs/PilaCircular/PilaCircular.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

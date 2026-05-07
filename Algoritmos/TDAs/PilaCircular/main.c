@@ -1,4 +1,4 @@
-#include "Pila.h"
+#include <PilaCircular.h>
 #include <string.h>
 #include <string.h>
 #include <stdlib.h>
@@ -29,7 +29,13 @@ int apilar(t_Pila *p, const void *d, unsigned tam)
 	memcpy(nue->dato, d, tam);
 	nue->tamDato = tam;
 	nue->sig = *p;
-	*p = nue;
+	if (*p == NULL) {
+		nue->sig = nue;
+		*p = nue;
+	} else {
+		nue->sig = (*p)->sig;
+		(*p)->sig = nue;
+	}
 	return OK;
 }
 
@@ -51,11 +57,11 @@ int desapilar(t_Pila *p, void *buffer, unsigned tam)
 	if (*p == NULL) {
 		return ERR_PIL_VACIA;
 	}
-	t_Nodo *n = *p;
-	memcpy(buffer, n->dato, MIN(n->tamDato, tam));
-	*p = n->sig;
-	free(n->dato);
-	free(n);
+	memcpy(buffer, (*p)->sig->dato, MIN((*p)->sig->tamDato, tam));
+	t_Nodo *n = (*p)->sig;
+	(*p)->sig = n->sig;
+	free((*p)->sig->dato);
+	free(*p);
 	return OK;
 }
 

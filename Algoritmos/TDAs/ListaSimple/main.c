@@ -578,3 +578,36 @@ int ordenarLista(t_Lista *l, const int ordenamiento, const t_Cmp cmp)
 	}
 	return code;
 }
+
+void mostrarListaInvertida(t_Lista *l, const t_Prnt mostrar)
+{
+	t_Lista lAux = NULL;
+	t_Nodo *aux = NULL;
+	if (l == NULL || mostrar == NULL) {
+		return;
+	}
+	aux = *l;
+	while (aux) {
+		t_Nodo *nue = (t_Nodo *)malloc(sizeof(t_Nodo));
+		if (nue == NULL) {
+			break;
+		}
+		nue->dato = malloc(aux->tam);
+		if (nue->dato == NULL) {
+			free(nue);
+			break;
+		}
+		memcpy(nue->dato, aux->dato, aux->tam);
+		nue->tam = aux->tam;
+		nue->sig = lAux;
+		lAux = nue;
+		aux = aux->sig;
+	}
+	while (lAux) {
+		t_Nodo *sig = lAux->sig;
+		mostrar(lAux->dato);
+		free(lAux->dato);
+		free(lAux);
+		lAux = sig;
+	}
+}

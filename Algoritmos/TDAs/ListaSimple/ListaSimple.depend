@@ -18,12 +18,13 @@
 	<stdio.h>
 	<string.h>
 
-1777473675 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/TDAs/ListaSimple/Test/test.c
+1779661127 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/TDAs/ListaSimple/Test/test.c
 	<ListaSimple.h>
 	"test_framework.h"
 	<Comun.h>
 
-1777473332 /home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/includes/ListaSimple.h
+1779881931 /home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/includes/ListaSimple.h
+	"Comun.h"
 	<stdbool.h>
 
 1777457463 /home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/includes/test_framework.h
@@ -32,7 +33,7 @@
 
 1777457463 /home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/includes/Comun.h
 
-1777473701 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/TDAs/ListaSimple/main.c
+1779883792 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/TDAs/ListaSimple/main.c
 	<ListaSimple.h>
 	<stdlib.h>
 	<string.h>

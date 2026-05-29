@@ -1,3 +1,4 @@
+
 #include <ListaDoble.h>
 #include <Comun.h>
 #include <stdlib.h>
@@ -56,15 +57,17 @@ int insertarAlFinal(t_Lista *l, const void *d, unsigned tam)
 		return 0;
 	}
 	memcpy(nue->dato, d, tam);
-	nue->tam = tam;
-	nue->tam = tam;
-	nue->sig = NULL;
-	nue->ant = act;
 
-	if (act) {
+	if (*l == NULL) {
+		nue->sig = nue;
+		nue->ant = nue;
+		*l = nue;
+	} else {
+		nue->sig = *l;
+		nue->ant = act;
 		act->sig = nue;
+		(*l)->ant = nue;
 	}
-	*l = nue;
 	return OK;
 }
 

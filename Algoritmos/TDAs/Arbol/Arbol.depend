@@ -1,0 +1,24 @@
+# depslib dependency file v1.0
+1779893893 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/TDAs/Arbol/Test/test_arbol.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"Arbol.h"
+	"test_framework.h"
+	<time.h>
+
+1779892285 /home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/includes/Arbol.h
+	<Comun.h>
+	<stdlib.h>
+
+1777457463 /home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/includes/test_framework.h
+	<stdio.h>
+	<string.h>
+
+1779894054 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/TDAs/Arbol/main.c
+	<Arbol.h>
+	<string.h>
+	<stdio.h>
+
+1777457463 /home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/includes/Comun.h
+

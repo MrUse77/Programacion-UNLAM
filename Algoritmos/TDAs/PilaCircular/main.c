@@ -28,7 +28,6 @@ int apilar(t_Pila *p, const void *d, unsigned tam)
 	}
 	memcpy(nue->dato, d, tam);
 	nue->tamDato = tam;
-	nue->sig = *p;
 	if (*p == NULL) {
 		nue->sig = nue;
 		*p = nue;

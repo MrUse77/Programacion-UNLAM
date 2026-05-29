@@ -90,7 +90,8 @@ void vaciarLista(t_Lista *l);
  * @param l Puntero a la lista.
  * @param d Puntero al dato a insertar.
  * @param tam Tamano del dato.
- * @return int OK (`200`) si se realizo exitosamente, ERR_MEM_LLENA (`101`) si no hay espacio.
+ * @return int OK (`200`) si se realizo exitosamente, ERR_MEM_LLENA (`101`) si
+ * no hay espacio.
  */
 int insertarAlPrincipioDeLista(t_Lista *l, const void *d, const unsigned tam);
 
@@ -101,7 +102,8 @@ int insertarAlPrincipioDeLista(t_Lista *l, const void *d, const unsigned tam);
  * @param l Puntero a la lista.
  * @param buff Buffer de salida.
  * @param tam Tamano del buffer.
- * @return int OK (`200`) si se realizo exitosamente, ERR_LISTA_VACIA si la lista esta vacia.
+ * @return int OK (`200`) si se realizo exitosamente, ERR_LISTA_VACIA si la
+ * lista esta vacia.
  */
 int sacarPrimeroLista(t_Lista *l, void *buff, const unsigned tam);
 
@@ -110,7 +112,8 @@ int sacarPrimeroLista(t_Lista *l, void *buff, const unsigned tam);
  * @param l Puntero a la lista.
  * @param d Puntero al dato a insertar.
  * @param tam Tamano del dato.
- * @return int OK (`200`) si se realizo exitosamente, ERR_MEM_LLENA (`101`) si no hay espacio.
+ * @return int OK (`200`) si se realizo exitosamente, ERR_MEM_LLENA (`101`) si
+ * no hay espacio.
  */
 int insertarAlFinalDeLista(t_Lista *l, const void *d, const unsigned tam);
 
@@ -119,7 +122,8 @@ int insertarAlFinalDeLista(t_Lista *l, const void *d, const unsigned tam);
  * @param l Puntero a la lista.
  * @param d Buffer de salida.
  * @param tam Tamano del buffer.
- * @return int OK (`200`) si se realizo exitosamente, ERR_LISTA_VACIA si la lista esta vacia.
+ * @return int OK (`200`) si se realizo exitosamente, ERR_LISTA_VACIA si la
+ * lista esta vacia.
  */
 int sacarUltimoDeLista(t_Lista *l, void *d, const unsigned tam);
 
@@ -128,7 +132,8 @@ int sacarUltimoDeLista(t_Lista *l, void *d, const unsigned tam);
  * @param l Puntero a la lista.
  * @param buff Buffer de salida.
  * @param tam Tamano del buffer.
- * @return int OK (`200`) si se realizo exitosamente, ERR_LISTA_VACIA si la lista esta vacia.
+ * @return int OK (`200`) si se realizo exitosamente, ERR_LISTA_VACIA si la
+ * lista esta vacia.
  */
 int verUltimoDeLista(t_Lista *l, void *buff, const unsigned tam);
 
@@ -140,7 +145,8 @@ int verUltimoDeLista(t_Lista *l, void *buff, const unsigned tam);
  * @param cmp Funcion de comparacion.
  * @param conDup Define si se aceptan duplicados.
  * @param accion Accion a ejecutar cuando hay duplicados.
- * @return int OK (`200`) si se realizo exitosamente, ERR_MEM_LLENA (`101`) si no hay espacio.
+ * @return int OK (`200`) si se realizo exitosamente, ERR_MEM_LLENA (`101`) si
+ * no hay espacio.
  */
 int insertarOrdenadoEnLista(t_Lista *l, const void *d, const unsigned tam,
                             t_Cmp cmp, const int conDup, t_Accion accion);
@@ -150,7 +156,8 @@ int insertarOrdenadoEnLista(t_Lista *l, const void *d, const unsigned tam,
  * @param l Puntero a la lista.
  * @param buff Buffer de salida.
  * @param tam Tamano del buffer.
- * @return int OK (`200`) si se realizo exitosamente, ERR_LISTA_VACIA si la lista esta vacia.
+ * @return int OK (`200`) si se realizo exitosamente, ERR_LISTA_VACIA si la
+ * lista esta vacia.
  */
 int verPrimeroDeLista(t_Lista *l, void *buff, const unsigned tam);
 
@@ -160,7 +167,8 @@ int verPrimeroDeLista(t_Lista *l, void *buff, const unsigned tam);
  * @param buff Buffer de salida.
  * @param tam Tamano del buffer.
  * @param cmp Funcion de comparacion.
- * @return int OK (`200`) si se realizo exitosamente, ERR_LISTA_NO_ENCONTRADO si no existe.
+ * @return int OK (`200`) si se realizo exitosamente, ERR_LISTA_NO_ENCONTRADO si
+ * no existe.
  */
 int eliminarPorClave(t_Lista *l, void *buff, const unsigned tam, t_Cmp cmp);
 
@@ -318,5 +326,7 @@ int listaContiene(t_Lista *l, const void *d, const t_Cmp cmp);
  * @return int OK (`200`) si se realizo exitosamente.
  */
 int ordenarLista(t_Lista *l, const int ordenamiento, const t_Cmp cmp);
+
+void mostrarListaInvertida(t_Lista *l, const t_Prnt mostrar);
 
 #endif // LISTA_SIMPLE_H

@@ -19,6 +19,11 @@ void cargarEnterosEnLista(t_Lista *l, int *vec, int cant)
 			     "insertarAlFinalDeLista debe retornar OK");
 	}
 }
+void printLista(const void *dato)
+{
+	int datoInt = *(int *)dato;
+	printf("%d\n", datoInt);
+}
 
 void verificarSecuenciaEnteros(t_Lista *l, int *vec, int cant)
 {
@@ -563,8 +568,19 @@ TEST(quick_sort_impar)
 	verificarSecuenciaEnteros(&l, esperado, 5);
 	TEST_PASSED("quick sort impar");
 }
+TEST(mostrar_lista_invertida)
+{
+	t_Lista l;
+	int v[] = { 1, 2, 3, 4, 5 };
+	crearLista(&l);
+	cargarEnterosEnLista(&l, v, 5);
+
+	mostrarListaInvertida(&l, printLista);
+	TEST_PASSED("mostrar lista invertida exitoso");
+}
 int main(void)
 {
+	RUN_TEST(mostrar_lista_invertida);
 	RUN_TEST(lista_recien_creada_esta_vacia);
 	RUN_TEST(lista_llena_en_condicion_normal_es_falsa);
 	RUN_TEST(insertar_al_principio);

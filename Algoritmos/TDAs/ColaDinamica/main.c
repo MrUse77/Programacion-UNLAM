@@ -1,92 +1,119 @@
 #include <Cola.h>
-#include <Comun.h>
+#include "Comun.h"
 #include <stdlib.h>
 #include <string.h>
 
-/**
- * @def MIN
- * @brief verifica cual es el menor entre 2 elementos
- */
-#define MIN(a, b) (a > b ? b : a)
+/* =============================================================================
+   Implementación Dinámica - Cola con Linked List Tradicional (head/tail)
+   Cada nodo contiene puntero a datos, tamaño y siguiente nodo
+   ============================================================================= */
 
-void queue_create(queue_t *c)
-{
-	c->prim = NULL;
-	c->ult = NULL;
+void queue_create(queue_t *c) {
+    /* Inicializar cola dinámica vacía: no hay nodos */
+    c->prim = NULL;  /* No hay primer nodo */
+    c->ult = NULL;   /* No hay último nodo */
 }
 
-int queue_push(queue_t *c, const void *d, unsigned tamDato)
-{
-	queue_node_t **ult = &c->ult;
-	queue_node_t *n = (queue_node_t *)malloc(sizeof(queue_node_t));
-	n->dato = malloc(tamDato);
-	if (!n || !n->dato) {
-		free(n);
-		return ERR_MEM_LLENA;
-	}
-	memcpy(n->dato, d, tamDato);
-	n->tamDato = tamDato;
-	n->sig = NULL;
-	if (c->ult != NULL) {
-		(*ult)->sig = n;
-	} else {
-		c->prim = n;
-	}
-	c->ult = n;
-	return OK;
+int queue_push(queue_t *c, const void *d, unsigned tamDato) {
+    t_Nodo *n = (t_Nodo *)malloc(sizeof(t_Nodo));
+    
+    if (!n) {
+        return ERR_MEM_LLENA;  /* Error: sin memoria para el nodo */
+    }
+    
+    n->dato = malloc(tamDato);
+    if (!n->dato) {
+        free(n);
+        return ERR_MEM_LLENA;  /* Error: sin memoria para los datos */
+    }
+    
+    memcpy(n->dato, d, tamDato);
+    n->tamDato = tamDato;
+    n->sig = NULL;
+    
+    if (c->ult == NULL) {
+        /* Cola vacía: el nuevo nodo es tanto primero como último */
+        c->prim = n;
+        c->ult = n;
+    } else {
+        /* Cola no vacía: conectar después del último nodo */
+        c->ult->sig = n;
+        c->ult = n;
+    }
+    
+    return OK;
 }
 
-int queue_is_full(queue_t *c, unsigned tam)
-{
-	queue_node_t *n = (queue_node_t *)malloc(sizeof(queue_node_t));
-	n->dato = malloc(tam);
-	if (!n || !n->dato) {
-		free(n);
-		return TRUE;
-	}
-	free(n->dato);
-	free(n);
-	return FALSE;
+int queue_is_full(queue_t *c, unsigned tam) {
+    /* Para implementación dinámica: siempre hay espacio (solo falla malloc) */
+    /* Función mantenida por compatibilidad API con estática */
+    (void)c;  /* Evitar advertencia de variable no usada */
+    (void)tam;
+    return FALSE;
 }
 
-int queue_see_first(queue_t *c, void *buff, unsigned tamDato)
-{
-	if (c->prim == NULL) {
-		return ERR_COLA_VACIA;
-	}
-	memcpy(buff, c->prim->dato, MIN(tamDato, c->prim->tamDato));
-	return OK;
+int queue_see_first(queue_t *c, void *buff, unsigned tamDato) {
+    if (c->prim == NULL) {
+        return ERR_COLA_VACIA;  /* Cola vacía: no hay primer elemento */
+    }
+    
+    memcpy(buff, c->prim->dato, MIN(tamDato, c->prim->tamDato));
+    return OK;
 }
 
-int queue_pull(queue_t *c, void *buff, unsigned tamDato)
-{
-	if (c->prim == NULL) {
-		return ERR_COLA_VACIA;
-	}
-	queue_node_t *prim = c->prim;
-	c->prim = prim->sig;
-	memcpy(buff, prim->dato, MIN(tamDato, prim->tamDato));
-	free(prim->dato);
-	free(prim);
-	if (c->prim == NULL) {
-		c->ult = NULL;
-	}
-	return OK;
+int queue_pull(queue_t *c, void *buff, unsigned tamDato) {
+    if (c->prim == NULL) {
+        return ERR_COLA_VACIA;  /* Cola vacía: no hay elementos */
+    }
+    
+    /* Obtener datos del primer nodo */
+    memcpy(buff, c->prim->dato, MIN(tamDato, c->prim->tamDato));
+    
+    t_Nodo *aux = c->prim;
+    
+    if (c->prim == c->ult) {
+        /* Solo hay un elemento: eliminarlo y dejar cola vacía */
+        free(aux->dato);  /* Liberar datos del nodo */
+        free(aux);        /* Liberar el nodo */
+        c->prim = NULL;
+        c->ult = NULL;
+    } else {
+        /* Hay múltiples elementos: mover el siguiente al frente */
+        t_Nodo *sig = aux->sig;  /* Guardar siguiente antes de liberar */
+        
+        free(aux->dato);         /* Liberar datos del nodo */
+        free(aux);               /* Liberar el nodo */
+        
+        c->prim = sig;           /* Nuevo primero es el antiguo segundo */
+    }
+    
+    return OK;
 }
 
-int queue_is_empty(queue_t *c)
-{
-	return c->prim == NULL ? TRUE : FALSE;
+int queue_is_empty(queue_t *c) {
+    return (c->prim == NULL && c->ult == NULL) ? TRUE : FALSE;
 }
 
-void queue_clear(queue_t *c)
-{
-	queue_node_t *prim = c->prim;
-	while (prim) {
-		queue_node_t *aux = prim;
-		prim = aux->sig;
-		free(aux->dato);
-		free(aux);
-	}
-	c->ult = NULL;
+void queue_clear(queue_t *c) {
+    if (c->prim == NULL && c->ult == NULL) {
+        /* Cola ya vacía: nada por hacer */
+        return;
+    }
+    
+    /* Liberar todos los nodos de la lista */
+    t_Nodo *aux = c->prim;
+    
+    while (aux != NULL) {
+        t_Nodo *sig = aux->sig;  /* Guardar siguiente antes de liberar */
+        
+        if (aux->dato != NULL) {
+            free(aux->dato);      /* Liberar datos del nodo */
+        }
+        free(aux);                /* Liberar el nodo */
+        aux = sig;               /* Avanzar al siguiente nodo */
+    }
+    
+    c->prim = NULL;
+    c->ult = NULL;
 }
+

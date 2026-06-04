@@ -2,27 +2,36 @@
 #include <stdlib.h>
 #include <string.h>
 
-/**
- * @def MIN
- * @brief verifica cual es el menor entre 2 elementos
- */
-#define MIN(a, b) (a > b ? b : a)
+/* =============================================================================
+   Implementación Circular - Cola Dinámica con Linked List Circular
+   Uso la estructura queue_t definida en Cola.h: typedef queue_node_t *queue_t;
+   Cada nodo es un puntero a struct queue_node
+   ============================================================================= */
 
-void crearCola(t_Cola *c)
+void queue_create(queue_t *c)
 {
+	/* Inicializa cola vacía: prim y ult apuntan al mismo nodo NULL */
 	*c = NULL;
 }
 
-int ponerEnCola(t_Cola *c, const void *d, unsigned tamDato)
+int queue_push(queue_t *c, const void *d, unsigned tamDato)
 {
-	t_Nodo *n = (t_Nodo *)malloc(sizeof(t_Nodo));
+	queue_node_t *n = (queue_node_t *)malloc(sizeof(queue_node_t));
+
+	if (!n) {
+		return ERR_MEM_LLENA;
+	}
+
 	n->dato = malloc(tamDato);
-	if (!n || !n->dato) {
+	if (!n->dato) {
 		free(n);
 		return ERR_MEM_LLENA;
 	}
+
 	memcpy(n->dato, d, tamDato);
 	n->tamDato = tamDato;
+
+	/* Insertar al final de la lista circular */
 	if (*c == NULL) {
 		n->sig = n;
 		*c = n;
@@ -31,12 +40,13 @@ int ponerEnCola(t_Cola *c, const void *d, unsigned tamDato)
 		(*c)->sig = n;
 		*c = n;
 	}
+
 	return OK;
 }
 
-int colaLlena(t_Cola *c, unsigned tam)
+int queue_is_full(queue_t *c, unsigned tam)
 {
-	t_Nodo *n = (t_Nodo *)malloc(sizeof(t_Nodo));
+	queue_node_t *n = (queue_node_t *)malloc(sizeof(queue_node_t));
 	n->dato = malloc(tam);
 	if (!n || !n->dato) {
 		free(n);
@@ -47,15 +57,24 @@ int colaLlena(t_Cola *c, unsigned tam)
 	return FALSE;
 }
 
-int verPrimero(t_Cola *c, void *buff, unsigned tamDato);
+int queue_see_first(queue_t *c, void *buff, unsigned tamDato)
+{
+	if (*c) {
+		return ERR_COLA_VACIA;
+	}
 
-int sacarDeCola(t_Cola *c, void *buff, unsigned tamDato)
+	/* En cola circular: el primer dato está en prim->dato */
+	memcpy(buff, (*c)->sig->dato, MIN(tamDato, (*c)->sig->tamDato));
+	return OK;
+}
+
+int queue_pull(queue_t *c, void *buff, unsigned tamDato)
 {
 	if (*c == NULL) {
 		return ERR_COLA_VACIA;
 	}
 	memcpy(buff, (*c)->sig->dato, MIN(tamDato, (*c)->sig->tamDato));
-	t_Nodo *aux = (*c)->sig;
+	queue_node_t *aux = (*c)->sig;
 	(*c)->sig = aux->sig;
 	free((*c)->sig->dato);
 	free((*c)->sig);
@@ -65,9 +84,31 @@ int sacarDeCola(t_Cola *c, void *buff, unsigned tamDato)
 	return OK;
 }
 
-int colaVacia(t_Cola *c)
+int queue_is_empty(queue_t *c)
 {
 	return *c == NULL ? TRUE : FALSE;
 }
 
-void vaciarCola(t_Cola *c);
+void queue_clear(queue_t *c)
+{
+	if (*c == NULL) {
+		/* Cola ya vacía */
+		return;
+	}
+
+	/* Liberar todos los nodos recorriendo la lista circular */
+	queue_node_t *aux =
+		(*c)->sig; /* Usar queue_node_t en lugar de queue_node_t */
+
+	while (aux != NULL) {
+		queue_node_t *sig =
+			aux->sig; /* Guardar siguiente antes de liberar */
+
+		if (aux->dato != NULL) {
+			free(aux->dato); /* Liberar datos del nodo */
+		}
+		free(aux); /* Liberar el nodo */
+		aux = sig; /* Avanzar al siguiente */
+	}
+	*c = NULL;
+}

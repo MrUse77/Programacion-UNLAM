@@ -1,11 +1,11 @@
 # depslib dependency file v1.0
-1780257834 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/ListaDoble/main.c
+1780177156 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/ListaDoble/main.c
 	<ListaDoble.h>
 	<Comun.h>
 	<stdlib.h>
 	<string.h>
 
-1780201238 /home/agustin/Documentos/unlam/Algoritmos/includes/ListaDoble.h
+1780176928 /home/agustin/Documentos/unlam/Algoritmos/includes/ListaDoble.h
 	"Comun.h"
 	<stdbool.h>
 

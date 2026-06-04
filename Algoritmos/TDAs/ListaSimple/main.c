@@ -5,17 +5,17 @@
 #define MIN(a, b) (a > b ? b : a)
 
 // FUNCIONES QUE SE USAN SOLAMENTE ACA DENTRO
-static int dividirLista(t_Lista *orig, t_Lista *izq, t_Lista *der)
+static int list_divide(list_t *orig, list_t *left, list_t *right)
 {
-	t_Nodo *slow;
-	t_Nodo *fast;
-	t_Nodo *prev;
+	list_node_t *slow;
+	list_node_t *fast;
+	list_node_t *prev;
 	if (orig == NULL || *orig == NULL) {
 		return ERR_LISTA_VACIA;
 	}
 	if ((*orig)->sig == NULL) {
-		*izq = *orig;
-		*der = NULL;
+		*left = *orig;
+		*right = NULL;
 		*orig = NULL;
 		return OK;
 	}
@@ -27,41 +27,41 @@ static int dividirLista(t_Lista *orig, t_Lista *izq, t_Lista *der)
 		slow = slow->sig;
 		fast = fast->sig->sig;
 	}
-	*izq = *orig;
-	*der = slow;
+	*left = *orig;
+	*right = slow;
 	prev->sig = NULL;
 	*orig = NULL;
 	return OK;
 }
 
-static t_Lista mezclarListas(t_Lista izq, t_Lista der, t_Cmp cmp)
+static list_t list_merge_lists(list_t left, list_t right, t_Cmp cmp)
 {
-	if (izq == NULL)
-		return der;
-	if (der == NULL)
-		return izq;
-	if (cmp(izq->dato, der->dato) <= 0) {
-		izq->sig = mezclarListas(izq->sig, der, cmp);
-		return izq;
+	if (left == NULL)
+		return right;
+	if (right == NULL)
+		return left;
+	if (cmp(left->dato, right->dato) <= 0) {
+		left->sig = list_merge_lists(left->sig, right, cmp);
+		return left;
 	} else {
-		der->sig = mezclarListas(izq, der->sig, cmp);
-		return der;
+		right->sig = list_merge_lists(left, right->sig, cmp);
+		return right;
 	}
 }
 
-static int mergeSort(t_Lista *l, t_Cmp cmp)
+static int list_merge_sort(list_t *l, t_Cmp cmp)
 {
-	t_Lista izq, der;
+	list_t left, right;
 	if (*l == NULL || (*l)->sig == NULL)
 		return ERR_LISTA_VACIA;
-	dividirLista(l, &izq, &der);
-	mergeSort(&izq, cmp);
-	mergeSort(&der, cmp);
-	*l = mezclarListas(izq, der, cmp);
+	list_divide(l, &left, &right);
+	list_merge_sort(&left, cmp);
+	list_merge_sort(&right, cmp);
+	*l = list_merge_lists(left, right, cmp);
 	return OK;
 }
 
-static t_Nodo *ultimo(t_Nodo *l)
+static list_node_t *list_last(list_node_t *l)
 {
 	while (l && l->sig) {
 		l = l->sig;
@@ -69,97 +69,98 @@ static t_Nodo *ultimo(t_Nodo *l)
 	return l;
 }
 
-static int quickSort(t_Lista *l, t_Cmp cmp)
+static int list_quick_sort(list_t *l, t_Cmp cmp)
 {
-	t_Lista menor = NULL, mayor = NULL, igual = NULL;
-	t_Nodo *pivote = *l, *act = pivote, *sig = NULL;
-	t_Nodo *hMen = NULL, *hIg = NULL, *hMay = NULL;
-	if (pivote == NULL) {
+	list_t smaller = NULL, larger = NULL, equal = NULL;
+	list_node_t *pivot = *l, *current = pivot, *next = NULL;
+	list_node_t *head_smaller = NULL, *head_equal = NULL,
+		    *head_larger = NULL;
+	if (pivot == NULL) {
 		return ERR_LISTA_VACIA;
 	}
-	while (act != NULL) {
-		sig = act->sig;
-		act->sig = NULL;
-		if (cmp(act->dato, pivote->dato) < 0) {
-			if (menor == NULL) {
-				menor = act;
-				hMen = act;
+	while (current != NULL) {
+		next = current->sig;
+		current->sig = NULL;
+		if (cmp(current->dato, pivot->dato) < 0) {
+			if (smaller == NULL) {
+				head_smaller = current;
+				head_smaller = current;
 			} else {
-				hMen->sig = act;
-				hMen = hMen->sig;
+				head_smaller->sig = current;
+				head_smaller = head_smaller->sig;
 			}
-		} else if (cmp(act->dato, pivote->dato) > 0) {
-			if (mayor == NULL) {
-				mayor = act;
-				hMay = act;
+		} else if (cmp(current->dato, pivot->dato) > 0) {
+			if (larger == NULL) {
+				head_larger = current;
+				head_larger = current;
 			} else {
-				hMay->sig = act;
-				hMay = hMay->sig;
+				head_larger->sig = current;
+				head_larger = head_larger->sig;
 			}
 		} else {
-			if (igual == NULL) {
-				igual = act;
-				hIg = act;
+			if (equal == NULL) {
+				head_equal = current;
+				head_equal = current;
 			} else {
-				hIg->sig = act;
-				hIg = hIg->sig;
+				head_equal->sig = current;
+				head_equal = head_equal->sig;
 			}
 		}
-		act = sig;
+		current = next;
 	}
-	quickSort(&menor, cmp);
-	quickSort(&mayor, cmp);
-	t_Lista res = NULL;
-	if (menor != NULL) {
-		res = menor;
-		ultimo(menor)->sig = igual;
+	list_quick_sort(&smaller, cmp);
+	list_quick_sort(&larger, cmp);
+	list_t res = NULL;
+	if (smaller != NULL) {
+		res = smaller;
+		list_last(smaller)->sig = equal;
 	} else {
-		res = igual;
+		res = equal;
 	}
-	if (igual != NULL) {
-		ultimo(igual)->sig = mayor;
+	if (equal != NULL) {
+		list_last(equal)->sig = larger;
 	} else if (res == NULL) {
-		res = mayor;
+		res = head_larger;
 	}
 	*l = res;
 	return OK;
 }
 
-void crearLista(t_Lista *l)
+void list_create(list_t *l)
 {
 	*l = NULL;
 }
 
-int listaVacia(const t_Lista *l)
+int list_is_empty(const list_t *l)
 {
 	return *l == NULL ? TRUE : FALSE;
 }
 
-int listaLlena(const t_Lista *l, const unsigned tam)
+int list_is_full(const list_t *l, const unsigned tam)
 {
-	t_Nodo *aux = (t_Nodo *)malloc(sizeof(t_Nodo));
+	list_node_t *aux = (list_node_t *)malloc(sizeof(list_node_t));
 	void *info = malloc(tam);
 	free(aux);
 	free(info);
 	return aux == NULL || info == NULL ? TRUE : FALSE;
 }
 
-void vaciarLista(t_Lista *l)
+void list_clear(list_t *l)
 {
 	while (*l) {
-		t_Nodo *aux = *l;
+		list_node_t *aux = *l;
 		*l = aux->sig;
 		free(aux->dato);
 		free(aux);
 	}
 }
 
-int insertarAlPrincipioDeLista(t_Lista *l, const void *d, const unsigned tam)
+int list_push_first(list_t *l, const void *d, const unsigned tam)
 {
-	if (listaLlena(l, tam)) {
+	if (list_is_full(l, tam)) {
 		return ERR_MEM_LLENA;
 	}
-	t_Nodo *n = (t_Nodo *)malloc(sizeof(t_Nodo));
+	list_node_t *n = (list_node_t *)malloc(sizeof(list_node_t));
 	n->dato = malloc(tam);
 	if (!n || !n->dato) {
 		free(n);
@@ -173,12 +174,12 @@ int insertarAlPrincipioDeLista(t_Lista *l, const void *d, const unsigned tam)
 	return OK;
 }
 
-int sacarPrimeroLista(t_Lista *l, void *buff, const unsigned tam)
+int list_pull_first(list_t *l, void *buff, const unsigned tam)
 {
-	if (l == NULL) {
+	if (*l == NULL) {
 		return ERR_LISTA_VACIA;
 	}
-	t_Nodo *aux = *l;
+	list_node_t *aux = *l;
 	*l = aux->sig;
 	memcpy(buff, aux->dato, MIN(tam, aux->tam));
 	free(aux->dato);
@@ -186,9 +187,9 @@ int sacarPrimeroLista(t_Lista *l, void *buff, const unsigned tam)
 	return OK;
 }
 
-int insertarAlFinalDeLista(t_Lista *l, const void *d, const unsigned tam)
+int list_push_last(list_t *l, const void *d, const unsigned tam)
 {
-	t_Nodo *n = (t_Nodo *)malloc(sizeof(t_Nodo));
+	list_node_t *n = (list_node_t *)malloc(sizeof(list_node_t));
 	n->dato = malloc(tam);
 	if (!n || !n->dato) {
 		free(n);
@@ -204,12 +205,28 @@ int insertarAlFinalDeLista(t_Lista *l, const void *d, const unsigned tam)
 	return OK;
 }
 
-int sacarUltimoDeLista(t_Lista *l, void *buff, const unsigned tam)
+int list_pull_last(list_t *l, void *buff, const unsigned tam)
 {
-	if (listaVacia(l)) {
+	if (*l == NULL) {
 		return ERR_LISTA_VACIA;
 	}
-	t_Nodo *aux = *l;
+	list_node_t *aux = *l;
+	while (aux->sig) {
+		aux = aux->sig;
+	}
+	memcpy(buff, aux->dato, MIN(tam, aux->tam));
+	free(aux->dato);
+	free(aux);
+	*l = NULL;
+	return OK;
+}
+
+int list_see_last(list_t *l, void *buff, const unsigned tam)
+{
+	if (*l == NULL) {
+		return ERR_LISTA_VACIA;
+	}
+	list_node_t *aux = *l;
 	while ((*l)->sig) {
 		l = &(*l)->sig;
 	}
@@ -220,23 +237,10 @@ int sacarUltimoDeLista(t_Lista *l, void *buff, const unsigned tam)
 	return OK;
 }
 
-int verUltimoDeLista(t_Lista *l, void *buff, unsigned tam)
+int list_push_orrighter(list_t *l, const void *d, const unsigned tam, t_Cmp cmp,
+			const int conDup, t_Accion accion)
 {
-	if (listaVacia(l)) {
-		return ERR_LISTA_VACIA;
-	}
-	t_Nodo *aux = *l;
-	while (aux->sig != NULL) {
-		aux = aux->sig;
-	}
-	memcpy(buff, aux->dato, MIN(tam, aux->tam));
-	return OK;
-}
-
-int insertarOrdenadoEnLista(t_Lista *l, const void *d, const unsigned tam,
-			    t_Cmp cmp, const int conDup, t_Accion accion)
-{
-	t_Nodo *n = (t_Nodo *)malloc(sizeof(t_Nodo));
+	list_node_t *n = (list_node_t *)malloc(sizeof(list_node_t));
 	n->dato = malloc(tam);
 	if (!n || !n->dato) {
 		free(n);
@@ -245,7 +249,7 @@ int insertarOrdenadoEnLista(t_Lista *l, const void *d, const unsigned tam,
 	n->sig = NULL;
 	n->tam = tam;
 	memcpy(n->dato, d, tam);
-	while (*l != NULL && cmp(n->dato, (*l)->dato) > 0) {
+	while (*l && cmp(n->dato, (*l)->dato) > 0) {
 		l = &(*l)->sig;
 	}
 	if (*l && cmp(n->dato, (*l)->dato) == 0) {
@@ -263,9 +267,9 @@ int insertarOrdenadoEnLista(t_Lista *l, const void *d, const unsigned tam,
 	return OK;
 }
 
-int eliminarPorClave(t_Lista *l, void *buff, const unsigned tam, t_Cmp cmp)
+int list_delete_by_key(list_t *l, void *buff, const unsigned tam, t_Cmp cmp)
 {
-	if (listaVacia(l)) {
+	if (*l == NULL) {
 		return ERR_LISTA_VACIA;
 	}
 	while (*l && cmp(buff, (*l)->dato) != 0) {
@@ -275,44 +279,44 @@ int eliminarPorClave(t_Lista *l, void *buff, const unsigned tam, t_Cmp cmp)
 		return ERR_LISTA_NO_ENCONTRADO;
 	}
 	memcpy(buff, (*l)->dato, MIN(tam, (*l)->tam));
-	t_Nodo *elim = *l;
+	list_node_t *elim = *l;
 	*l = elim->sig;
 	free(elim->dato);
 	free(elim);
 	return OK;
 }
 
-int verElementoEnPosicion(t_Lista *l, void *buff, const unsigned tam,
-			  const int pos)
+int list_get_at_position(list_t *l, void *buff, const unsigned tam,
+			 const int position)
 {
-	if (l == NULL) {
+	if (*l == NULL) {
 		return ERR_LISTA_VACIA;
 	}
 	int i;
-	for (i = 0; i < pos; i++) {
+	for (i = 0; i < position && *l != NULL; i++) {
 		l = &(*l)->sig;
 	}
 	memcpy(buff, (*l)->dato, MIN(tam, (*l)->tam));
 	return OK;
 }
 
-int longitudLista(t_Lista *l)
+int list_length(list_t *l)
 {
-	int cont = 0;
-	if (l == NULL) {
-		return cont;
+	int count = 0;
+	if (*l == NULL) {
+		return count;
 	}
 
-	while (*l) {
+	while (*l != NULL) {
 		l = &(*l)->sig;
-		cont++;
+		count++;
 	}
-	return cont;
+	return count;
 }
 
-int buscarEnLista(t_Lista *l, void *buff, const unsigned tam, t_Cmp cmp)
+int list_search(list_t *l, void *buff, const unsigned tam, t_Cmp cmp)
 {
-	if (l == NULL) {
+	if (*l == NULL) {
 		return ERR_LISTA_VACIA;
 	}
 	while (*l && cmp(buff, (*l)->dato) != 0) {
@@ -325,34 +329,35 @@ int buscarEnLista(t_Lista *l, void *buff, const unsigned tam, t_Cmp cmp)
 	return OK;
 }
 
-int copiarLista(t_Lista *l, t_Lista *lCopia)
+int list_copy(list_t *source, list_t *dest)
 {
-	if (l == NULL) {
+	if (*source == NULL) {
 		return ERR_LISTA_VACIA;
 	}
-	while (*l) {
-		t_Nodo *n = malloc(sizeof(t_Nodo));
-		n->dato = malloc((*l)->tam);
+	while (*source != NULL) {
+		list_node_t *n = malloc(sizeof(list_node_t));
+		n->dato = malloc((*source)->tam);
 		if (!n || !n->dato) {
 			free(n);
 			return ERR_MEM_LLENA;
 		}
-		n->tam = (*l)->tam;
-		memcpy(n->dato, (*l)->dato, sizeof((*l)->tam));
+		n->tam = (*source)->tam;
+		memcpy(n->dato, (*source)->dato, sizeof((*source)->tam));
 		n->sig = NULL;
-		if (*lCopia) {
-			lCopia = &(*lCopia)->sig;
+		if (*dest != NULL) {
+			(*dest)->sig = n;
+		} else {
+			*dest = n;
 		}
-		*lCopia = n;
-		l = &(*l)->sig;
+		source = &(*source)->sig;
 	}
 	return OK;
 }
 
-int insertarEnPosicion(t_Lista *l, const void *d, const unsigned tam,
-		       const int pos)
+int list_push_at_position(list_t *l, const void *d, const unsigned tam,
+			  const int pos)
 {
-	t_Nodo *n = malloc(sizeof(t_Nodo));
+	list_node_t *n = malloc(sizeof(list_node_t));
 	n->dato = malloc(tam);
 	if (!n || !n->dato) {
 		free(n);
@@ -369,10 +374,10 @@ int insertarEnPosicion(t_Lista *l, const void *d, const unsigned tam,
 	return OK;
 }
 
-int insertarDespuesDeClave(t_Lista *l, const void *d, const unsigned tam,
-			   const void *clave, const t_Cmp cmp)
+int list_push_after_key(list_t *l, const void *d, const unsigned tam,
+			const void *clave, const t_Cmp cmp)
 {
-	t_Nodo *n = (t_Nodo *)malloc(sizeof(t_Nodo));
+	list_node_t *n = (list_node_t *)malloc(sizeof(list_node_t));
 	n->dato = malloc(tam);
 	if (!n || !n->dato) {
 		free(n);
@@ -390,11 +395,11 @@ int insertarDespuesDeClave(t_Lista *l, const void *d, const unsigned tam,
 	return OK;
 }
 
-int insertarAntesDeClave(t_Lista *l, const void *d, const unsigned tam,
-			 const void *clave, const t_Cmp cmp)
+int list_insert_before_key(list_t *l, const void *d, const unsigned tam,
+			   const void *clave, const t_Cmp cmp)
 {
-	t_Nodo *n = (t_Nodo *)malloc(sizeof(t_Nodo));
-	t_Nodo **aux = l;
+	list_node_t *n = (list_node_t *)malloc(sizeof(list_node_t));
+	list_node_t **aux = l;
 	n->dato = malloc(tam);
 	if (!n || !n->dato) {
 		free(n);
@@ -414,23 +419,23 @@ int insertarAntesDeClave(t_Lista *l, const void *d, const unsigned tam,
 	return OK;
 }
 
-int verPrimeroDeLista(t_Lista *l, void *buff, const unsigned tam)
+int list_peek_first(list_t *l, void *buff, const unsigned tam)
 {
-	if (l == NULL) {
+	if (*l == NULL) {
 		return ERR_LISTA_VACIA;
 	}
 	memcpy(buff, (*l)->dato, MIN(tam, (*l)->tam));
 	return OK;
 }
 
-int eliminarPorPosicion(t_Lista *l, void *buff, const unsigned int tam,
-			const int pos)
+int list_delete_at_position(list_t *l, void *buff, const unsigned int tam,
+			    const int pos)
 {
 	int i;
 	if (l == NULL) {
 		return ERR_LISTA_VACIA;
 	}
-	t_Nodo **aux = l, *elim = NULL;
+	list_node_t **aux = l, *elim = NULL;
 	for (i = 0; i < pos; i++) {
 		aux = &(*aux)->sig;
 	}
@@ -445,13 +450,13 @@ int eliminarPorPosicion(t_Lista *l, void *buff, const unsigned int tam,
 	return OK;
 }
 
-int eliminarAntesDeClave(t_Lista *l, void *buff, const unsigned int tam,
-			 const void *clave, const t_Cmp cmp)
+int list_delete_before_key(list_t *l, void *buff, const unsigned int tam,
+			   const void *clave, const t_Cmp cmp)
 {
 	if (l == NULL) {
 		return ERR_LISTA_VACIA;
 	}
-	t_Nodo **aux = l;
+	list_node_t **aux = l;
 	while (*aux != NULL && cmp(clave, (*aux)->dato) != 0) {
 		aux = &(*aux)->sig;
 	}
@@ -465,13 +470,13 @@ int eliminarAntesDeClave(t_Lista *l, void *buff, const unsigned int tam,
 	return OK;
 }
 
-int eliminarDespuesDeClave(t_Lista *l, void *buff, const unsigned int tam,
-			   const void *clave, const t_Cmp cmp)
+int list_delete_after_key(list_t *l, void *buff, const unsigned int tam,
+			  const void *clave, const t_Cmp cmp)
 {
 	if (l == NULL) {
 		return ERR_LISTA_VACIA;
 	}
-	t_Nodo **aux = l;
+	list_node_t **aux = l;
 	while (*aux != NULL && cmp(clave, (*aux)->dato) != 0) {
 		aux = &(*aux)->sig;
 	}
@@ -486,7 +491,7 @@ int eliminarDespuesDeClave(t_Lista *l, void *buff, const unsigned int tam,
 	return OK;
 }
 
-void mostrarLista(const t_Lista *l, const t_Prnt prnt)
+void list_show(const list_t *l, const t_Prnt prnt)
 {
 	while (*l) {
 		prnt((*l)->dato);
@@ -494,9 +499,9 @@ void mostrarLista(const t_Lista *l, const t_Prnt prnt)
 	}
 }
 
-int invertirLista(t_Lista *l)
+int list_invert(list_t *l)
 {
-	t_Nodo *prev, *act, *sig;
+	list_node_t *prev, *act, *sig;
 	if (l == NULL || *l == NULL) {
 		return ERR_LISTA_VACIA;
 	}
@@ -512,7 +517,7 @@ int invertirLista(t_Lista *l)
 	return OK;
 }
 
-int concatenarListas(t_Lista *l1, t_Lista *l2)
+int list_concat(list_t *l1, list_t *l2)
 {
 	if (l1 == NULL || l2 == NULL) {
 		return ERR_LISTA_VACIA;
@@ -525,7 +530,7 @@ int concatenarListas(t_Lista *l1, t_Lista *l2)
 		*l2 = NULL;
 		return OK;
 	}
-	t_Nodo *aux = *l1;
+	list_node_t *aux = *l1;
 	while (aux->sig != NULL) {
 		aux = aux->sig;
 	}
@@ -534,7 +539,7 @@ int concatenarListas(t_Lista *l1, t_Lista *l2)
 	return OK;
 }
 
-int contarApariciones(t_Lista *l, const void *d, int *res, const t_Cmp cmp)
+int list_count_appear(list_t *l, const void *d, int *res, const t_Cmp cmp)
 {
 	if (l == NULL) {
 		return ERR_LISTA_VACIA;
@@ -548,7 +553,7 @@ int contarApariciones(t_Lista *l, const void *d, int *res, const t_Cmp cmp)
 	return OK;
 }
 
-int listaContiene(t_Lista *l, const void *d, const t_Cmp cmp)
+int list_contain(list_t *l, const void *d, const t_Cmp cmp)
 {
 	if (l == NULL) {
 		return ERR_LISTA_VACIA;
@@ -562,7 +567,7 @@ int listaContiene(t_Lista *l, const void *d, const t_Cmp cmp)
 	return ERR_LISTA_NO_ENCONTRADO;
 }
 
-int ordenarLista(t_Lista *l, const int ordenamiento, const t_Cmp cmp)
+int list_order(list_t *l, const int ordenamiento, const t_Cmp cmp)
 {
 	int code;
 	switch (ordenamiento) {
@@ -579,16 +584,16 @@ int ordenarLista(t_Lista *l, const int ordenamiento, const t_Cmp cmp)
 	return code;
 }
 
-void mostrarListaInvertida(t_Lista *l, const t_Prnt mostrar)
+void list_show_invert(list_t *l, const t_Prnt mostrar)
 {
-	t_Lista lAux = NULL;
-	t_Nodo *aux = NULL;
+	list_t lAux = NULL;
+	list_node_t *aux = NULL;
 	if (l == NULL || mostrar == NULL) {
 		return;
 	}
 	aux = *l;
 	while (aux) {
-		t_Nodo *nue = (t_Nodo *)malloc(sizeof(t_Nodo));
+		list_node_t *nue = (list_node_t *)malloc(sizeof(list_node_t));
 		if (nue == NULL) {
 			break;
 		}
@@ -604,7 +609,7 @@ void mostrarListaInvertida(t_Lista *l, const t_Prnt mostrar)
 		aux = aux->sig;
 	}
 	while (lAux) {
-		t_Nodo *sig = lAux->sig;
+		list_node_t *sig = lAux->sig;
 		mostrar(lAux->dato);
 		free(lAux->dato);
 		free(lAux);

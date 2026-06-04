@@ -4,12 +4,20 @@
 #include <stdlib.h>
 #include <string.h>
 
-void crearLista(double_list_t *l)
+/**
+ * @brief Crea una lista vacia.
+ * @param l Puntero a la lista.
+ */
+void list_create(double_list_t *l)
 {
 	*l = NULL;
 }
 
-int vaciarLista(double_list_t *l)
+/**
+ * @brief Vacia la lista completa.
+ * @param l Puntero a la lista.
+ */
+int list_clear(double_list_t *l)
 {
 	double_list_node_t *act = *l;
 	int cant = 0;
@@ -29,12 +37,23 @@ int vaciarLista(double_list_t *l)
 	return cant;
 }
 
-int listaVacia(const double_list_t *l)
+/**
+ * @brief Indica si la lista esta vacia.
+ * @param l Puntero a la lista.
+ * @return int TRUE si esta vacia, FALSE en caso contrario.
+ */
+int list_is_empty(const double_list_t *l)
 {
 	return *l == NULL;
 }
 
-int listaLlena(const double_list_t *l, unsigned tam)
+/**
+ * @brief Indica si no hay mas espacio disponible en la lista.
+ * @param l Puntero a la lista.
+ * @param tam Tamano del elemento.
+ * @return int FALSE si hay espacio disponible, ERR_MEM_LLENA (`101`) si no.
+ */
+int list_is_full(const double_list_t *l, const unsigned tam)
 {
 	double_list_node_t *nue =
 		(double_list_node_t *)malloc(sizeof(double_list_node_t));
@@ -44,7 +63,15 @@ int listaLlena(const double_list_t *l, unsigned tam)
 	return aux == NULL || nue == NULL;
 }
 
-int insertarAlFinal(double_list_t *l, const void *d, unsigned tam)
+/**
+ * @brief Inserta un elemento al final de la lista.
+ * @param l Puntero a la lista.
+ * @param d Puntero al dato a insertar.
+ * @param tam Tamano del dato.
+ * @return int OK (`200`) si se realizo exitosamente, ERR_MEM_LLENA (`101`) si
+ * no hay espacio.
+ */
+int list_push_last(double_list_t *l, const void *d, const unsigned tam)
 {
 	double_list_node_t *act = *l, *nue;
 	if (act) {
@@ -73,7 +100,7 @@ int insertarAlFinal(double_list_t *l, const void *d, unsigned tam)
 	return OK;
 }
 
-int insertarAlComienzo(double_list_t *l, const void *d, unsigned tam)
+int list_push_first(double_list_t *l, const void *d, const unsigned tam)
 {
 	double_list_node_t *act = *l, *nue;
 	if (act) {
@@ -98,8 +125,8 @@ int insertarAlComienzo(double_list_t *l, const void *d, unsigned tam)
 	return OK;
 }
 
-int insertarOrdenadoEnLista(double_list_t *l, const void *d, const unsigned tam,
-			    t_Cmp cmp, t_Acum acumulador)
+int list_push_orederer(double_list_t *l, const void *d, const unsigned tam,
+		       t_Cmp cmp, t_Acum acumulador)
 {
 	double_list_node_t *act = *l, *sig, *ant, *nue;
 	if (act == NULL) {
@@ -152,25 +179,7 @@ int insertarOrdenadoEnLista(double_list_t *l, const void *d, const unsigned tam,
 	return OK;
 }
 
-int mostrarDeDerAIzq(const double_list_t *l, t_Prnt print)
-{
-	double_list_node_t *act = *l;
-	int cant = 0;
-	if (act) {
-		print(NULL);
-		while (act->sig) {
-			act = act->sig;
-		}
-		while (act) {
-			print(act->dato);
-			act = act->ant;
-			cant++;
-		}
-	}
-	return cant;
-}
-
-int mostrarDeIzqADer(const double_list_t *l, t_Prnt print)
+int list_show_rl(const double_list_t *l, const t_Prnt print)
 {
 	double_list_node_t *act = *l;
 	int cant = 0;
@@ -188,7 +197,25 @@ int mostrarDeIzqADer(const double_list_t *l, t_Prnt print)
 	return cant;
 }
 
-void ordenarLista(double_list_t *l, const t_Cmp cmp)
+int list_show_lr(const double_list_t *l, const t_Prnt print)
+{
+	double_list_node_t *act = *l;
+	int cant = 0;
+	if (act) {
+		print(NULL);
+		while (act->sig) {
+			act = act->sig;
+		}
+		while (act) {
+			print(act->dato);
+			act = act->ant;
+			cant++;
+		}
+	}
+	return cant;
+}
+
+void list_order(double_list_t *l, const t_Cmp cmp)
 {
 	double_list_node_t *act = *l, *sup = NULL, *inf = NULL;
 	int marca = 1;
@@ -229,8 +256,8 @@ void ordenarLista(double_list_t *l, const t_Cmp cmp)
 	}
 }
 
-int eliminarPorClave(double_list_t *l, void *buff, const unsigned int tam,
-		     t_Cmp cmp)
+int list_delete_by_key(double_list_t *l, void *buff, const unsigned int tam,
+		       t_Cmp cmp)
 {
 	double_list_node_t *act = *l;
 	int aux;

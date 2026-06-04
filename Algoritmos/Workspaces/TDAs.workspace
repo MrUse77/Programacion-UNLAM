@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
 	<Workspace title="TDAs">
-		<Project filename="../TDAs/Fecha/Fecha.cbp" />
 		<Project filename="../TDAs/PilaEstatica/Pila.cbp" />
 		<Project filename="../TDAs/utils/utils.cbp" />
 		<Project filename="../TDAs/ColaEstatica/Cola.cbp" />
@@ -10,5 +9,8 @@
 		<Project filename="../TDAs/ListaSimple/ListaSimple.cbp" />
 		<Project filename="../TDAs/ColaCircular/ColaCircular.cbp" />
 		<Project filename="../TDAs/PilaCircular/PilaCircular.cbp" />
+		<Project filename="../TDAs/Arbol/Arbol.cbp" />
+		<Project filename="../TDAs/ListaDoble/ListaDoble.cbp" />
+		<Project filename="../TDAs/ListaDobleCircular/ListaDobleCircular.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

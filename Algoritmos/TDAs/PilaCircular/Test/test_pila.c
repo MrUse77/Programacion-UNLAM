@@ -45,10 +45,10 @@ TEST(pop_de_stack_vacia_retorna_error)
 
 	// ACT
 	stack_init(&s);
-	int resultado = stack_pop(&s, &valor, sizeof(valor));
+	int resultado = stack_pull(&s, &valor, sizeof(valor));
 
 	// ASSERT
-	ASSERT_EQUAL(ERR_VACIA, resultado,
+	ASSERT_EQUAL(ERR_PILA_VACIA, resultado,
 		     "pop() de stack vacía debe retornar ERR_VACIA");
 	ASSERT_TRUE(stack_is_empty(&s), "Pila debe seguir vacía");
 	TEST_PASSED("Pop de pila vacía retorna error correctamente");
@@ -65,15 +65,14 @@ TEST(push_y_pop_mismo_valor)
 	stack_init(&s);
 	stack_push(&s, &valor_original, sizeof(valor_original));
 	int resultado =
-		stack_pop(&s, &valor_recuperado, sizeof(valor_recuperado));
+		stack_pull(&s, &valor_recuperado, sizeof(valor_recuperado));
 
 	// ASSERT
 	ASSERT_EQUAL(OK, resultado, "pop() debe retornar OK");
 	ASSERT_EQUAL(valor_original, valor_recuperado,
 		     "El valor poppeado debe ser el mismo que se pushó");
-	ASSERT_TRUE(
-		stack_is_empty(&s),
-		"Stack debe estar vacío después de pop único elemento");
+	ASSERT_TRUE(stack_is_empty(&s),
+		    "Stack debe estar vacío después de pop único elemento");
 	TEST_PASSED("Push y pop recupera el valor correcto");
 }
 
@@ -92,7 +91,7 @@ TEST(push_multiples_elementos_orden_LIFO)
 
 	// ASSERT - Pop en orden inverso (LIFO: Last In, First Out)
 	for (int i = 4; i >= 0; i--) {
-		int resultado = stack_pop(&s, &recuperado, sizeof(recuperado));
+		int resultado = stack_pull(&s, &recuperado, sizeof(recuperado));
 		ASSERT_EQUAL(OK, resultado, "pop() debe retornar OK");
 		ASSERT_EQUAL(valores[i], recuperado, "El orden debe ser LIFO");
 	}
@@ -118,8 +117,7 @@ TEST(push_estructuras_complejas)
 	// ACT
 	stack_init(&s);
 	int resultado_push = stack_push(&s, &original, sizeof(original));
-	int resultado_pop =
-		stack_pop(&s, &recuperado, sizeof(recuperado));
+	int resultado_pop = stack_pull(&s, &recuperado, sizeof(recuperado));
 
 	// ASSERT
 	ASSERT_EQUAL(OK, resultado_push, "push() debe retornar OK");
@@ -158,7 +156,7 @@ TEST(push_hasta_llenar_stack_estatica)
 		// Intentar push uno más debe fallar
 		int resultado = stack_push(&s, &valor, sizeof(valor));
 		ASSERT_EQUAL(ERR_MEM_LLENA, resultado,
-				     "Push en stack lleno debe retornar ERR");
+			     "Push en stack lleno debe retornar ERR");
 	}
 
 	TEST_PASSED("Stack maneja correctamente el llenado");
@@ -176,11 +174,11 @@ TEST(peek_no_modifica_stack)
 	stack_push(&s, &valor_original, sizeof(valor_original));
 
 	// Verificar tope múltiples veces
-	stack_peek(&s, &valor_tope, sizeof(valor_tope));
+	stack_see_top(&s, &valor_tope, sizeof(valor_tope));
 	ASSERT_EQUAL(valor_original, valor_tope,
 		     "peek() debe retornar el valor correcto");
 
-	stack_peek(&s, &valor_tope, sizeof(valor_tope));
+	stack_see_top(&s, &valor_tope, sizeof(valor_tope));
 	ASSERT_EQUAL(valor_original, valor_tope,
 		     "peek() no debe modificar la pila");
 

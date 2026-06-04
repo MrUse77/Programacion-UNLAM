@@ -1,13 +1,26 @@
 # depslib dependency file v1.0
-1780173490 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaCircular/main.c
-	<PilaCircular.h>
+1780602292 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaCircular/main.c
+	"Pila.h"
 	<string.h>
 	<string.h>
 	<stdlib.h>
 	"Comun.h"
 
-1778077294 /home/agustin/Documentos/unlam/Algoritmos/includes/PilaCircular.h
+1780600032 /home/agustin/Documentos/unlam/Algoritmos/includes/PilaCircular.h
 	<Comun.h>
 
-1777422382 /home/agustin/Documentos/unlam/Algoritmos/includes/Comun.h
+1780600032 /home/agustin/Documentos/unlam/Algoritmos/includes/Comun.h
+
+1780601915 /home/agustin/Documentos/unlam/Algoritmos/includes/Pila.h
+	"Comun.h"
+
+1780601947 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaCircular/Test/test_pila.c
+	<stdio.h>
+	<string.h>
+	<Pila.h>
+	"test_framework.h"
+
+1780600032 /home/agustin/Documentos/unlam/Algoritmos/includes/test_framework.h
+	<stdio.h>
+	<string.h>
 

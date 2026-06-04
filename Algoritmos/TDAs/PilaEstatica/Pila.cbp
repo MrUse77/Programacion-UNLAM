@@ -39,7 +39,7 @@
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-lPilaEstatica" />
-					<Add directory="../../libs" />
+					<Add directory="../../libs/Linux" />
 				</Linker>
 			</Target>
 			<Target title="Windows">
@@ -73,7 +73,7 @@
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-lPilaEstatica" />
-					<Add directory="../../libs" />
+					<Add directory="../../libs/Windows" />
 				</Linker>
 			</Target>
 		</Build>

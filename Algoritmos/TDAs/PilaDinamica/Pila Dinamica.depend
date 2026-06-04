@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1776544858 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaDinamica/Test/test_pila_dinamica.c
+1780600899 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaDinamica/Test/test_pila_dinamica.c
 	<stdio.h>
 	<string.h>
 	"Pila.h"
@@ -18,8 +18,12 @@
 	<stdlib.h>
 	"Comun.h"
 
-1777675159 /home/agustin/Documentos/unlam/Algoritmos/includes/Pila.h
+1780600032 /home/agustin/Documentos/unlam/Algoritmos/includes/Pila.h
 	<Comun.h>
 
-1777422382 /home/agustin/Documentos/unlam/Algoritmos/includes/Comun.h
+1780600032 /home/agustin/Documentos/unlam/Algoritmos/includes/Comun.h
+
+1780600032 /home/agustin/Documentos/unlam/Algoritmos/includes/test_framework.h
+	<stdio.h>
+	<string.h>
 

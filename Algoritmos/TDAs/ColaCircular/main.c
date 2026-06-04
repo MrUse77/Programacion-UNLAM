@@ -73,14 +73,15 @@ int queue_pull(queue_t *c, void *buff, unsigned tamDato)
 	if (*c == NULL) {
 		return ERR_COLA_VACIA;
 	}
-	memcpy(buff, (*c)->sig->dato, MIN(tamDato, (*c)->sig->tamDato));
 	queue_node_t *aux = (*c)->sig;
-	(*c)->sig = aux->sig;
-	free((*c)->sig->dato);
-	free((*c)->sig);
-	if (*c == NULL) {
+	memcpy(buff, aux->dato, MIN(tamDato, aux->tamDato));
+	if (aux == *c) {
 		*c = NULL;
+	} else {
+		(*c)->sig = aux->sig;
 	}
+	free(aux->dato);
+	free(aux);
 	return OK;
 }
 

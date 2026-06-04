@@ -112,6 +112,7 @@ TEST(eliminar_varios_elementos_en_cola)
 		ASSERT_EQUAL(resNum, aux,
 			     "aux debe ser igual al elemento puesto en cola");
 	}
+
 	TEST_PASSED("Desencolar elemento funciona correctamente");
 }
 

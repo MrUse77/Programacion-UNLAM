@@ -4,21 +4,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-void crearLista(t_Lista *l)
+void crearLista(double_list_t *l)
 {
 	*l = NULL;
 }
 
-int vaciarLista(t_Lista *l)
+int vaciarLista(double_list_t *l)
 {
-	t_Nodo *act = *l;
+	double_list_node_t *act = *l;
 	int cant = 0;
 	if (act) {
 		while (act->ant) {
 			act = act->ant;
 		}
 		while (*l) {
-			t_Nodo *aux = act->sig;
+			double_list_node_t *aux = act->sig;
 			free(aux->dato);
 			free(aux);
 			act = aux;
@@ -29,29 +29,31 @@ int vaciarLista(t_Lista *l)
 	return cant;
 }
 
-int listaVacia(const t_Lista *l)
+int listaVacia(const double_list_t *l)
 {
 	return *l == NULL;
 }
 
-int listaLlena(const t_Lista *l, unsigned tam)
+int listaLlena(const double_list_t *l, unsigned tam)
 {
-	t_Nodo *nue = (t_Nodo *)malloc(sizeof(t_Nodo));
+	double_list_node_t *nue =
+		(double_list_node_t *)malloc(sizeof(double_list_node_t));
 	void *aux = malloc(tam);
 	free(aux);
 	free(nue);
 	return aux == NULL || nue == NULL;
 }
 
-int insertarAlFinal(t_Lista *l, const void *d, unsigned tam)
+int insertarAlFinal(double_list_t *l, const void *d, unsigned tam)
 {
-	t_Nodo *act = *l, *nue;
+	double_list_node_t *act = *l, *nue;
 	if (act) {
 		while (act->sig) {
 			act = act->sig;
 		}
 	}
-	if ((nue = (t_Nodo *)malloc(sizeof(t_Nodo))) == NULL ||
+	if ((nue = (double_list_node_t *)malloc(sizeof(double_list_node_t))) ==
+		    NULL ||
 	    (nue->dato = malloc(tam)) == NULL) {
 		free(nue);
 		return 0;
@@ -71,15 +73,16 @@ int insertarAlFinal(t_Lista *l, const void *d, unsigned tam)
 	return OK;
 }
 
-int insertarAlComienzo(t_Lista *l, const void *d, unsigned tam)
+int insertarAlComienzo(double_list_t *l, const void *d, unsigned tam)
 {
-	t_Nodo *act = *l, *nue;
+	double_list_node_t *act = *l, *nue;
 	if (act) {
 		while (act->ant) {
 			act = act->ant;
 		}
 	}
-	if ((nue = (t_Nodo *)malloc(sizeof(t_Nodo))) == NULL ||
+	if ((nue = (double_list_node_t *)malloc(sizeof(double_list_node_t))) ==
+		    NULL ||
 	    (nue->dato = malloc(tam)) == NULL) {
 		free(nue);
 		return 0;
@@ -95,10 +98,10 @@ int insertarAlComienzo(t_Lista *l, const void *d, unsigned tam)
 	return OK;
 }
 
-int insertarOrdenadoEnLista(t_Lista *l, const void *d, const unsigned tam,
+int insertarOrdenadoEnLista(double_list_t *l, const void *d, const unsigned tam,
 			    t_Cmp cmp, t_Acum acumulador)
 {
-	t_Nodo *act = *l, *sig, *ant, *nue;
+	double_list_node_t *act = *l, *sig, *ant, *nue;
 	if (act == NULL) {
 		ant = NULL;
 		sig = NULL;
@@ -129,7 +132,8 @@ int insertarOrdenadoEnLista(t_Lista *l, const void *d, const unsigned tam,
 			sig = act;
 		}
 	}
-	if ((nue = (t_Nodo *)malloc(sizeof(t_Nodo))) == NULL ||
+	if ((nue = (double_list_node_t *)malloc(sizeof(double_list_node_t))) ==
+		    NULL ||
 	    (nue->dato = malloc(tam)) == NULL) {
 		free(nue);
 		return ERR_MEM_LLENA;
@@ -148,9 +152,9 @@ int insertarOrdenadoEnLista(t_Lista *l, const void *d, const unsigned tam,
 	return OK;
 }
 
-int mostrarDeDerAIzq(const t_Lista *l, t_Prnt print)
+int mostrarDeDerAIzq(const double_list_t *l, t_Prnt print)
 {
-	t_Nodo *act = *l;
+	double_list_node_t *act = *l;
 	int cant = 0;
 	if (act) {
 		print(NULL);
@@ -166,9 +170,9 @@ int mostrarDeDerAIzq(const t_Lista *l, t_Prnt print)
 	return cant;
 }
 
-int mostrarDeIzqADer(const t_Lista *l, t_Prnt print)
+int mostrarDeIzqADer(const double_list_t *l, t_Prnt print)
 {
-	t_Nodo *act = *l;
+	double_list_node_t *act = *l;
 	int cant = 0;
 	if (act) {
 		print(NULL);
@@ -184,9 +188,9 @@ int mostrarDeIzqADer(const t_Lista *l, t_Prnt print)
 	return cant;
 }
 
-void ordenarLista(t_Lista *l, const t_Cmp cmp)
+void ordenarLista(double_list_t *l, const t_Cmp cmp)
 {
-	t_Nodo *act = *l, *sup = NULL, *inf = NULL;
+	double_list_node_t *act = *l, *sup = NULL, *inf = NULL;
 	int marca = 1;
 	if (act == NULL) {
 		return;
@@ -225,9 +229,10 @@ void ordenarLista(t_Lista *l, const t_Cmp cmp)
 	}
 }
 
-int eliminarPorClave(t_Lista *l, void *buff, const unsigned int tam, t_Cmp cmp)
+int eliminarPorClave(double_list_t *l, void *buff, const unsigned int tam,
+		     t_Cmp cmp)
 {
-	t_Nodo *act = *l;
+	double_list_node_t *act = *l;
 	int aux;
 	if (act == NULL) {
 		return 0;
@@ -240,7 +245,7 @@ int eliminarPorClave(t_Lista *l, void *buff, const unsigned int tam, t_Cmp cmp)
 	}
 	aux = cmp(act->dato, buff);
 	if (aux == 0) {
-		t_Nodo *ant = act->ant, *sig = act->sig;
+		double_list_node_t *ant = act->ant, *sig = act->sig;
 		if (ant) {
 			ant->sig = sig;
 		}

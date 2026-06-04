@@ -1,6 +1,12 @@
-#include <ColaCircular.h>
+#include <Cola.h>
 #include <stdlib.h>
 #include <string.h>
+
+/**
+ * @def MIN
+ * @brief verifica cual es el menor entre 2 elementos
+ */
+#define MIN(a, b) (a > b ? b : a)
 
 void crearCola(t_Cola *c)
 {

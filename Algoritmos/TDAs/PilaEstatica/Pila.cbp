@@ -6,8 +6,8 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="Debug">
-				<Option output="../../libs/PilaEstatica/Linux/PilaEstatica" prefix_auto="1" extension_auto="1" />
+			<Target title="Linux">
+				<Option output="../../libs/Linux/PilaEstatica" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="obj/Debug/" />
 				<Option type="2" />
@@ -23,23 +23,8 @@
 					<Add directory="../../includes" />
 				</ResourceCompiler>
 			</Target>
-			<Target title="Release">
-				<Option output="bin/Release/Pila" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="" />
-				<Option object_output="obj/Release/" />
-				<Option type="2" />
-				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Compiler>
-					<Add option="-Wall" />
-					<Add option="-O2" />
-				</Compiler>
-				<Linker>
-					<Add option="-s" />
-				</Linker>
-			</Target>
-			<Target title="Test">
-				<Option output="bin/Test/TestPila" prefix_auto="1" extension_auto="1" />
+			<Target title="TestLinux">
+				<Option output="bin/Test/Linux/TestPila" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Test/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -58,12 +43,13 @@
 				</Linker>
 			</Target>
 			<Target title="Windows">
-				<Option output="../../libs/PilaEstatica/Windows/PilaEstatica" prefix_auto="1" extension_auto="1" />
+				<Option output="../../libs/Windows/PilaEstatica" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option type="2" />
 				<Option compiler="mingw-w64_windows_cross-compiler" />
 				<Option createDefFile="1" />
 				<Compiler>
+					<Add option="-nostdinc -I/usr/x86_64-w64-mingw32/include -I/usr/lib/gcc/x86_64-w64-mingw32/16.1.0/include" />
 					<Add option="-DPILA_ESTATICA=1" />
 					<Add directory="../../includes" />
 				</Compiler>
@@ -71,13 +57,38 @@
 					<Add directory="../../includes" />
 				</ResourceCompiler>
 			</Target>
+			<Target title="TestWindows">
+				<Option output="bin/Test/Windows/TestPila" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Test/" />
+				<Option type="1" />
+				<Option compiler="mingw-w64_windows_cross-compiler" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-DPILA_ESTATICA=1" />
+					<Add directory="../../includes" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../../includes" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-lPilaEstatica" />
+					<Add directory="../../libs" />
+				</Linker>
+			</Target>
 		</Build>
+		<VirtualTargets>
+			<Add alias="WyL" targets="Linux;Windows;" />
+		</VirtualTargets>
 		<Unit filename="Pila.c">
 			<Option compilerVar="CC" />
+			<Option target="Linux" />
+			<Option target="Windows" />
 		</Unit>
 		<Unit filename="Test/test_pila.c">
 			<Option compilerVar="CC" />
-			<Option target="Test" />
+			<Option target="TestLinux" />
+			<Option target="TestWindows" />
 		</Unit>
 		<Extensions />
 	</Project>

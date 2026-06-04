@@ -6,8 +6,8 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="Debug">
-				<Option output="bin/Debug/Arbol" prefix_auto="1" extension_auto="1" />
+			<Target title="Linux">
+				<Option output="../../libs/Linux/Arbol" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="obj/Debug/" />
 				<Option type="2" />
@@ -16,24 +16,36 @@
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
+					<Add directory="../../includes" />
 				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../../includes" />
+				</ResourceCompiler>
 			</Target>
-			<Target title="Release">
-				<Option output="bin/Release/Arbol" prefix_auto="1" extension_auto="1" />
+			<Target title="Windows">
+				<Option output="../../libs/Windows/Arbol" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="obj/Release/" />
 				<Option type="2" />
-				<Option compiler="gcc" />
+				<Option compiler="mingw-w64_windows_cross-compiler" />
 				<Option createDefFile="1" />
 				<Compiler>
-					<Add option="-Wall" />
 					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-nostdinc -I/usr/x86_64-w64-mingw32/include -I/usr/lib/gcc/x86_64-w64-mingw32/16.1.0/include" />
+					<Add directory="../../includes" />
 				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../../includes" />
+				</ResourceCompiler>
 				<Linker>
 					<Add option="-s" />
 				</Linker>
 			</Target>
 		</Build>
+		<VirtualTargets>
+			<Add alias="WyL" targets="Linux;Windows;" />
+		</VirtualTargets>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

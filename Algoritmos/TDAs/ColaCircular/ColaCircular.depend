@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1778079307 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/ColaCircular/main.c
+	<ColaCircular.h>
+	<stdlib.h>
+	<string.h>
+
+1778077543 /home/agustin/Documentos/unlam/Algoritmos/includes/ColaCircular.h
+	<Comun.h>
+
+1777422382 /home/agustin/Documentos/unlam/Algoritmos/includes/Comun.h
+

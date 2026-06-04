@@ -6,8 +6,8 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="Debug">
-				<Option output="../../libs/ColaEstatica/Linux/ColaEstatica" prefix_auto="1" extension_auto="1" />
+			<Target title="Linux">
+				<Option output="../../libs/Linux/ColaEstatica" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="obj/Debug/" />
 				<Option type="2" />
@@ -23,23 +23,26 @@
 					<Add directory="../../includes" />
 				</ResourceCompiler>
 			</Target>
-			<Target title="Release">
-				<Option output="bin/Release/Cola" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="" />
+			<Target title="TestWindows">
+				<Option output="bin/Test/Windows/TestColaEstatica" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Test/Linux" />
 				<Option object_output="obj/Release/" />
-				<Option type="2" />
-				<Option compiler="gcc" />
-				<Option createDefFile="1" />
+				<Option type="1" />
+				<Option compiler="mingw-w64_windows_cross-compiler" />
+				<Option use_console_runner="0" />
 				<Compiler>
-					<Add option="-Wall" />
 					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-nostdinc -I/usr/x86_64-w64-mingw32/include -I/usr/lib/gcc/x86_64-w64-mingw32/16.1.0/include" />
+					<Add option="-DCOLA_ESTATICA=1" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lColaEstatica" />
 				</Linker>
 			</Target>
 			<Target title="Test">
-				<Option output="Cola" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Test/Linux/TestColaEstatica" prefix_auto="1" extension_auto="1" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -55,12 +58,13 @@
 				</Linker>
 			</Target>
 			<Target title="Windows">
-				<Option output="../../libs/ColaEstatica/Windows/ColaEstatica" prefix_auto="1" extension_auto="1" />
+				<Option output="../../libs/Windows/ColaEstatica" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option type="2" />
 				<Option compiler="mingw-w64_windows_cross-compiler" />
 				<Option createDefFile="1" />
 				<Compiler>
+					<Add option="-nostdinc -I/usr/x86_64-w64-mingw32/include -I/usr/lib/gcc/x86_64-w64-mingw32/16.1.0/include" />
 					<Add option="-DCOLA_ESTATICA=1" />
 					<Add directory="../../includes" />
 				</Compiler>
@@ -69,15 +73,17 @@
 				</ResourceCompiler>
 			</Target>
 		</Build>
+		<VirtualTargets>
+			<Add alias="WyL" targets="Linux;Windows;" />
+		</VirtualTargets>
 		<Unit filename="Test/test_cola.c">
 			<Option compilerVar="CC" />
-			<Option target="Release" />
+			<Option target="TestWindows" />
 			<Option target="Test" />
 		</Unit>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="Linux" />
 			<Option target="Windows" />
 		</Unit>
 		<Extensions />

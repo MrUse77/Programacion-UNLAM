@@ -1,15 +1,14 @@
 #include <Cola.h>
 #include <stdlib.h>
 #include <string.h>
-#include <Comun.h>
 
-void crearCola(t_Cola *c)
+void crearCola(queue_t *c)
 {
 	c->prim = TAM_COLA - 20;
 	c->ult = TAM_COLA - 20;
 	c->tamDisp = TAM_COLA;
 }
-int ponerEnCola(t_Cola *c, const void *d, unsigned tamDato)
+int ponerEnCola(queue_t *c, const void *d, unsigned tamDato)
 {
 	if (colaLlena(c, tamDato)) {
 		return ERR_COLA_LLENA;
@@ -37,11 +36,11 @@ int ponerEnCola(t_Cola *c, const void *d, unsigned tamDato)
 	c->ult = fin ? fin : c->ult + ini;
 	return OK;
 }
-int colaLlena(t_Cola *c, unsigned tam)
+int colaLlena(queue_t *c, unsigned tam)
 {
 	return c->tamDisp > tam + sizeof(tam) ? FALSE : TRUE;
 }
-int verPrimero(t_Cola *c, void *buff, unsigned tamDato)
+int verPrimero(queue_t *c, void *buff, unsigned tamDato)
 {
 	if (colaVacia(c)) {
 		return ERR_COLA_VACIA;
@@ -68,7 +67,7 @@ int verPrimero(t_Cola *c, void *buff, unsigned tamDato)
 	return OK;
 }
 
-int sacarDeCola(t_Cola *c, void *buff, unsigned tamDato)
+int sacarDeCola(queue_t *c, void *buff, unsigned tamDato)
 {
 	if (colaVacia(c)) {
 		return ERR_COLA_VACIA;
@@ -96,11 +95,11 @@ int sacarDeCola(t_Cola *c, void *buff, unsigned tamDato)
 	c->prim = fin ? fin : c->prim + ini;
 	return OK;
 }
-int colaVacia(t_Cola *c)
+int colaVacia(queue_t *c)
 {
 	return c->tamDisp == TAM_COLA ? TRUE : FALSE;
 }
-void vaciarCola(t_Cola *c)
+void vaciarCola(queue_t *c)
 {
 	c->tamDisp = TAM_COLA;
 }

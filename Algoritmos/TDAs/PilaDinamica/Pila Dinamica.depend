@@ -11,8 +11,15 @@
 	<stdio.h>
 	<string.h>
 
-1776261525 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaDinamica/main.c
+1778071209 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaDinamica/main.c
 	"Pila.h"
 	<string.h>
+	<string.h>
 	<stdlib.h>
+	"Comun.h"
+
+1777675159 /home/agustin/Documentos/unlam/Algoritmos/includes/Pila.h
+	<Comun.h>
+
+1777422382 /home/agustin/Documentos/unlam/Algoritmos/includes/Comun.h
 

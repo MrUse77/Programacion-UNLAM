@@ -1,120 +1,127 @@
 #ifndef PILA_H_INCLUDED
 #define PILA_H_INCLUDED
 
-#include <Comun.h>
-/**
- * @def ERR_PIL_VACIA
- * @brief Error: pila vacía.
- */
-#define ERR_PIL_VACIA 301
+#include "Comun.h"
 
-/**
- * @def ERR_PIL_LLENA
- * @brief Error: pila llena.
- */
-#define ERR_PIL_LLENA 302
+/* Definiciones de errores (unificadas para las 3 implementaciones) */
+#define ERR_PILA_VACIA 301 /* Pila sin elementos */
+#define ERR_PILA_LLENA 302 /* Pila sin lugar para el elemento (estática) */
+#define ERR_MEM_LLENA 310  /* Memoria llena (dinámica/circular) */
 
-// Definicion de si usa la estructura de la pila estatica o de la pila dinamica
+/* =============================================================================
+   Definición de estructuras según la implementación seleccionada
+   =============================================================================
+   */
+
+// #define PILA_ESTATICA
+// #define PILA_DINAMICA
+#define PILA_CIRCULAR
+
 #ifdef PILA_ESTATICA
-
-/* Version Estatica */
+/* --- Versión Estática --- */
 
 /**
  * @def TAM_PILA
- * @brief Define el tamaño de la pila estatica
+ * @brief Define el tamaño máximo de la pila estática (por defecto: 200000)
  */
-#define TAM_PILA 200000 // TAM para pila estatica
+#ifndef TAM_PILA
+#define TAM_PILA 200000
+#endif
 
-/**
- * @struct t_Pila
- * @brief Representa a una pila, solo se puede sacar, ver o poner en la cima
- */
 typedef struct {
   char Vector[TAM_PILA];
   unsigned tope;
-} t_Pila;
+} stack_t;
 
-#else
+#elif defined(PILA_DINAMICA)
+/* --- Versión Dinámica (Linked List con nodos en memoria heap) --- */
 
-/* Version Dinamica */
-
-/**
- * @struct s_Nodo
- * @brief Representa una pila, solo se puede sacar, ver o poner en la cima.
- */
-typedef struct s_Nodo { // sNodo defino la estructura
+typedef struct stack_node {
   void *dato;
   unsigned tamDato;
-  struct s_Nodo *sig;
-} t_Nodo; // inicializo el tipo de dato
+  struct stack_node *sig;
+} stack_node_t;
 
-/**
- * @brief Puntuero a puntero para poder formar la Pila.
- */
-typedef t_Nodo *t_Pila;
+/* Pila dinámica: puntero a primer nodo (lista simple con head) */
+typedef stack_node_t *stack_t;
 
+#elif defined(PILA_CIRCULAR)
+/* --- Versión Circular (Linked List circular con nodos en memoria heap) --- */
+
+typedef struct stack_node {
+  void *dato;
+  unsigned tamDato;
+  struct stack_node *sig;
+} stack_node_t;
+
+typedef stack_node_t *stack_t;
+
+#else
+/* --- Implementación por defecto: Dinámica --- */
+/* Se define implícitamente PILA_DINAMICA si no se especifica otra opción */
+#define PILA_DINAMICA
 #endif
 
-/**
- * @brief Crea una pila de tamaño fijo o dinamica dependiendo de la version que
- * se use
- * @param p puntero a pila
+/* =============================================================================
+   Declaraciones de funciones (7 firmas unificadas)
+   =============================================================================
  */
-void crearPila(t_Pila *p);
 
 /**
- * @brief Revisa si la pila esta llena para el elemento que se quiera insertar
- * @brief Es compatible con memoria dinamica pero se recomienda su uso sobre la
- * estatica
- * @param p Puntero a pila
- * @param tam Tamaño del elemento
- * @returns int Si hay espacio, devuelve FALSE, si no hay, devuelve TRUE
+ * @brief Crea una pila según la implementación seleccionada
+ * (estática/dinámica/circular)
+ * @param p Puntero a la estructura de pila
  */
-int pilaLlena(const t_Pila *p, unsigned tam);
+void stack_init(stack_t *p);
 
 /**
- * @brief Revisa si la pila esta esta vacia
- * @param p Puntero a pila
- * @returns int Si esta vacia, devuelve TRUE, si no, devuelve FALSE
+ * @brief Añade un elemento al tope de la pila (push)
+ * @param p Pila donde agregar el elemento
+ * @param d Dato a insertar (puntero a datos)
+ * @param tamDato Tamaño del dato
+ * @return OK si se realizó con éxito, o error correspondiente:
+ *         - ERR_PILA_LLENA (estática): pila llena
+ *         - ERR_MEM_LLENA (dinámica/circular): no hay memoria disponible
  */
-int pilaVacia(const t_Pila *p);
+int stack_push(stack_t *p, const void *d, unsigned tamDato);
 
 /**
- * @brief Vacia la pila entera
- * @param p Puntero a pila
+ * @brief Comproba si la pila está llena (útil para implementación estática)
+ * @param p Pila a verificar
+ * @param tam Tamaño del elemento que se intentaría insertar
+ * @return TRUE si está llena, FALSE si hay espacio
  */
-void vaciarPila(t_Pila *p);
+int stack_is_full(stack_t *p, unsigned tam);
 
 /**
- * @brief Coloca un elemento en el tope de la pila
- * @param p Puntero a pila
- * @param d Puntero a elemento
- * @param tam Tamaño del elemento
- * @returns int Si salio bien reotrna OK, si la pila esta llena devuelve
- * ERR_PIL_LLENA
+ * @brief Obtiene el dato del tope SIN eliminarlo (peek)
+ * @param p Pila de donde obtener el dato
+ * @param buff Puntero al buffer donde copiar el elemento
+ * @param tamDato Tamaño del buffer
+ * @return OK si se realizó con éxito, ERR_PILA_VACIA si la pila está vacía
  */
-int apilar(t_Pila *p, const void *d, unsigned tam);
+int stack_see_top(stack_t *p, void *buff, unsigned tamDato);
 
 /**
- * @brief Se obtiene el elemento del tope de la pila y se descarta
- * Puede ocurrir que se obtenga un tamaño menor a tamDato;
- * si el tamaño del dato es mayor que tamDato, el sobrante del dato se pierde
- * @param p puntero a pila
- * @param buffer puntero a buffer para obtener el elemento
- * @param tam tamaño del buffer
- * @returns int Si salio bien reotrna OK, si la pila esta vacia devuelve
- * ERR_PIL_VACIA
+ * @brief Obtiene y elimina el dato del tope (pop)
+ * @param p Pila de donde obtener y eliminar el dato
+ * @param buff Puntero al buffer donde copiar el elemento eliminado
+ * @param tamDato Tamaño del buffer
+ * @return OK si se realizó con éxito, ERR_PILA_VACIA si la pila está vacía
  */
-int desapilar(t_Pila *p, void *buffer, unsigned tam);
+int stack_pull(stack_t *p, void *buff, unsigned tamDato);
 
 /**
- * @brief Se obtiene el dato del tope de la pila sin eliminarlo
- * @param p puntero a pila
- * @param buffer puntero a buffer para obtener el elemento
- * @param tam tamaño del buffer
- * @returns int Si salio bien reotrna OK, si la pila esta vacia devuelve
- * ERR_PIL_VACIA
+ * @brief Comproba si la pila está vacía
+ * @param p Pila a verificar
+ * @return FALSE si tiene elementos, TRUE si está vacía
  */
-int verTope(const t_Pila *p, void *buffer, unsigned tam);
+int stack_is_empty(stack_t *p);
+
+/**
+ * @brief Elimina todos los elementos de la pila (clear)
+ * @param p Pila a vaciar
+ */
+void stack_clear(stack_t *p);
 
 #endif // PILA_H_INCLUDED

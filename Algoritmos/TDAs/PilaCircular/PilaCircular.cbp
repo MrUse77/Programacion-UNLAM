@@ -48,6 +48,9 @@
 		<ResourceCompiler>
 			<Add directory="../../includes" />
 		</ResourceCompiler>
+		<Unit filename="Test/test_pila.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

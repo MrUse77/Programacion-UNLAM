@@ -27,16 +27,15 @@
 				<Option object_output="obj/Test" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option use_console_runner="0" />
 				<Compiler>
-					<Add directory="../includes" />
+					<Add directory="../../includes" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="../includes" />
+					<Add directory="../../includes" />
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-lPilaDinamica" />
-					<Add directory="../libs" />
+					<Add directory="../../libs/Linux" />
 				</Linker>
 			</Target>
 			<Target title="Windows">

@@ -30,7 +30,7 @@
 1775940606 /home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaEstatica/Pila.h
 	<stdlib.h>
 
-1775946281 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaEstatica/Test/test_pila.c
+1780600835 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/PilaEstatica/Test/test_pila.c
 	<stdio.h>
 	<string.h>
 	"Pila.h"
@@ -42,12 +42,12 @@
 	<stdio.h>
 	<string.h>
 
-1777673228 /home/agustin/Documentos/unlam/Algoritmos/includes/Pila.h
-	"Comun.h"
+1780600032 /home/agustin/Documentos/unlam/Algoritmos/includes/Pila.h
+	<Comun.h>
 
-1775946281 /home/agustin/Documentos/unlam/Algoritmos/includes/test_framework.h
+1780600032 /home/agustin/Documentos/unlam/Algoritmos/includes/test_framework.h
 	<stdio.h>
 	<string.h>
 
-1777422382 /home/agustin/Documentos/unlam/Algoritmos/includes/Comun.h
+1780600032 /home/agustin/Documentos/unlam/Algoritmos/includes/Comun.h
 

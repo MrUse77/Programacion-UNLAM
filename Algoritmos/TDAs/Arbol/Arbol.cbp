@@ -46,6 +46,9 @@
 		<VirtualTargets>
 			<Add alias="WyL" targets="Linux;Windows;" />
 		</VirtualTargets>
+		<Unit filename="Test/test_arbol.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

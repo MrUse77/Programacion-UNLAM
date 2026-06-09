@@ -1,6 +1,7 @@
 #include <binary_tree.h>
 #include <string.h>
 #include <stdio.h>
+#include <types.h>
 
 /**
  * @def MIN
@@ -8,39 +9,109 @@
  */
 #define MIN(a, b) (a > b ? b : a)
 
+static tree_node_t **tree_node_max(tree_t *t)
+{
+	if (!*t) {
+		return NULL;
+	}
+	while ((*t)->der) {
+		*t = (*t)->der;
+	}
+	return t;
+}
+
+static tree_node_t **tree_node_min(tree_t *t)
+{
+	if (!*t) {
+		return NULL;
+	}
+	while ((*t)->izq) {
+		*t = (*t)->izq;
+	}
+	return t;
+}
+
+static unsigned read_bin_file(void **d, void *f, unsigned pos, void *params)
+{
+	unsigned tam = *(int *)params;
+	*d = malloc(tam);
+	if (!*d) {
+		return TREE_ERR_MEM_FULL;
+	}
+	fseek((FILE *)f, pos * tam, SEEK_SET);
+	return fread(*d, tam, 1, (FILE *)f);
+}
+
+static int tree_load_order(tree_t *t, void *d, read_t read, int li, int ls,
+			   void *params)
+{
+	int med = (li + ls) / 2, code;
+	if (li > ls) {
+		return EXIT_SUCCESS;
+	}
+	*t = (tree_node_t *)malloc(sizeof(tree_node_t));
+	if (!(*t) || !((*t)->tam = read(&(*t)->dato, d, med, params))) {
+		free(*t);
+		return TREE_ERR_MEM_FULL;
+	}
+	(*t)->izq = (*t)->der = NULL;
+	if ((code = tree_load_order(&(*t)->izq, d, read, li, med - 1, params) !=
+		    EXIT_SUCCESS)) {
+		return code;
+	}
+	return tree_load_order(&(*t)->der, d, read, med + 1, ls, params);
+}
+
 void tree_init(tree_t *a)
 {
 	*a = NULL;
 }
 
-void tree_walk_in_order(tree_t *a, t_Prnt mostrar)
+int tree_load_to_bin_file_sorted(tree_t *t, const char *path, unsigned tamInfo)
+{
+	if (*t) {
+		return TREE_ERR_INVAL;
+	}
+	FILE *f = fopen(path, "rb");
+	int cant = 0, code = EXIT_SUCCESS;
+	if (!f) {
+		return TREE_ERR_INVAL;
+	}
+	fseek(f, 0, SEEK_END);
+	cant = ftell(f) / tamInfo;
+	code = tree_load_order(t, f, read_bin_file, 0, cant - 1, &tamInfo);
+	fclose(f);
+	return code;
+}
+
+void tree_walk_in_order(tree_t *a, t_Accion accion, void *param)
 {
 	if (*a == NULL || a == NULL) {
 		return;
 	}
-	tree_walk_in_order(&(*a)->izq, mostrar);
-	mostrar((*a)->dato);
-	tree_walk_in_order(&(*a)->der, mostrar);
+	tree_walk_in_order(&(*a)->izq, accion, param);
+	accion(param, (*a)->dato);
+	tree_walk_in_order(&(*a)->der, accion, param);
 }
 
-void tree_walk_pre_order(tree_t *a, t_Prnt mostrar)
+void tree_walk_pre_order(tree_t *a, t_Accion accion, void *param)
 {
 	if (*a == NULL) {
 		return;
 	}
-	mostrar((*a)->dato);
-	tree_walk_pre_order(&(*a)->izq, mostrar);
-	tree_walk_pre_order(&(*a)->der, mostrar);
+	accion(param, (*a)->dato);
+	tree_walk_pre_order(&(*a)->izq, accion, param);
+	tree_walk_pre_order(&(*a)->der, accion, param);
 }
 
-void tree_walk_post_order(tree_t *a, t_Prnt mostrar)
+void tree_walk_post_order(tree_t *a, t_Accion accion, void *param)
 {
 	if (*a == NULL) {
 		return;
 	}
-	tree_walk_post_order(&(*a)->izq, mostrar);
-	tree_walk_post_order(&(*a)->der, mostrar);
-	mostrar((*a)->dato);
+	tree_walk_post_order(&(*a)->izq, accion, param);
+	tree_walk_post_order(&(*a)->der, accion, param);
+	accion(param, (*a)->dato);
 }
 
 int tree_insert(tree_t *a, const void *d, const size_t tam, const t_Cmp cmp)
@@ -52,7 +123,7 @@ int tree_insert(tree_t *a, const void *d, const size_t tam, const t_Cmp cmp)
 		} else if (comp > 0) {
 			return tree_insert(&((*a)->izq), d, tam, cmp);
 		} else if (comp == 0) {
-			return MISMO_VALOR;
+			return TREE_EQUAL_VALUE;
 		}
 	}
 	tree_node_t *aux = (tree_node_t *)malloc(sizeof(tree_node_t));
@@ -69,33 +140,38 @@ int tree_insert(tree_t *a, const void *d, const size_t tam, const t_Cmp cmp)
 	aux->der = NULL;
 	aux->tam = tam;
 	*a = aux;
-	return OK;
+	return TREE_SUCCESS;
 }
 
 int tree_insert_iter(tree_t *a, const void *d, const size_t tam,
 		     const t_Cmp cmp)
 {
-	while (*a) {
-		int comp = cmp((*a)->dato, d);
+	tree_node_t **current = a;
+	while (*current) {
+		int comp = cmp((*current)->dato, d);
 		if (comp < 0) {
-			*a = (*a)->der;
+			current = &(*current)->der;
 		} else if (comp > 0) {
-			*a = (*a)->izq;
+			current = &(*current)->izq;
 		} else {
-			return MISMO_VALOR;
+			return TREE_EQUAL_VALUE;
 		}
 	}
-	*a = (tree_node_t *)malloc(sizeof(tree_node_t));
-	(*a)->dato = malloc(tam);
-	if (!*a || !(*a)->dato) {
-		free((*a));
+	*current = (tree_node_t *)malloc(sizeof(tree_node_t));
+	if (!*current) {
 		return -1;
 	}
-	memcpy((*a)->dato, d, tam);
-	(*a)->izq = NULL;
-	(*a)->der = NULL;
-	(*a)->tam = tam;
-	return OK;
+	(*current)->dato = malloc(tam);
+	if (!(*current)->dato) {
+		free(*current);
+		*current = NULL;
+		return -2;
+	}
+	memcpy((*current)->dato, d, tam);
+	(*current)->izq = NULL;
+	(*current)->der = NULL;
+	(*current)->tam = tam;
+	return TREE_SUCCESS;
 }
 
 int tree_node_count(const tree_t *a)
@@ -136,11 +212,11 @@ int tree_node_wr_count(const tree_t *a)
 {
 	if (*a != NULL) {
 		if ((*a)->der != NULL) {
-			return 1 + tree_node_wl_count(&(*a)->der) +
-			       tree_node_wl_count(&(*a)->izq);
+			return 1 + tree_node_wr_count(&(*a)->der) +
+			       tree_node_wr_count(&(*a)->izq);
 		}
-		return tree_node_wl_count(&(*a)->der) +
-		       tree_node_wl_count(&(*a)->izq);
+		return tree_node_wr_count(&(*a)->der) +
+		       tree_node_wr_count(&(*a)->izq);
 	}
 	return 0;
 }
@@ -149,11 +225,11 @@ int tree_node_w_cond_count(const tree_t *a, t_Cmp cmp, void *d)
 {
 	if (*a != NULL) {
 		if (cmp((*a)->dato, d) == 0) {
-			return 1 + tree_node_wl_count(&(*a)->der) +
-			       tree_node_wl_count(&(*a)->izq);
+			return 1 + tree_node_w_cond_count(&(*a)->der, cmp, d) +
+			       tree_node_w_cond_count(&(*a)->izq, cmp, d);
 		}
-		return tree_node_wl_count(&(*a)->der) +
-		       tree_node_wl_count(&(*a)->izq);
+		return tree_node_w_cond_count(&(*a)->der, cmp, d) +
+		       tree_node_w_cond_count(&(*a)->izq, cmp, d);
 	}
 	return 0;
 }
@@ -182,8 +258,12 @@ int tree_node_count_in_level(const tree_t *a, int height)
 int tree_node_count_below_level(const tree_t *a, int height)
 {
 	if (*a != NULL) {
-		if (height > 0) {
-			return 1;
+		if (height < 0) {
+			return 1 +
+			       tree_node_count_below_level(&(*a)->der,
+							   height - 1) +
+			       tree_node_count_below_level(&(*a)->izq,
+							   height - 1);
 		}
 		return tree_node_count_below_level(&(*a)->der, height - 1) +
 		       tree_node_count_below_level(&(*a)->izq, height - 1);
@@ -194,11 +274,14 @@ int tree_node_count_below_level(const tree_t *a, int height)
 int tree_node_count_beyond_level(const tree_t *a, int height)
 {
 	if (*a != NULL) {
-		if (height < 0) {
-			return 1;
+		if (height >= 0) {
+			return 1 +
+			       tree_node_count_beyond_level(&(*a)->der,
+							    height - 1) +
+			       tree_node_count_beyond_level(&(*a)->izq,
+							    height - 1);
 		}
-		return tree_node_count_beyond_level(&(*a)->der, height - 1) +
-		       tree_node_count_beyond_level(&(*a)->izq, height - 1);
+		return 0;
 	}
 	return 0;
 }
@@ -207,7 +290,11 @@ int tree_node_count_from_level_inclusive(const tree_t *a, int height)
 {
 	if (*a != NULL) {
 		if (height <= 0) {
-			return 1;
+			return 1 +
+			       tree_node_count_from_level_inclusive(
+				       &(*a)->der, height - 1) +
+			       tree_node_count_from_level_inclusive(&(*a)->izq,
+								    height - 1);
 		}
 		return tree_node_count_from_level_inclusive(&(*a)->der,
 							    height - 1) +
@@ -219,4 +306,64 @@ int tree_node_count_from_level_inclusive(const tree_t *a, int height)
 
 int tree_cut_leaves(tree_t *t)
 {
+	if (*t == NULL) {
+		return 0;
+	}
+	if ((*t)->izq == NULL && (*t)->der == NULL) {
+		free((*t)->dato);
+		free(*t);
+		*t = NULL;
+		return 1;
+	}
+	return tree_cut_leaves(&(*t)->izq) + tree_cut_leaves(&(*t)->der);
+}
+
+int tree_destroy(tree_t *tree)
+{
+	if (!tree || !*tree) {
+		return 0;
+	}
+
+	tree_destroy(&(*tree)->izq);
+	tree_destroy(&(*tree)->der);
+	free((*tree)->dato);
+	free((*tree));
+	return TREE_SUCCESS;
+}
+
+int tree_delete_node(tree_t *t, void *buff, const unsigned tam, t_Cmp cmp)
+{
+	if (*t == NULL) {
+		return -1;
+	}
+	int comp = cmp((*t)->dato, buff);
+	if (comp < 0) {
+		return tree_delete_node(&(*t)->der, buff, tam, cmp);
+	} else if (comp > 0) {
+		return tree_delete_node(&(*t)->izq, buff, tam, cmp);
+	}
+	tree_node_t *aux = *t;
+	if ((*t)->izq == NULL) {
+		*t = (*t)->der; // Si es hoja, pasa NULL. Si tiene hijo der, hace el puente.
+		free(aux->dato);
+		free(aux);
+	} else if ((*t)->der == NULL) {
+		*t = (*t)->izq; // Tiene solo hijo izq, hace el puente.
+		free(aux->dato);
+		free(aux);
+	} else {
+		tree_node_t **remp = tree_height(&aux->izq) >
+						     tree_height(&aux->der) ?
+					     tree_node_max(&aux->izq) :
+					     tree_node_min(&aux->der),
+			    *elim;
+		elim = *remp;
+
+		free(aux->dato);
+		(*t)->dato = elim->dato; //Cambia puntero del dato
+		(*t)->tam = elim->tam; //Cambia valor entero
+		*remp = elim->izq ? elim->izq : elim->der;
+		free(elim);
+	}
+	return TREE_SUCCESS;
 }

@@ -11,6 +11,7 @@
 
 /* Definiciones de estado para retornos de funciones */
 typedef enum {
+  TREE_EQUAL_VALUE = 1,
   TREE_SUCCESS = 0,
   TREE_ERR_EMPTY = -1,    /* ARBOL_VACIO (árbol vacío) */
   TREE_ERR_EXISTS = -2,   /* MISMO_VALOR (valor ya existe) */
@@ -54,25 +55,28 @@ void tree_init(tree_t *a);
 /**
  * @brief Recorre el arbol en orden (in-order): izquierda, raiz, derecha.
  * @param a Puntero al arbol.
- * @param mostrar Funcion de impresion para cada nodo.
+ * @param accion Funcion a ejecutar por cada nodo (recibe contexto + dato).
+ * @param param Puntero opaco que se pasa como contexto a la funcion.
  */
-void tree_walk_in_order(tree_t *a, t_Prnt mostrar);
+void tree_walk_in_order(tree_t *a, t_Accion accion, void *param);
 
 /**
  * @brief Recorre el arbol en orden post-orden (post-order): izquierda, derecha,
  * raiz.
  * @param a Puntero al arbol.
- * @param mostrar Funcion de impresion para cada nodo.
+ * @param accion Funcion a ejecutar por cada nodo (recibe contexto + dato).
+ * @param param Puntero opaco que se pasa como contexto a la funcion.
  */
-void tree_walk_post_order(tree_t *a, t_Prnt mostrar);
+void tree_walk_post_order(tree_t *a, t_Accion accion, void *param);
 
 /**
  * @brief Recorre el arbol en orden pre-orden (pre-order): raiz, izquierda,
  * derecha.
  * @param a Puntero al arbol.
- * @param mostrar Funcion de impresion para cada nodo.
+ * @param accion Funcion a ejecutar por cada nodo (recibe contexto + dato).
+ * @param param Puntero opaco que se pasa como contexto a la funcion.
  */
-void tree_walk_pre_order(tree_t *a, t_Prnt mostrar);
+void tree_walk_pre_order(tree_t *a, t_Accion accion, void *param);
 
 /**
  * @brief Inserta un elemento en el arbol de forma recursiva con control de
@@ -86,6 +90,8 @@ void tree_walk_pre_order(tree_t *a, t_Prnt mostrar);
  */
 int tree_insert(tree_t *a, const void *d, const size_t tam, const t_Cmp cmp);
 
+int tree_load_to_bin_file_sorted(tree_t *t, const char *path, unsigned tamInfo);
+
 /**
  * @brief Inserta un elemento en el arbol de forma iterativa con control de
  * duplicados.
@@ -93,8 +99,8 @@ int tree_insert(tree_t *a, const void *d, const size_t tam, const t_Cmp cmp);
  * @param d Puntero al dato a insertar.
  * @param tam Tamano del dato.
  * @param cmp Funcion de comparacion.
- * @return int OK (`200`) si se inserto exitosamente, MISMO_VALOR si el valor ya
- * existe, ERR o ERR_MEM_LLENA si no hay memoria.
+ * @return int OK (`200`) si se inserto exitosamente, MISMO_VALOR si el
+ * valor ya existe, ERR o ERR_MEM_LLENA si no hay memoria.
  */
 int tree_insert_iter(tree_t *a, const void *d, const size_t tam,
                      const t_Cmp cmp);
@@ -208,5 +214,15 @@ int tree_destroy(tree_t *t);
  * @return int TRUE (`1`) si esta vacio, FALSE (`0`) en caso contrario.
  */
 int tree_is_empty(tree_t *t);
+
+/**
+ * @brief Elimina un nodo del arbol que contenga el valor buscado.
+ * @param t Puntero al arbol.
+ * @param buff Valor a eliminar.
+ * @param tam Tamano del valor.
+ * @param cmp Funcion de comparacion.
+ * @return int TREE_SUCCESS si se elimino, TREE_ERR_EMPTY si no se encontro.
+ */
+int tree_delete_node(tree_t *t, void *buff, const unsigned tam, t_Cmp cmp);
 
 #endif // ARBOL_H

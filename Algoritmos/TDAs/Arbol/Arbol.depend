@@ -22,18 +22,38 @@
 
 1777457463 /home/agustin/Documentos/unlam/Programacion-UNLAM/Algoritmos/includes/Comun.h
 
-1780354715 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/Arbol/Test/test_arbol.c
+1781028953 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/Arbol/Test/test_arbol.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
-	"Arbol.h"
+	"binary_tree.h"
 	"test_framework.h"
 	<time.h>
 
 1780354769 /home/agustin/Documentos/unlam/Algoritmos/includes/Arbol.h
 	<stdlib.h>
 
-1775946281 /home/agustin/Documentos/unlam/Algoritmos/includes/test_framework.h
+1780600032 /home/agustin/Documentos/unlam/Algoritmos/includes/test_framework.h
 	<stdio.h>
 	<string.h>
+
+1781029723 /home/agustin/Documentos/unlam/Algoritmos/includes/binary_tree.h
+	"types.h"
+	<stdlib.h>
+
+1781023583 /home/agustin/Documentos/unlam/Algoritmos/includes/types.h
+
+1781014373 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/Arbol/main.c
+	<binary_tree.h>
+	<string.h>
+	<stdio.h>
+	<types.h>
+
+1781031231 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/Arbol/Test/test_arbol_indice_dni.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	"binary_tree.h"
+	"test_framework.h"
 

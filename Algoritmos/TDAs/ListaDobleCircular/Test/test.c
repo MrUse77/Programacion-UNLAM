@@ -1,4 +1,4 @@
-#include <simple_list.h>
+#include <double_list.h>
 #include "test_framework.h"
 /* Helpers */
 int Comp(const void *a, const void *b)
@@ -8,6 +8,22 @@ int Comp(const void *a, const void *b)
 void sumarAExistente(void *param, const void *dato)
 {
 	*(int *)param += *(int *)dato;
+}
+
+/* Llamada para tests LIFO */
+void verificarSecuenciaEnterosLIFO(list_t *l, int *vec, int cant)
+{
+	int i;
+	int aux;
+	int res;
+
+	for (i = 0; i < cant; i++) {
+		res = list_pull_last(l, &aux, sizeof(int));
+		printf("%d \n", aux);
+		ASSERT_EQUAL(OK, res, "list_pull_last debe retornar OK");
+		ASSERT_EQUAL(vec[i], aux,
+			     "La secuencia de la lista es incorrecta");
+	}
 }
 void cargarEnterosEnLista(list_t *l, int *vec, int cant)
 {
@@ -31,9 +47,9 @@ void verificarSecuenciaEnteros(list_t *l, int *vec, int cant)
 	int res;
 
 	for (i = 0; i < cant; i++) {
-		res = list_pull_last(l, &aux, sizeof(int));
+		res = list_pull_first(l, &aux, sizeof(int));
 		printf("%d \n", aux);
-		ASSERT_EQUAL(OK, res, "list_pull_last debe retornar OK");
+		ASSERT_EQUAL(OK, res, "list_pull_first debe retornar OK");
 		ASSERT_EQUAL(vec[i], aux,
 			     "La secuencia de la lista es incorrecta");
 	}
@@ -66,12 +82,12 @@ TEST(insertar_al_principio)
 		     "list_push_first debe retornar OK");
 	ASSERT_EQUAL(OK, list_push_first(&l, &b, sizeof(int)),
 		     "list_push_first debe retornar OK");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(2, x,
 		     "El ultimo insertado al principio debe salir primero");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(1, x, "El anterior debe salir segundo");
 	TEST_PASSED("list_push_first funciona");
 }
@@ -86,11 +102,11 @@ TEST(insertar_al_final)
 		     "list_push_last debe retornar OK");
 	ASSERT_EQUAL(OK, list_push_last(&l, &b, sizeof(int)),
 		     "list_push_last debe retornar OK");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(1, x, "Debe respetar FIFO");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(2, x, "Debe respetar FIFO");
 	TEST_PASSED("list_push_last funciona");
 }
@@ -101,17 +117,17 @@ TEST(sacar_primero_de_lista)
 	int x;
 	list_create(&l);
 	cargarEnterosEnLista(&l, v, 3);
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(10, x, "Debe salir el primer elemento");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(20, x, "Debe salir el segundo elemento");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(30, x, "Debe salir el tercer elemento");
 	ASSERT_TRUE(list_is_empty(&l), "La lista debe quedar vacia");
-	TEST_PASSED("list_pull_last funciona");
+	TEST_PASSED("list_pull_first funciona");
 }
 TEST(sacar_ultimo_de_lista)
 {
@@ -142,8 +158,8 @@ TEST(ver_primero_sin_quitar)
 	ASSERT_EQUAL(OK, list_see_first(&l, &x, sizeof(int)),
 		     "list_see_first debe retornar OK");
 	ASSERT_EQUAL(10, x, "Debe ver el primer elemento");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &y, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &y, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(10, y, "El primero sigue siendo 10");
 	TEST_PASSED("list_see_first funciona sin quitar");
 }
@@ -179,7 +195,7 @@ TEST(ver_elemento_en_posicion)
 	list_create(&l);
 	cargarEnterosEnLista(&l, v, 3);
 
-	ASSERT_EQUAL(OK, list_get_at_position(&l, &x, sizeof(int), 1),
+	ASSERT_EQUAL(OK, list_see_in_pos(&l, &x, sizeof(int), 1),
 		     "list_show_in_position debe retornar OK");
 	ASSERT_EQUAL(20, x, "La posicion 1 debe ser 20");
 	TEST_PASSED("list_show_in_position funciona");
@@ -200,7 +216,7 @@ TEST(buscar_en_lista)
 	ASSERT_EQUAL(20, clave, "Debe devolver el elemento buscado");
 
 	clave = 99;
-	ASSERT_EQUAL(ERR_LISTA_NO_ENCONTRADO,
+	ASSERT_EQUAL(LIST_ERR_NOT_FOUND,
 		     list_search(&l, &clave, sizeof(int), Comp),
 		     "Debe informar no encontrado");
 	TEST_PASSED("list_search funciona");
@@ -224,7 +240,7 @@ TEST(copiar_lista)
 	ASSERT_TRUE(list_is_empty(&copia),
 		    "La copia debe quedar vacia al consumirla");
 
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
 		     "La lista original debe seguir intacta");
 	ASSERT_EQUAL(10, x, "La copia no debe afectar a la original");
 	TEST_PASSED("list_copy funciona");
@@ -248,7 +264,7 @@ TEST(clonar_lista)
 	verificarSecuenciaEnteros(&clon, esperado, 3);
 	ASSERT_TRUE(list_is_empty(&clon), "El clon debe quedar vacio al consumirlo");
 
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
 		     "La lista original debe seguir intacta");
 	ASSERT_EQUAL(10, x, "El clon no debe afectar a la original");
 	TEST_PASSED("clonarLista funciona");
@@ -264,19 +280,19 @@ TEST(insertar_en_posicion)
 	list_create(&l);
 	cargarEnterosEnLista(&l, v, 2);
 
-	ASSERT_EQUAL(OK, list_push_at_position(&l, &nuevo, sizeof(int), 1),
-		     "list_push_at_position debe retornar OK");
+	ASSERT_EQUAL(OK, list_push_in_pos(&l, &nuevo, sizeof(int), 1),
+		     "list_push_in_pos debe retornar OK");
 
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(1, x, "Debe quedar primero el 1");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(2, x, "Debe insertarse en la posicion pedida");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(3, x, "Debe quedar ultimo el 3");
-	TEST_PASSED("list_push_at_position funciona");
+	TEST_PASSED("list_push_in_pos funciona");
 }
 
 TEST(eliminar_por_posicion)
@@ -288,17 +304,17 @@ TEST(eliminar_por_posicion)
 	list_create(&l);
 	cargarEnterosEnLista(&l, v, 3);
 
-	ASSERT_EQUAL(OK, list_delete_at_position(&l, &x, sizeof(int), 1),
-		     "list_delete_at_position debe retornar OK");
+	ASSERT_EQUAL(OK, list_delete_pos(&l, &x, sizeof(int), 1),
+		     "list_delete_pos debe retornar OK");
 	ASSERT_EQUAL(2, x, "Debe eliminar la posicion solicitada");
 
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(1, x, "La lista quedo mal");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(3, x, "La lista quedo mal");
-	TEST_PASSED("list_delete_at_position funciona");
+	TEST_PASSED("list_delete_pos funciona");
 }
 
 TEST(invertir_lista)
@@ -364,7 +380,7 @@ TEST(vaciar_lista)
 	ASSERT_TRUE(list_is_empty(&l) == TRUE, "La lista debe quedar vacia");
 	ASSERT_EQUAL(OK, list_push_last(&l, &v[0], sizeof(int)),
 		     "La lista vaciada debe seguir funcionando");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
 		     "Debe poder sacar luego de vaciar");
 	ASSERT_EQUAL(1, x, "Debe salir el valor insertado");
 	TEST_PASSED("list_clear funciona");
@@ -375,29 +391,25 @@ TEST(insertar_ordenado_sin_duplicados)
 	int v[] = { 3, 1, 4, 2 };
 	int x;
 	list_create(&l);
-	ASSERT_EQUAL(OK,
-		     list_push_orderer(&l, &v[0], sizeof(int), Comp, 0, NULL),
+	ASSERT_EQUAL(OK, list_push_orderer(&l, &v[0], sizeof(int), Comp, NULL),
 		     "list_push_orderer debe retornar OK");
-	ASSERT_EQUAL(OK,
-		     list_push_orderer(&l, &v[1], sizeof(int), Comp, 0, NULL),
+	ASSERT_EQUAL(OK, list_push_orderer(&l, &v[1], sizeof(int), Comp, NULL),
 		     "list_push_orderer debe retornar OK");
-	ASSERT_EQUAL(OK,
-		     list_push_orderer(&l, &v[2], sizeof(int), Comp, 0, NULL),
+	ASSERT_EQUAL(OK, list_push_orderer(&l, &v[2], sizeof(int), Comp, NULL),
 		     "list_push_orderer debe retornar OK");
-	ASSERT_EQUAL(OK,
-		     list_push_orderer(&l, &v[3], sizeof(int), Comp, 0, NULL),
+	ASSERT_EQUAL(OK, list_push_orderer(&l, &v[3], sizeof(int), Comp, NULL),
 		     "list_push_orderer debe retornar OK");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(1, x, "Orden incorrecto");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(2, x, "Orden incorrecto");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(3, x, "Orden incorrecto");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(4, x, "Orden incorrecto");
 	TEST_PASSED("list_push_orderer sin duplicados funciona");
 }
@@ -407,26 +419,22 @@ TEST(insertar_ordenado_con_duplicados_sin_insertar)
 	int v[] = { 3, 1, 3, 2 };
 	int x;
 	list_create(&l);
-	ASSERT_EQUAL(OK,
-		     list_push_orderer(&l, &v[0], sizeof(int), Comp, 0, NULL),
+	ASSERT_EQUAL(OK, list_push_orderer(&l, &v[0], sizeof(int), Comp, NULL),
 		     "list_push_orderer debe retornar OK");
-	ASSERT_EQUAL(OK,
-		     list_push_orderer(&l, &v[1], sizeof(int), Comp, 0, NULL),
+	ASSERT_EQUAL(OK, list_push_orderer(&l, &v[1], sizeof(int), Comp, NULL),
 		     "list_push_orderer debe retornar OK");
-	ASSERT_EQUAL(OK,
-		     list_push_orderer(&l, &v[2], sizeof(int), Comp, 0, NULL),
+	ASSERT_EQUAL(OK, list_push_orderer(&l, &v[2], sizeof(int), Comp, NULL),
 		     "list_push_orderer debe retornar OK");
-	ASSERT_EQUAL(OK,
-		     list_push_orderer(&l, &v[3], sizeof(int), Comp, 0, NULL),
+	ASSERT_EQUAL(OK, list_push_orderer(&l, &v[3], sizeof(int), Comp, NULL),
 		     "list_push_orderer debe retornar OK");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(1, x, "Orden incorrecto");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(2, x, "Orden incorrecto");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(3, x, "Orden incorrecto");
 	ASSERT_TRUE(list_is_empty(&l), "Debe quedar solo una instancia del 3");
 	TEST_PASSED("list_push_orderer sin duplicados funciona");
@@ -438,15 +446,15 @@ TEST(insertar_ordenado_con_duplicados_y_accion)
 	int x;
 	list_create(&l);
 	ASSERT_EQUAL(OK,
-		     list_push_orderer(&l, &v[0], sizeof(int), Comp, 1,
+		     list_push_orderer(&l, &v[0], sizeof(int), Comp,
 				       sumarAExistente),
 		     "list_push_orderer debe retornar OK");
 	ASSERT_EQUAL(OK,
-		     list_push_orderer(&l, &v[1], sizeof(int), Comp, 1,
+		     list_push_orderer(&l, &v[1], sizeof(int), Comp,
 				       sumarAExistente),
 		     "list_push_orderer debe retornar OK");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(
 		10, x,
 		"La accion debe haber acumulado el duplicado en el existente");
@@ -463,17 +471,17 @@ TEST(eliminar_por_clave_existente)
 	ASSERT_EQUAL(OK, list_delete_by_key(&l, &clave, sizeof(int), Comp),
 		     "list_delete_by_key debe retornar OK");
 	ASSERT_EQUAL(3, clave, "Debe devolver el eliminado");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(1, x, "La lista quedo mal");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(2, x, "La lista quedo mal");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(4, x, "Debe faltar el 3");
-	ASSERT_EQUAL(OK, list_pull_last(&l, &x, sizeof(int)),
-		     "list_pull_last debe retornar OK");
+	ASSERT_EQUAL(OK, list_pull_first(&l, &x, sizeof(int)),
+		     "list_pull_first debe retornar OK");
 	ASSERT_EQUAL(5, x, "La lista quedo mal");
 	TEST_PASSED("list_delete_by_key existente funciona");
 }
@@ -485,7 +493,7 @@ TEST(eliminar_por_clave_inexistente)
 	list_create(&l);
 	cargarEnterosEnLista(&l, v, 4);
 	clave = 3;
-	ASSERT_EQUAL(ERR_LISTA_NO_ENCONTRADO,
+	ASSERT_EQUAL(LIST_ERR_NOT_FOUND,
 		     list_delete_by_key(&l, &clave, sizeof(int), Comp),
 		     "Debe devolver no encontrado");
 	TEST_PASSED("list_delete_by_key inexistente funciona");
@@ -495,7 +503,7 @@ TEST(merge_sort_lista_vacia)
 {
 	list_t l;
 	list_create(&l);
-	ASSERT_EQUAL(ERR_LISTA_VACIA, list_order(&l, MERGE, Comp),
+	ASSERT_EQUAL(LIST_ERR_EMPTY, list_order(&l, MERGE, Comp),
 		     "Merge sort sobre lista vacia debe andar");
 	ASSERT_TRUE(list_is_empty(&l), "Debe seguir vacia");
 	TEST_PASSED("merge sort lista vacia");
@@ -529,7 +537,7 @@ TEST(quick_sort_lista_vacia)
 {
 	list_t l;
 	list_create(&l);
-	ASSERT_EQUAL(ERR_LISTA_VACIA, list_order(&l, QUICK, Comp),
+	ASSERT_EQUAL(LIST_ERR_EMPTY, list_order(&l, QUICK, Comp),
 		     "Quick sort sobre lista vacia debe andar");
 	ASSERT_TRUE(list_is_empty(&l), "Debe seguir vacia");
 	TEST_PASSED("quick sort lista vacia");

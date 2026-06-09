@@ -1,4 +1,4 @@
-#include <Arbol.h>
+#include <binary_tree.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -215,4 +215,8 @@ int tree_node_count_from_level_inclusive(const tree_t *a, int height)
 							    height - 1);
 	}
 	return 0;
+}
+
+int tree_cut_leaves(tree_t *t)
+{
 }

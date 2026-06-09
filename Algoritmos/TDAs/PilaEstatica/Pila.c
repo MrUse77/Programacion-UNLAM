@@ -1,5 +1,4 @@
-#define PILA_ESTATICA
-#include "Pila.h"
+#include "static_stack.h"
 #include "Comun.h"
 #include <string.h>
 

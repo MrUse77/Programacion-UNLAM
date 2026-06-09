@@ -6,49 +6,17 @@
 #ifndef ARBOL_H
 #define ARBOL_H
 
+#include "types.h"
 #include <stdlib.h>
 
-/**
- * @def ARBOL_VACIO
- * @brief Error: arbol vacio.
- */
-#define ARBOL_VACIO 1
-
-/**
- * @def MISMO_VALOR
- * @brief Error: se intento insertar un valor ya existente en el arbol.
- */
-#define MISMO_VALOR 2
-
-/**
- * @def TRUE
- * @brief Valor verdadero.
- */
-#define TRUE 1
-
-/**
- * @def FALSE
- * @brief Valor falso.
- */
-#define FALSE 0
-
-/**
- * @def OK
- * @brief Valor de exito.
- */
-#define OK 200
-
-/**
- * @def ERR
- * @brief Error general.
- */
-#define ERR -1
-
-/**
- * @def ERR_MEM_LLENA
- * @brief Error de memoria.
- */
-#define ERR_MEM_LLENA 101
+/* Definiciones de estado para retornos de funciones */
+typedef enum {
+  TREE_SUCCESS = 0,
+  TREE_ERR_EMPTY = -1,    /* ARBOL_VACIO (árbol vacío) */
+  TREE_ERR_EXISTS = -2,   /* MISMO_VALOR (valor ya existe) */
+  TREE_ERR_MEM_FULL = -3, /* ERR_MEM_LLENA (memoria llena) */
+  TREE_ERR_INVAL = -4     /* Parámetros inválidos */
+} tree_status_t;
 
 /**
  * @struct tree_node_s

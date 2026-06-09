@@ -1,8 +1,9 @@
-#include <ListaSimple.h>
+#include "simple_list.h"
 #include <stdlib.h>
 #include <string.h>
-#include <Comun.h>
-#define MIN(a, b) (a > b ? b : a)
+#ifndef ERR_MEM_LLENA
+#define ERR_MEM_LLENA LIST_ERR_MEM_FULL
+#endif
 
 // FUNCIONES QUE SE USAN SOLAMENTE ACA DENTRO
 static int list_divide(list_t *orig, list_t *left, list_t *right)
@@ -138,6 +139,7 @@ int list_is_empty(const list_t *l)
 
 int list_is_full(const list_t *l, const unsigned tam)
 {
+	(void)l;
 	list_node_t *aux = (list_node_t *)malloc(sizeof(list_node_t));
 	void *info = malloc(tam);
 	free(aux);
@@ -210,14 +212,20 @@ int list_pull_last(list_t *l, void *buff, const unsigned tam)
 	if (*l == NULL) {
 		return ERR_LISTA_VACIA;
 	}
+	list_node_t *prev = NULL;
 	list_node_t *aux = *l;
 	while (aux->sig) {
+		prev = aux;
 		aux = aux->sig;
 	}
 	memcpy(buff, aux->dato, MIN(tam, aux->tam));
 	free(aux->dato);
 	free(aux);
-	*l = NULL;
+	if (prev != NULL) {
+		prev->sig = NULL;
+	} else {
+		*l = NULL;
+	}
 	return OK;
 }
 
@@ -227,18 +235,24 @@ int list_see_last(list_t *l, void *buff, const unsigned tam)
 		return ERR_LISTA_VACIA;
 	}
 	list_node_t *aux = *l;
-	while ((*l)->sig) {
-		l = &(*l)->sig;
+	while (aux->sig) {
+		aux = aux->sig;
 	}
-	memcpy(buff, (*l)->dato, MIN(tam, aux->tam));
-	free((*l)->dato);
-	free(*l);
-	*l = NULL;
+	memcpy(buff, aux->dato, MIN(tam, aux->tam));
 	return OK;
 }
 
-int list_push_orrighter(list_t *l, const void *d, const unsigned tam, t_Cmp cmp,
-			const int conDup, t_Accion accion)
+int list_see_first(list_t *l, void *buff, const unsigned tam)
+{
+	if (*l == NULL) {
+		return ERR_LISTA_VACIA;
+	}
+	memcpy(buff, (*l)->dato, MIN(tam, (*l)->tam));
+	return OK;
+}
+
+int list_push_orderer(list_t *l, const void *d, const unsigned tam, t_Cmp cmp,
+		      const int conDup, t_Accion accion)
 {
 	list_node_t *n = (list_node_t *)malloc(sizeof(list_node_t));
 	n->dato = malloc(tam);
@@ -300,7 +314,7 @@ int list_get_at_position(list_t *l, void *buff, const unsigned tam,
 	return OK;
 }
 
-int list_length(list_t *l)
+int list_len(list_t *l)
 {
 	int count = 0;
 	if (*l == NULL) {
@@ -569,16 +583,16 @@ int list_contain(list_t *l, const void *d, const t_Cmp cmp)
 
 int list_order(list_t *l, const int ordenamiento, const t_Cmp cmp)
 {
-	int code;
+	int code = LIST_ERR_INVAL;
 	switch (ordenamiento) {
 	case MERGE:
-		code = mergeSort(l, cmp);
+		code = list_merge_sort(l, cmp);
 		break;
 	case RADIX:
-		code = mergeSort(l, cmp);
+		code = list_merge_sort(l, cmp);
 		break;
 	case QUICK:
-		code = quickSort(l, cmp);
+		code = list_quick_sort(l, cmp);
 		break;
 	}
 	return code;

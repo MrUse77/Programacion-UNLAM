@@ -1,9 +1,9 @@
-#include <ListaDoble.h>
-#include <Comun.h>
+#include "double_list.h"
+#include <types.h>
 #include <stdlib.h>
 #include <string.h>
 
-static double_list_node_t *list_head(double_list_node_t *n)
+static list_node_t *list_head(list_node_t *n)
 {
 	while (n && n->ant) {
 		n = n->ant;
@@ -11,7 +11,7 @@ static double_list_node_t *list_head(double_list_node_t *n)
 	return n;
 }
 
-static double_list_node_t *list_tail(double_list_node_t *n)
+static list_node_t *list_tail(list_node_t *n)
 {
 	while (n && n->sig) {
 		n = n->sig;
@@ -19,21 +19,21 @@ static double_list_node_t *list_tail(double_list_node_t *n)
 	return n;
 }
 
-void list_create(double_list_t *l)
+void list_create(list_t *l)
 {
 	*l = NULL;
 }
 
-int list_clear(double_list_t *l)
+int list_clear(list_t *l)
 {
-	double_list_node_t *act = *l;
+	list_node_t *act = *l;
 	int cant = 0;
 	if (act) {
 		while (act->ant) {
 			act = act->ant;
 		}
 		while (act) {
-			double_list_node_t *aux = act->sig;
+			list_node_t *aux = act->sig;
 			free(act->dato);
 			free(act);
 			act = aux;
@@ -44,34 +44,32 @@ int list_clear(double_list_t *l)
 	return cant;
 }
 
-int list_is_empty(const double_list_t *l)
+int list_is_empty(const list_t *l)
 {
 	return *l == NULL;
 }
 
-int list_is_full(const double_list_t *l, const unsigned tam)
+int list_is_full(const list_t *l, const unsigned tam)
 {
-	double_list_node_t *nue =
-		(double_list_node_t *)malloc(sizeof(double_list_node_t));
+	list_node_t *nue = (list_node_t *)malloc(sizeof(list_node_t));
 	void *aux = malloc(tam);
 	free(aux);
 	free(nue);
 	return aux == NULL || nue == NULL;
 }
 
-int list_push_last(double_list_t *l, const void *d, const unsigned tam)
+int list_push_last(list_t *l, const void *d, const unsigned tam)
 {
-	double_list_node_t *act = *l, *nue;
+	list_node_t *act = *l, *nue;
 	if (act) {
 		while (act->sig) {
 			act = act->sig;
 		}
 	}
-	if ((nue = (double_list_node_t *)malloc(sizeof(double_list_node_t))) ==
-		    NULL ||
+	if ((nue = (list_node_t *)malloc(sizeof(list_node_t))) == NULL ||
 	    (nue->dato = malloc(tam)) == NULL) {
 		free(nue);
-		return 0;
+		return LIST_ERR_MEM_FULL;
 	}
 	memcpy(nue->dato, d, tam);
 	nue->tam = tam;
@@ -86,19 +84,18 @@ int list_push_last(double_list_t *l, const void *d, const unsigned tam)
 	return OK;
 }
 
-int list_push_first(double_list_t *l, const void *d, const unsigned tam)
+int list_push_first(list_t *l, const void *d, const unsigned tam)
 {
-	double_list_node_t *act = *l, *nue;
+	list_node_t *act = *l, *nue;
 	if (act) {
 		while (act->ant) {
 			act = act->ant;
 		}
 	}
-	if ((nue = (double_list_node_t *)malloc(sizeof(double_list_node_t))) ==
-		    NULL ||
+	if ((nue = (list_node_t *)malloc(sizeof(list_node_t))) == NULL ||
 	    (nue->dato = malloc(tam)) == NULL) {
 		free(nue);
-		return 0;
+		return LIST_ERR_MEM_FULL;
 	}
 	memcpy(nue->dato, d, tam);
 	nue->tam = tam;
@@ -111,10 +108,10 @@ int list_push_first(double_list_t *l, const void *d, const unsigned tam)
 	return OK;
 }
 
-int list_push_orderer(double_list_t *l, const void *d, const unsigned tam,
-		      t_Cmp cmp, t_Acum acumulador)
+int list_push_orderer(list_t *l, const void *d, const unsigned tam, t_Cmp cmp,
+		      t_Acum acumulador)
 {
-	double_list_node_t *act = *l, *sig, *ant, *nue;
+	list_node_t *act = *l, *sig, *ant, *nue;
 	if (act == NULL) {
 		ant = NULL;
 		sig = NULL;
@@ -132,9 +129,9 @@ int list_push_orderer(double_list_t *l, const void *d, const unsigned tam,
 			if (acumulador) {
 				if (acumulador(&act->dato, &act->tam, d, tam) ==
 				    0) {
-					return ERR_MEM_LLENA;
+					return LIST_ERR_MEM_FULL;
 				}
-				return ERR;
+				return LIST_ERR_INVAL;
 			}
 		}
 		if (aux < 0) {
@@ -145,11 +142,10 @@ int list_push_orderer(double_list_t *l, const void *d, const unsigned tam,
 			sig = act;
 		}
 	}
-	if ((nue = (double_list_node_t *)malloc(sizeof(double_list_node_t))) ==
-		    NULL ||
+	if ((nue = (list_node_t *)malloc(sizeof(list_node_t))) == NULL ||
 	    (nue->dato = malloc(tam)) == NULL) {
 		free(nue);
-		return ERR_MEM_LLENA;
+		return LIST_ERR_MEM_FULL;
 	}
 	memcpy(nue->dato, d, tam);
 	nue->tam = tam;
@@ -165,9 +161,9 @@ int list_push_orderer(double_list_t *l, const void *d, const unsigned tam,
 	return OK;
 }
 
-int list_show_lr(const double_list_t *l, t_Prnt print)
+int list_show_lr(const list_t *l, t_Prnt print)
 {
-	double_list_node_t *act = *l;
+	list_node_t *act = *l;
 	int cant = 0;
 	if (act) {
 		while (act->sig) {
@@ -182,9 +178,9 @@ int list_show_lr(const double_list_t *l, t_Prnt print)
 	return cant;
 }
 
-int list_show_rl(const double_list_t *l, t_Prnt print)
+int list_show_rl(const list_t *l, t_Prnt print)
 {
-	double_list_node_t *act = *l;
+	list_node_t *act = *l;
 	int cant = 0;
 	if (act) {
 		while (act->ant) {
@@ -199,9 +195,9 @@ int list_show_rl(const double_list_t *l, t_Prnt print)
 	return cant;
 }
 
-void list_order(double_list_t *l, const t_Cmp cmp)
+void list_order(list_t *l, const t_Cmp cmp)
 {
-	double_list_node_t *act = *l, *sup = NULL, *inf = NULL;
+	list_node_t *act = *l, *sup = NULL, *inf = NULL;
 	int marca = 1;
 	if (act == NULL) {
 		return;
@@ -240,10 +236,9 @@ void list_order(double_list_t *l, const t_Cmp cmp)
 	}
 }
 
-int list_delete_by_key(double_list_t *l, void *buff, const unsigned int tam,
-		       t_Cmp cmp)
+int list_delete_by_key(list_t *l, void *buff, const unsigned int tam, t_Cmp cmp)
 {
-	double_list_node_t *act = *l;
+	list_node_t *act = *l;
 	int aux;
 	if (act == NULL) {
 		return 0;
@@ -256,7 +251,7 @@ int list_delete_by_key(double_list_t *l, void *buff, const unsigned int tam,
 	}
 	aux = cmp(act->dato, buff);
 	if (aux == 0) {
-		double_list_node_t *ant = act->ant, *sig = act->sig;
+		list_node_t *ant = act->ant, *sig = act->sig;
 		if (ant) {
 			ant->sig = sig;
 		}
@@ -271,14 +266,14 @@ int list_delete_by_key(double_list_t *l, void *buff, const unsigned int tam,
 		free(act);
 		return OK;
 	}
-	return ERR;
+	return LIST_ERR_INVAL;
 }
 
-int list_pull_first(double_list_t *l, void *buff, const unsigned tam)
+int list_pull_first(list_t *l, void *buff, const unsigned tam)
 {
-	double_list_node_t *act;
+	list_node_t *act;
 	if (l == NULL || *l == NULL) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = list_head(*l);
 	if (buff) {
@@ -293,11 +288,11 @@ int list_pull_first(double_list_t *l, void *buff, const unsigned tam)
 	return OK;
 }
 
-int list_pull_last(double_list_t *l, void *buff, const unsigned tam)
+int list_pull_last(list_t *l, void *buff, const unsigned tam)
 {
-	double_list_node_t *act;
+	list_node_t *act;
 	if (l == NULL || *l == NULL) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = list_tail(*l);
 	if (buff) {
@@ -312,11 +307,11 @@ int list_pull_last(double_list_t *l, void *buff, const unsigned tam)
 	return OK;
 }
 
-int list_see_last(double_list_t *l, void *buff, const unsigned tam)
+int list_see_last(list_t *l, void *buff, const unsigned tam)
 {
-	double_list_node_t *act;
+	list_node_t *act;
 	if (l == NULL || *l == NULL) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = list_tail(*l);
 	if (buff) {
@@ -325,11 +320,11 @@ int list_see_last(double_list_t *l, void *buff, const unsigned tam)
 	return OK;
 }
 
-int list_see_first(double_list_t *l, void *buff, const unsigned tam)
+int list_see_first(list_t *l, void *buff, const unsigned tam)
 {
-	double_list_node_t *act;
+	list_node_t *act;
 	if (l == NULL || *l == NULL) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = list_head(*l);
 	if (buff) {
@@ -338,12 +333,12 @@ int list_see_first(double_list_t *l, void *buff, const unsigned tam)
 	return OK;
 }
 
-int list_see_in_pos(double_list_t *l, void *buff, const unsigned tam, int pos)
+int list_see_in_pos(list_t *l, void *buff, const unsigned tam, int pos)
 {
-	double_list_node_t *act;
+	list_node_t *act;
 	int i = 0;
 	if (l == NULL || *l == NULL || pos < 0) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = list_head(*l);
 	while (act && i < pos) {
@@ -351,7 +346,7 @@ int list_see_in_pos(double_list_t *l, void *buff, const unsigned tam, int pos)
 		i++;
 	}
 	if (act == NULL) {
-		return ERR_LISTA_NO_ENCONTRADO;
+		return LIST_ERR_NOT_FOUND;
 	}
 	if (buff) {
 		memcpy(buff, act->dato, MIN(tam, act->tam));
@@ -359,10 +354,10 @@ int list_see_in_pos(double_list_t *l, void *buff, const unsigned tam, int pos)
 	return OK;
 }
 
-int list_long(double_list_t *l)
+int list_len(list_t *l)
 {
 	int cont = 0;
-	double_list_node_t *act;
+	list_node_t *act;
 	if (l == NULL || *l == NULL) {
 		return cont;
 	}
@@ -374,18 +369,18 @@ int list_long(double_list_t *l)
 	return cont;
 }
 
-int list_search(double_list_t *l, void *buff, const unsigned tam, t_Cmp cmp)
+int list_search(list_t *l, void *buff, const unsigned tam, t_Cmp cmp)
 {
-	double_list_node_t *act;
+	list_node_t *act;
 	if (l == NULL || *l == NULL) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = list_head(*l);
 	while (act && cmp(buff, act->dato) != 0) {
 		act = act->sig;
 	}
 	if (act == NULL) {
-		return ERR_LISTA_NO_ENCONTRADO;
+		return LIST_ERR_NOT_FOUND;
 	}
 	if (buff) {
 		memcpy(buff, act->dato, MIN(tam, act->tam));
@@ -394,25 +389,24 @@ int list_search(double_list_t *l, void *buff, const unsigned tam, t_Cmp cmp)
 	return OK;
 }
 
-int list_copy(double_list_t *l, double_list_t *lCopia)
+int list_copy(list_t *l, list_t *lCopia)
 {
-	double_list_node_t *act;
-	double_list_node_t *tail = NULL;
+	list_node_t *act;
+	list_node_t *tail = NULL;
 	if (l == NULL || lCopia == NULL) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = *l ? list_head(*l) : NULL;
 	*lCopia = NULL;
 	while (act) {
-		double_list_node_t *nue = (double_list_node_t *)malloc(
-			sizeof(double_list_node_t));
+		list_node_t *nue = (list_node_t *)malloc(sizeof(list_node_t));
 		if (nue == NULL) {
-			return ERR_MEM_LLENA;
+			return LIST_ERR_MEM_FULL;
 		}
 		nue->dato = malloc(act->tam);
 		if (nue->dato == NULL) {
 			free(nue);
-			return ERR_MEM_LLENA;
+			return LIST_ERR_MEM_FULL;
 		}
 		memcpy(nue->dato, act->dato, act->tam);
 		nue->tam = act->tam;
@@ -429,30 +423,29 @@ int list_copy(double_list_t *l, double_list_t *lCopia)
 	return OK;
 }
 
-int list_push_in_pos(double_list_t *l, const void *buff, const unsigned tam,
+int list_push_in_pos(list_t *l, const void *buff, const unsigned tam,
 		     const int pos)
 {
-	double_list_node_t *act;
-	double_list_node_t *nue;
+	list_node_t *act;
+	list_node_t *nue;
 	int i = 0;
 	if (l == NULL || pos < 0) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = *l ? list_head(*l) : NULL;
 	while (act && i < pos) {
 		act = act->sig;
 		i++;
 	}
-	if ((nue = (double_list_node_t *)malloc(sizeof(double_list_node_t))) ==
-		    NULL ||
+	if ((nue = (list_node_t *)malloc(sizeof(list_node_t))) == NULL ||
 	    (nue->dato = malloc(tam)) == NULL) {
 		free(nue);
-		return ERR_MEM_LLENA;
+		return LIST_ERR_MEM_FULL;
 	}
 	memcpy(nue->dato, buff, tam);
 	nue->tam = tam;
 	if (act == NULL) {
-		double_list_node_t *tail = *l ? list_tail(*l) : NULL;
+		list_node_t *tail = *l ? list_tail(*l) : NULL;
 		nue->sig = NULL;
 		nue->ant = tail;
 		if (tail) {
@@ -471,26 +464,25 @@ int list_push_in_pos(double_list_t *l, const void *buff, const unsigned tam,
 	return OK;
 }
 
-int list_push_after_key(double_list_t *l, const void *d, const unsigned tam,
+int list_push_after_key(list_t *l, const void *d, const unsigned tam,
 			const void *clave, const t_Cmp cmp)
 {
-	double_list_node_t *act;
-	double_list_node_t *nue;
+	list_node_t *act;
+	list_node_t *nue;
 	if (l == NULL || *l == NULL) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = list_head(*l);
 	while (act && cmp(clave, act->dato) != 0) {
 		act = act->sig;
 	}
 	if (act == NULL) {
-		return ERR_LISTA_NO_ENCONTRADO;
+		return LIST_ERR_NOT_FOUND;
 	}
-	if ((nue = (double_list_node_t *)malloc(sizeof(double_list_node_t))) ==
-		    NULL ||
+	if ((nue = (list_node_t *)malloc(sizeof(list_node_t))) == NULL ||
 	    (nue->dato = malloc(tam)) == NULL) {
 		free(nue);
-		return ERR_MEM_LLENA;
+		return LIST_ERR_MEM_FULL;
 	}
 	memcpy(nue->dato, d, tam);
 	nue->tam = tam;
@@ -504,26 +496,25 @@ int list_push_after_key(double_list_t *l, const void *d, const unsigned tam,
 	return OK;
 }
 
-int list_push_before_key(double_list_t *l, const void *d, const unsigned tam,
+int list_push_before_key(list_t *l, const void *d, const unsigned tam,
 			 const void *clave, const t_Cmp cmp)
 {
-	double_list_node_t *act;
-	double_list_node_t *nue;
+	list_node_t *act;
+	list_node_t *nue;
 	if (l == NULL || *l == NULL) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = list_head(*l);
 	while (act && cmp(clave, act->dato) != 0) {
 		act = act->sig;
 	}
 	if (act == NULL) {
-		return ERR_LISTA_NO_ENCONTRADO;
+		return LIST_ERR_NOT_FOUND;
 	}
-	if ((nue = (double_list_node_t *)malloc(sizeof(double_list_node_t))) ==
-		    NULL ||
+	if ((nue = (list_node_t *)malloc(sizeof(list_node_t))) == NULL ||
 	    (nue->dato = malloc(tam)) == NULL) {
 		free(nue);
-		return ERR_MEM_LLENA;
+		return LIST_ERR_MEM_FULL;
 	}
 	memcpy(nue->dato, d, tam);
 	nue->tam = tam;
@@ -537,13 +528,13 @@ int list_push_before_key(double_list_t *l, const void *d, const unsigned tam,
 	return OK;
 }
 
-int list_delete_pos(double_list_t *l, void *buff, const unsigned int tam,
+int list_delete_pos(list_t *l, void *buff, const unsigned int tam,
 		    const int pos)
 {
-	double_list_node_t *act;
+	list_node_t *act;
 	int i = 0;
 	if (l == NULL || *l == NULL || pos < 0) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = list_head(*l);
 	while (act && i < pos) {
@@ -551,7 +542,7 @@ int list_delete_pos(double_list_t *l, void *buff, const unsigned int tam,
 		i++;
 	}
 	if (act == NULL) {
-		return ERR_LISTA_NO_ENCONTRADO;
+		return LIST_ERR_NOT_FOUND;
 	}
 	if (buff) {
 		memcpy(buff, act->dato, MIN(tam, act->tam));
@@ -568,19 +559,19 @@ int list_delete_pos(double_list_t *l, void *buff, const unsigned int tam,
 	return OK;
 }
 
-int list_delete_before_key(double_list_t *l, void *buff, const unsigned int tam,
+int list_delete_before_key(list_t *l, void *buff, const unsigned int tam,
 			   const void *clave, const t_Cmp cmp)
 {
-	double_list_node_t *act;
+	list_node_t *act;
 	if (l == NULL || *l == NULL) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = list_head(*l);
 	while (act && cmp(clave, act->dato) != 0) {
 		act = act->sig;
 	}
 	if (act == NULL || act->ant == NULL) {
-		return ERR_LISTA_NO_ENCONTRADO;
+		return LIST_ERR_NOT_FOUND;
 	}
 	act = act->ant;
 	if (buff) {
@@ -598,19 +589,19 @@ int list_delete_before_key(double_list_t *l, void *buff, const unsigned int tam,
 	return OK;
 }
 
-int list_delete_after_key(double_list_t *l, void *buff, const unsigned int tam,
+int list_delete_after_key(list_t *l, void *buff, const unsigned int tam,
 			  const void *clave, const t_Cmp cmp)
 {
-	double_list_node_t *act;
+	list_node_t *act;
 	if (l == NULL || *l == NULL) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = list_head(*l);
 	while (act && cmp(clave, act->dato) != 0) {
 		act = act->sig;
 	}
 	if (act == NULL || act->sig == NULL) {
-		return ERR_LISTA_NO_ENCONTRADO;
+		return LIST_ERR_NOT_FOUND;
 	}
 	act = act->sig;
 	if (buff) {
@@ -628,12 +619,12 @@ int list_delete_after_key(double_list_t *l, void *buff, const unsigned int tam,
 	return OK;
 }
 
-int list_invert(double_list_t *l)
+int list_invert(list_t *l)
 {
-	double_list_node_t *act;
-	double_list_node_t *tmp;
+	list_node_t *act;
+	list_node_t *tmp;
 	if (l == NULL || *l == NULL) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = list_head(*l);
 	while (act) {
@@ -648,12 +639,12 @@ int list_invert(double_list_t *l)
 	return OK;
 }
 
-int list_concat(double_list_t *l1, double_list_t *l2)
+int list_concat(list_t *l1, list_t *l2)
 {
-	double_list_node_t *tail1;
-	double_list_node_t *head2;
+	list_node_t *tail1;
+	list_node_t *head2;
 	if (l1 == NULL || l2 == NULL) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	if (*l2 == NULL) {
 		return OK;
@@ -672,29 +663,29 @@ int list_concat(double_list_t *l1, double_list_t *l2)
 	return OK;
 }
 
-int list_count_appear(double_list_t *l, const void *d, int *res,
-		      const t_Cmp cmp)
+int list_count_appear(list_t *l, const void *d, const t_Cmp cmp)
 {
-	double_list_node_t *act;
-	if (l == NULL || res == NULL) {
-		return ERR_LISTA_VACIA;
+	int res;
+	list_node_t *act;
+	if (*l == NULL) {
+		return LIST_ERR_EMPTY;
 	}
-	*res = 0;
-	act = *l ? list_head(*l) : NULL;
+	res = 0;
+	act = list_head(*l);
 	while (act) {
 		if (cmp(d, act->dato) == 0) {
-			(*res)++;
+			(res)++;
 		}
 		act = act->sig;
 	}
-	return OK;
+	return res;
 }
 
-int list_contain(double_list_t *l, const void *d, const t_Cmp cmp)
+int list_contain(list_t *l, const void *d, const t_Cmp cmp)
 {
-	double_list_node_t *act;
+	list_node_t *act;
 	if (l == NULL || *l == NULL) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = list_head(*l);
 	while (act) {
@@ -703,16 +694,15 @@ int list_contain(double_list_t *l, const void *d, const t_Cmp cmp)
 		}
 		act = act->sig;
 	}
-	return ERR_LISTA_NO_ENCONTRADO;
+	return LIST_ERR_NOT_FOUND;
 }
 
-int list_update_by_pos(double_list_t *l, const void *d, int pos,
-		       t_Accion accion)
+int list_update_by_pos(list_t *l, const void *d, int pos, t_Accion accion)
 {
-	double_list_node_t *act;
+	list_node_t *act;
 	int i = 0;
 	if (l == NULL || *l == NULL || accion == NULL || pos < 0) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = list_head(*l);
 	while (act && i < pos) {
@@ -720,38 +710,37 @@ int list_update_by_pos(double_list_t *l, const void *d, int pos,
 		i++;
 	}
 	if (act == NULL) {
-		return ERR_LISTA_NO_ENCONTRADO;
+		return LIST_ERR_NOT_FOUND;
 	}
 	accion(act->dato, d);
 	*l = act;
 	return OK;
 }
 
-int list_update_by_key(double_list_t *l, const void *d, t_Cmp cmp,
-		       t_Accion accion)
+int list_update_by_key(list_t *l, const void *d, t_Cmp cmp, t_Accion accion)
 {
-	double_list_node_t *act;
+	list_node_t *act;
 	if (l == NULL || *l == NULL || accion == NULL || cmp == NULL) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = list_head(*l);
 	while (act && cmp(d, act->dato) != 0) {
 		act = act->sig;
 	}
 	if (act == NULL) {
-		return ERR_LISTA_NO_ENCONTRADO;
+		return LIST_ERR_NOT_FOUND;
 	}
 	accion(act->dato, d);
 	*l = act;
 	return OK;
 }
 
-int list_search_pos(double_list_t *l, const void *d, t_Cmp cmp)
+int list_search_pos(list_t *l, const void *d, t_Cmp cmp)
 {
-	double_list_node_t *act;
+	list_node_t *act;
 	int pos = 0;
 	if (l == NULL || *l == NULL || cmp == NULL) {
-		return ERR_LISTA_VACIA;
+		return LIST_ERR_EMPTY;
 	}
 	act = list_head(*l);
 	while (act) {
@@ -762,5 +751,5 @@ int list_search_pos(double_list_t *l, const void *d, t_Cmp cmp)
 		pos++;
 		act = act->sig;
 	}
-	return ERR_LISTA_NO_ENCONTRADO;
+	return LIST_ERR_NOT_FOUND;
 }

@@ -1,0 +1,21 @@
+# depslib dependency file v1.0
+1780743999 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/ListaDobleCircular/main.c
+	"double_list.h"
+	<types.h>
+	<stdlib.h>
+	<string.h>
+
+1780744912 /home/agustin/Documentos/unlam/Algoritmos/includes/double_list.h
+	<stdbool.h>
+	<types.h>
+
+1780709073 /home/agustin/Documentos/unlam/Algoritmos/includes/types.h
+
+1780743895 source:/home/agustin/Documentos/unlam/Algoritmos/TDAs/ListaDobleCircular/Test/test.c
+	<double_list.h>
+	"test_framework.h"
+
+1780600032 /home/agustin/Documentos/unlam/Algoritmos/includes/test_framework.h
+	<stdio.h>
+	<string.h>
+

@@ -1,24 +1,21 @@
-#ifndef PILA_H_INCLUDED
-#define PILA_H_INCLUDED
+#ifndef STATIC_STACK_H_INCLUDED
+#define STATIC_STACK_H_INCLUDED
 
-#include "Comun.h"
+/* Pila Estática - Implementación con array de tamaño fijo */
 
-/* Definiciones de errores (unificadas para las 3 implementaciones) */
-#define ERR_PILA_VACIA 301 /* Pila sin elementos */
-#define ERR_PILA_LLENA 302 /* Pila sin lugar para el elemento (estática) */
-#define ERR_MEM_LLENA 310  /* Memoria llena (dinámica/circular) */
+/* Definiciones de errores (específicas para estática) */
+typedef enum {
+  STACK_SUCCESS = 0,
+  STACK_ERR_EMPTY = -1,      /* ERR_PILA_VACIA */
+  STACK_ERR_CAPACITY = -2,   /* ERR_PILA_LLENA */
+  STACK_ERR_MEM_FULL = -3,   /* ERR_MEM_LLENA (no aplica aquí) */
+  STACK_ERR_INVAL = -4       /* Parámetros inválidos */
+} stack_status_t;
 
 /* =============================================================================
-   Definición de estructuras según la implementación seleccionada
+   Definición de estructura estática
    =============================================================================
-   */
-
-// #define PILA_ESTATICA
-// #define PILA_DINAMICA
-#define PILA_CIRCULAR
-
-#ifdef PILA_ESTATICA
-/* --- Versión Estática --- */
+ */
 
 /**
  * @def TAM_PILA
@@ -33,43 +30,13 @@ typedef struct {
   unsigned tope;
 } stack_t;
 
-#elif defined(PILA_DINAMICA)
-/* --- Versión Dinámica (Linked List con nodos en memoria heap) --- */
-
-typedef struct stack_node {
-  void *dato;
-  unsigned tamDato;
-  struct stack_node *sig;
-} stack_node_t;
-
-/* Pila dinámica: puntero a primer nodo (lista simple con head) */
-typedef stack_node_t *stack_t;
-
-#elif defined(PILA_CIRCULAR)
-/* --- Versión Circular (Linked List circular con nodos en memoria heap) --- */
-
-typedef struct stack_node {
-  void *dato;
-  unsigned tamDato;
-  struct stack_node *sig;
-} stack_node_t;
-
-typedef stack_node_t *stack_t;
-
-#else
-/* --- Implementación por defecto: Dinámica --- */
-/* Se define implícitamente PILA_DINAMICA si no se especifica otra opción */
-#define PILA_DINAMICA
-#endif
-
 /* =============================================================================
-   Declaraciones de funciones (7 firmas unificadas)
+   Declaraciones de funciones
    =============================================================================
  */
 
 /**
- * @brief Crea una pila según la implementación seleccionada
- * (estática/dinámica/circular)
+ * @brief Crea una pila estática y la inicializa (tamaño = 0)
  * @param p Puntero a la estructura de pila
  */
 void stack_init(stack_t *p);
@@ -79,14 +46,12 @@ void stack_init(stack_t *p);
  * @param p Pila donde agregar el elemento
  * @param d Dato a insertar (puntero a datos)
  * @param tamDato Tamaño del dato
- * @return OK si se realizó con éxito, o error correspondiente:
- *         - ERR_PILA_LLENA (estática): pila llena
- *         - ERR_MEM_LLENA (dinámica/circular): no hay memoria disponible
+ * @return OK si se realizó con éxito, ERR_PILA_LLENA si la pila está llena
  */
 int stack_push(stack_t *p, const void *d, unsigned tamDato);
 
 /**
- * @brief Comproba si la pila está llena (útil para implementación estática)
+ * @brief Comproba si la pila está llena
  * @param p Pila a verificar
  * @param tam Tamaño del elemento que se intentaría insertar
  * @return TRUE si está llena, FALSE si hay espacio
@@ -124,4 +89,4 @@ int stack_is_empty(stack_t *p);
  */
 void stack_clear(stack_t *p);
 
-#endif // PILA_H_INCLUDED
+#endif // STATIC_STACK_H_INCLUDED

@@ -1,4 +1,4 @@
-#include <Cola.h>
+#include "circular_queue.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -19,13 +19,13 @@ int queue_push(queue_t *c, const void *d, unsigned tamDato)
 	queue_node_t *n = (queue_node_t *)malloc(sizeof(queue_node_t));
 
 	if (!n) {
-		return ERR_MEM_LLENA;
+		return QUEUE_ERR_FULL;
 	}
 
 	n->dato = malloc(tamDato);
 	if (!n->dato) {
 		free(n);
-		return ERR_MEM_LLENA;
+		return QUEUE_ERR_FULL;
 	}
 
 	memcpy(n->dato, d, tamDato);
@@ -41,11 +41,12 @@ int queue_push(queue_t *c, const void *d, unsigned tamDato)
 		*c = n;
 	}
 
-	return OK;
+	return EXIT_SUCCESS;
 }
 
 int queue_is_full(queue_t *c, unsigned tam)
 {
+	(void)c;
 	queue_node_t *n = (queue_node_t *)malloc(sizeof(queue_node_t));
 	n->dato = malloc(tam);
 	if (!n || !n->dato) {
@@ -60,18 +61,18 @@ int queue_is_full(queue_t *c, unsigned tam)
 int queue_see_first(queue_t *c, void *buff, unsigned tamDato)
 {
 	if (*c) {
-		return ERR_COLA_VACIA;
+		return QUEUE_ERR_EMPTY;
 	}
 
 	/* En cola circular: el primer dato está en prim->dato */
 	memcpy(buff, (*c)->sig->dato, MIN(tamDato, (*c)->sig->tamDato));
-	return OK;
+	return EXIT_SUCCESS;
 }
 
 int queue_pull(queue_t *c, void *buff, unsigned tamDato)
 {
 	if (*c == NULL) {
-		return ERR_COLA_VACIA;
+		return QUEUE_ERR_EMPTY;
 	}
 	queue_node_t *aux = (*c)->sig;
 	memcpy(buff, aux->dato, MIN(tamDato, aux->tamDato));
@@ -82,7 +83,7 @@ int queue_pull(queue_t *c, void *buff, unsigned tamDato)
 	}
 	free(aux->dato);
 	free(aux);
-	return OK;
+	return EXIT_SUCCESS;
 }
 
 int queue_is_empty(queue_t *c)

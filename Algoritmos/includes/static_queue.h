@@ -1,24 +1,22 @@
-#ifndef COLA_H_INCLUDED
-#define COLA_H_INCLUDED
+#ifndef STATIC_QUEUE_H_INCLUDED
+#define STATIC_QUEUE_H_INCLUDED
+#include "types.h"
 
-#include "Comun.h"
+/* Cola Estática - Implementación con array de tamaño fijo */
 
-/* Definiciones de errores (unificadas para las 3 implementaciones) */
-#define ERR_COLA_LLENA 311 /* Cola sin lugar para el elemento (estática) */
-#define ERR_COLA_VACIA 312 /* Cola sin elementos */
-#define ERR_MEM_LLENA 310  /* Memoria llena (dinámica) */
+/* Definiciones de estado para retornos de funciones */
+typedef enum {
+  QUEUE_SUCCESS = 0,
+  QUEUE_ERR_EMPTY = -1,    /* ERR_COLA_VACIA */
+  QUEUE_ERR_FULL = -2,     /* ERR_COLA_LLENA */
+  QUEUE_ERR_MEM_FULL = -3, /* ERR_MEM_LLENA (no aplica aquí) */
+  QUEUE_ERR_INVAL = -4     /* Parámetros inválidos */
+} queue_status_t;
 
 /* =============================================================================
-   Definición de estructuras según la implementación seleccionada
+   Definición de estructura estática
    =============================================================================
-   */
-
-// #define COLA_ESTATICA
-// #define COLA_DINAMICA
-#define COLA_CIRCULAR
-
-#ifdef COLA_ESTATICA
-/* --- Versión Estática --- */
+ */
 
 /**
  * @def TAM_COLA
@@ -35,44 +33,14 @@ typedef struct {
   unsigned tamDisp;       /* Espacio disponible */
 } queue_t;
 
-#elif defined(COLA_DINAMICA)
-/* --- Versión Dinámica (Linked List con nodos en memoria heap) --- */
-
-typedef struct queue_node {
-  void *dato;             /* Puntero al dato almacenado */
-  unsigned tamDato;       /* Tamaño del dato */
-  struct queue_node *sig; /* Siguiente nodo */
-} queue_node_t;
-
-/* Cola dinámica: puntero a primer nodo (lista simple con head) */
-typedef queue_node_t *queue_t;
-
-#elif defined(COLA_CIRCULAR)
-/* --- Versión Circular (Linked List circular con nodos en memoria heap) --- */
-
-typedef struct queue_node {
-  void *dato;             /* Puntero al dato almacenado */
-  unsigned tamDato;       /* Tamaño del dato */
-  struct queue_node *sig; /* Siguiente nodo */
-} queue_node_t;
-
-typedef queue_node_t *queue_t;
-
-#else
-/* --- Implementación por defecto: Dinámica --- */
-/* Se define implícitamente COLA_DINAMICA si no se especifica otra opción */
-#define COLA_DINAMICA
-#endif
-
 /* =============================================================================
-   Declaraciones de funciones (7 firmas unificadas)
+   Declaraciones de funciones
    =============================================================================
  */
 
 /**
- * @brief Crea una cola según la implementación seleccionada
- * (estática/dinámica/circular)
- * @param p Puntero a la estructura de cola
+ * @brief Crea una cola estática y la inicializa (cola vacía)
+ * @param c Puntero a la estructura de cola
  */
 void queue_create(queue_t *c);
 
@@ -81,14 +49,12 @@ void queue_create(queue_t *c);
  * @param c Cola donde agregar el elemento
  * @param d Dato a insertar (puntero a datos)
  * @param tamDato Tamaño del dato
- * @return OK si se realizó con éxito, o error correspondiente:
- *         - ERR_COLA_LLENA (estática): cola llena
- *         - ERR_MEM_LLENA (dinámica/circular): no hay memoria disponible
+ * @return OK si se realizó con éxito, ERR_COLA_LLENA si la cola está llena
  */
 int queue_push(queue_t *c, const void *d, unsigned tamDato);
 
 /**
- * @brief Comproba si la cola está llena (útil para implementación estática)
+ * @brief Comproba si la cola está llena
  * @param c Cola a verificar
  * @param tam Tamaño del elemento que se intentaría insertar
  * @return TRUE si está llena, FALSE si hay espacio
@@ -126,4 +92,4 @@ int queue_is_empty(queue_t *c);
  */
 void queue_clear(queue_t *c);
 
-#endif // COLA_H_INCLUDED
+#endif // STATIC_QUEUE_H_INCLUDED

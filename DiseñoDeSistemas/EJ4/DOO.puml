@@ -1,0 +1,200 @@
+/*
+Parafarma es una cadena de farmacias que brinda servicios en distintas localidades de
+Buenos Aires. Ofrece a sus clientes dos canales de venta, por una parte, la venta de
+modo tradicional en mostrador, y, por otra parte, brinda la posibilidad de realizar
+compras online de productos de distintos rubros como cosmética y belleza, salud y
+nutrición, higiene, entre otros; vale aclarar que por este canal NO se venden ni publicitan
+especialidades medicinales, ni medicamentos de venta libre o de venta bajo receta.
+La persona que desee comprar debe haberse registrado como cliente, los datos a
+registrar son los que permitan su identificación, con los que puede ingresar en las visitas
+futuras y realizar un seguimiento sobre sus compras. 
+Para agregar un producto al carrito de compras el cliente debe seleccionarlo desde el
+catálogo, e indicar la cantidad de unidades. Una vez que ha seleccionado todos los
+productos deseados deberá indicar el domicilio de entrega de la compra.
+Se ofrece dos modalidades de envío. La primera es seleccionar un domicilio donde pueda
+ser recibido por una persona mayor de edad en el horario de 9 a 18 horas, el costo del
+envío varía en relación con el valor de la compra y la zona de entrega; y la segunda es
+seleccionar una sucursal de la farmacia para retirar el pedido personalmente, sin costos
+adicionales.
+En ambos casos, la compra mínima online es de $30000.
+Por último, el cliente indica los datos para el pago. El portal trabaja únicamente con pago
+por tarjeta de crédito, una vez verificado el mismo, el cliente recibe un correo de
+confirmación con la factura emitida electrónicamente de acuerdo a la Res. General
+N°2975 de AFIP, sus modificatorias y complementarias. 
+*/
+@startuml
+skinparam classAttributeIconSize 0
+skinparam dpi 192
+'----- CLASES -----'
+
+class Sucursal {
+	- Id : UUID
+	- NumSucursal :  int
+}
+
+class Pago {
+	- Id : UUID
+	- FechaYHora : date
+	- NumTarjeta : int
+}
+
+class Cliente {
+	- DNI : int
+	- Nombre : String
+	- Apellido : String
+	- Email : String
+	- Contraseña : String
+}
+
+class Venta {
+	- Id : UUID
+	- Total : int
+	- FechaYHora : date
+	+ getTotal() : int
+
+}
+
+class EstadoVenta {
+	- Estado : String
+}
+
+class LineaProducto {
+	- Cantidad : int
+	- MontoFinal :	int 
+	+ getMontoFinal() : int
+	+ getCantidad() : int
+}
+
+class Producto {
+	- Id : UUID
+	- Descripcion : String
+	- PrecioUnitario : int 
+	+ getPrecioUnitario() : int
+}
+
+class Rubro {
+	- Tipo : String
+}
+
+class ResCompraMin {
+	- Minimo : int
+}
+
+class Envio {
+	- id : UUID
+	- PrecioEnvio : int
+	- FechaYHoraEntrega : Date
+}
+
+class ZonaEntrega {
+	- Numero : int
+	- Valor : int
+}
+
+class Direccion {
+	- Calle : String
+	- Numero : int
+}
+
+class EstadoEnvio {
+	- Estado : int
+	+ setEstado(estado: int) : int
+}
+
+class Localidad {
+	- CP : int
+	- Nombre : String
+}
+
+class EntregaDom{
+	# rangoHorario : Date
+	- calcularCostoEnvio(subtotal: Float) : Float
+	+ realizarEntrega() : int
+}
+
+class EntregaPresencial{
+	+ realizarEntrega() : int
+}
+
+class ControladorVenta <<Controller>>{
+	+ iniciarVenta(): Venta
+	+ introducirProducto(Cod: int, Cant: int) : Float
+	+ finalizarVenta() : Pago
+}
+
+class GestorVenta{
+	+ iniciarVenta(): Venta
+	+ introducirProducto(Cod: int, Cant: int) : Float
+	+ finalizarVenta() : Pago
+}
+
+class ControladorEntrega <<Controller>>{ 
+	+ cargarEntrega()
+	+ realizarEntrega()
+	+ confirmarEntrega()
+}
+
+class GestorEntrega{
+	+ cargarEntrega()
+	+ realizarEntrega()
+	+ confirmarEntrega()
+}
+
+class GestorPago{
+
+}
+
+class ControladorCliente <<Controller>>{
+	+ registrarCliente() : void
+	+ verDatos() : Cliente
+}
+
+class GestorCliente{
+	+ registrarCliente() : void
+	+ verDatos() : Cliente
+}
+
+'----- INTERFACES -----'
+interface IEntrega <<Interface>>{
+	+ realizarEntrega() : int
+}
+
+'----- RELACIONES -----'
+Cliente -- Venta
+Cliente -- Direccion
+
+Pago -- Venta
+
+ControladorEntrega -- GestorEntrega
+GestorEntrega -- IEntrega
+IEntrega <|.. EntregaDom
+IEntrega <|.. EntregaPresencial
+
+
+EntregaDom -- Envio
+EntregaPresencial -- Sucursal
+
+ControladorCliente -- GestorCliente
+GestorCliente -- Cliente
+
+ControladorVenta -- GestorVenta
+GestorVenta -- Venta
+GestorVenta -- GestorPago
+GestorPago -- Pago
+Venta -- EstadoVenta
+Venta --* LineaProducto
+Venta -- GestorEntrega : "Tiene una"
+LineaProducto -- Producto
+Producto -- Rubro
+
+Venta -- ResCompraMin
+Envio -- Direccion
+EntregaDom -- EstadoEnvio
+EntregaPresencial -- EstadoEnvio
+Envio -- ZonaEntrega
+
+Direccion -- Localidad
+ZonaEntrega -- Localidad
+
+
+@enduml

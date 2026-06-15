@@ -42,15 +42,61 @@
 					<Add option="-s" />
 				</Linker>
 			</Target>
+			<Target title="TestLinux">
+				<Option output="bin/Test/Linux/Arbol" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Test/Linux" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add directory="../../includes" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../../includes" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-lArbol" />
+					<Add directory="../../libs/Linux" />
+				</Linker>
+			</Target>
+			<Target title="TestLinuxIndices">
+				<Option output="bin/Test/Linux/ArbolIndices" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Test/Linux" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add directory="../../includes" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../../includes" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-lArbol" />
+					<Add directory="../../libs/Linux" />
+				</Linker>
+			</Target>
 		</Build>
 		<VirtualTargets>
 			<Add alias="WyL" targets="Linux;Windows;" />
 		</VirtualTargets>
 		<Unit filename="Test/test_arbol.c">
 			<Option compilerVar="CC" />
+			<Option target="TestLinux" />
+			<Option target="Linux" />
+			<Option target="Windows" />
+		</Unit>
+		<Unit filename="Test/test_arbol_indice_dni.c">
+			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
+			<Option target="Linux" />
+			<Option target="Windows" />
 		</Unit>
 		<Extensions />
 	</Project>

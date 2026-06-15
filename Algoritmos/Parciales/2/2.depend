@@ -1,0 +1,20 @@
+# depslib dependency file v1.0
+1781366180 source:/home/agustin/Documentos/unlam/Algoritmos/Parciales/2/dron.c
+	"dron.h"
+	<stdio.h>
+	<stdlib.h>
+
+1781309316 /home/agustin/Documentos/unlam/Algoritmos/Parciales/2/dron.h
+	"queue.h"
+
+1781307134 /home/agustin/Documentos/unlam/Algoritmos/Parciales/2/queue.h
+
+1781306317 source:/home/agustin/Documentos/unlam/Algoritmos/Parciales/2/queue.c
+	"queue.h"
+	<string.h>
+
+1781363950 source:/home/agustin/Documentos/unlam/Algoritmos/Parciales/2/main.c
+	"dron.h"
+	"queue.h"
+	<stdio.h>
+

@@ -1,5 +1,5 @@
 #include "static_stack.h"
-#include "Comun.h"
+#include "types.h"
 #include <string.h>
 
 #define MIN(a, b) (a > b ? b : a)

@@ -50,7 +50,7 @@ static list_node_t *split_list(list_node_t *head)
 }
 
 /* Merge two sorted doubly-linked lists, return head of merged list. */
-static list_node_t *merge_sorted(list_node_t *a, list_node_t *b, t_Cmp cmp)
+static list_node_t *merge_sorted(list_node_t *a, list_node_t *b, cmp_t cmp)
 {
 	list_node_t *head = NULL, **tail = &head, *prev = NULL;
 
@@ -81,7 +81,7 @@ static list_node_t *merge_sorted(list_node_t *a, list_node_t *b, t_Cmp cmp)
 }
 
 /* Recursive merge sort on nodes. Returns new head. */
-static list_node_t *merge_sort_nodes(list_node_t *head, t_Cmp cmp)
+static list_node_t *merge_sort_nodes(list_node_t *head, cmp_t cmp)
 {
 	if (!head || !head->sig)
 		return head;
@@ -95,7 +95,7 @@ static list_node_t *merge_sort_nodes(list_node_t *head, t_Cmp cmp)
 
 /* Partition around pivot (last node in the segment).
  * Swaps data between nodes for simplicity (no relinking). */
-static list_node_t *partition(list_node_t *low, list_node_t *high, t_Cmp cmp)
+static list_node_t *partition(list_node_t *low, list_node_t *high, cmp_t cmp)
 {
 	void *pivot_data = high->dato;
 	list_node_t *i = low ? low->ant : NULL;
@@ -125,7 +125,7 @@ static list_node_t *partition(list_node_t *low, list_node_t *high, t_Cmp cmp)
 	return i;
 }
 
-static void quick_sort_range(list_node_t *low, list_node_t *high, t_Cmp cmp)
+static void quick_sort_range(list_node_t *low, list_node_t *high, cmp_t cmp)
 {
 	if (high && low && low != high && low != high->sig) {
 		list_node_t *p = partition(low, high, cmp);
@@ -135,7 +135,7 @@ static void quick_sort_range(list_node_t *low, list_node_t *high, t_Cmp cmp)
 }
 
 /* ---- Radix sort stub (not tested, returns OK without sorting) ---- */
-static int radix_sort_stub(list_t *l, t_Cmp cmp)
+static int radix_sort_stub(list_t *l, cmp_t cmp)
 {
 	(void)l;
 	(void)cmp;
@@ -300,8 +300,8 @@ int list_see_last(list_t *l, void *buff, const unsigned tam)
 	return OK;
 }
 
-int list_push_orderer(list_t *l, const void *d, const unsigned tam, t_Cmp cmp,
-		      t_Accion accion)
+int list_push_orderer(list_t *l, const void *d, const unsigned tam, cmp_t cmp,
+		      accion_t accion)
 {
 	if (!l)
 		return LIST_ERR_INVAL;
@@ -351,7 +351,7 @@ int list_push_orderer(list_t *l, const void *d, const unsigned tam, t_Cmp cmp,
 	return OK;
 }
 
-int list_delete_by_key(list_t *l, void *buff, const unsigned tam, t_Cmp cmp)
+int list_delete_by_key(list_t *l, void *buff, const unsigned tam, cmp_t cmp)
 {
 	if (!l || !*l)
 		return LIST_ERR_EMPTY;
@@ -419,7 +419,7 @@ int list_len(list_t *l)
 	return cont;
 }
 
-int list_search(list_t *l, void *buff, const unsigned tam, t_Cmp cmp)
+int list_search(list_t *l, void *buff, const unsigned tam, cmp_t cmp)
 {
 	if (!l || !*l)
 		return LIST_ERR_NOT_FOUND;
@@ -590,7 +590,7 @@ int list_concat(list_t *l1, list_t *l2)
 	return OK;
 }
 
-int list_count_appear(list_t *l, const void *d, const t_Cmp cmp)
+int list_count_appear(list_t *l, const void *d, const cmp_t cmp)
 {
 	if (!l || !*l)
 		return LIST_ERR_EMPTY;
@@ -606,7 +606,7 @@ int list_count_appear(list_t *l, const void *d, const t_Cmp cmp)
 	return res;
 }
 
-int list_contain(list_t *l, const void *d, const t_Cmp cmp)
+int list_contain(list_t *l, const void *d, const cmp_t cmp)
 {
 	if (!l || !*l)
 		return LIST_ERR_EMPTY;
@@ -621,7 +621,7 @@ int list_contain(list_t *l, const void *d, const t_Cmp cmp)
 	return LIST_ERR_NOT_FOUND;
 }
 
-int list_order(list_t *l, const int ordenamiento, const t_Cmp cmp)
+int list_order(list_t *l, const int ordenamiento, const cmp_t cmp)
 {
 	if (!l || !*l)
 		return LIST_ERR_EMPTY;
@@ -643,7 +643,7 @@ int list_order(list_t *l, const int ordenamiento, const t_Cmp cmp)
 	return OK;
 }
 
-int list_update_by_pos(list_t *l, const void *d, int pos, t_Accion accion)
+int list_update_by_pos(list_t *l, const void *d, int pos, accion_t accion)
 {
 	if (!l || !*l || !accion || pos < 0)
 		return LIST_ERR_EMPTY;
@@ -665,7 +665,7 @@ int list_update_by_pos(list_t *l, const void *d, int pos, t_Accion accion)
 	return OK;
 }
 
-int list_update_by_key(list_t *l, const void *d, t_Cmp cmp, t_Accion accion)
+int list_update_by_key(list_t *l, const void *d, cmp_t cmp, accion_t accion)
 {
 	if (!l || !*l || !accion || !cmp)
 		return LIST_ERR_EMPTY;
@@ -682,7 +682,7 @@ int list_update_by_key(list_t *l, const void *d, t_Cmp cmp, t_Accion accion)
 	return LIST_ERR_NOT_FOUND;
 }
 
-int list_search_pos(list_t *l, const void *d, t_Cmp cmp)
+int list_search_pos(list_t *l, const void *d, cmp_t cmp)
 {
 	if (!l || !*l || !cmp)
 		return LIST_ERR_EMPTY;
@@ -703,7 +703,7 @@ int list_search_pos(list_t *l, const void *d, t_Cmp cmp)
  * Display functions
  * ============================================================ */
 
-int list_show_rl(const list_t *l, const t_Prnt print)
+int list_show_rl(const list_t *l, const prnt_t print)
 {
 	if (!l || !*l || !print)
 		return 0;
@@ -720,7 +720,7 @@ int list_show_rl(const list_t *l, const t_Prnt print)
 	return cant;
 }
 
-int list_show_lr(const list_t *l, const t_Prnt print)
+int list_show_lr(const list_t *l, const prnt_t print)
 {
 	if (!l || !*l || !print)
 		return 0;
@@ -737,7 +737,7 @@ int list_show_lr(const list_t *l, const t_Prnt print)
 	return cant;
 }
 
-void list_show_invert(list_t *l, const t_Prnt mostrar)
+void list_show_invert(list_t *l, const prnt_t mostrar)
 {
 	if (!l || !*l || !mostrar)
 		return;
@@ -755,7 +755,7 @@ void list_show_invert(list_t *l, const t_Prnt mostrar)
  * ============================================================ */
 
 int list_push_after_key(list_t *l, const void *d, const unsigned tam,
-			const void *clave, const t_Cmp cmp)
+			const void *clave, const cmp_t cmp)
 {
 	if (!l || !*l)
 		return LIST_ERR_EMPTY;
@@ -787,7 +787,7 @@ int list_push_after_key(list_t *l, const void *d, const unsigned tam,
 }
 
 int list_push_before_key(list_t *l, const void *d, const unsigned tam,
-			 const void *clave, const t_Cmp cmp)
+			 const void *clave, const cmp_t cmp)
 {
 	if (!l || !*l)
 		return LIST_ERR_EMPTY;
@@ -821,7 +821,7 @@ int list_push_before_key(list_t *l, const void *d, const unsigned tam,
 }
 
 int list_delete_before_key(list_t *l, void *buff, const unsigned int tam,
-			   const void *clave, const t_Cmp cmp)
+			   const void *clave, const cmp_t cmp)
 {
 	if (!l || !*l)
 		return LIST_ERR_EMPTY;
@@ -854,7 +854,7 @@ int list_delete_before_key(list_t *l, void *buff, const unsigned int tam,
 }
 
 int list_delete_after_key(list_t *l, void *buff, const unsigned int tam,
-			  const void *clave, const t_Cmp cmp)
+			  const void *clave, const cmp_t cmp)
 {
 	if (!l || !*l)
 		return LIST_ERR_EMPTY;

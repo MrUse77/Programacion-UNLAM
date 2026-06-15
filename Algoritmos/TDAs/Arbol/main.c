@@ -7,9 +7,8 @@
  * @def MIN
  * @brief verifica cual es el menor entre 2 elementos
  */
-#define MIN(a, b) (a > b ? b : a)
 
-static tree_node_t **tree_node_max(tree_t *t)
+static tree_node_t **tree_node_max_key(tree_t *t)
 {
 	if (!*t) {
 		return NULL;
@@ -84,7 +83,25 @@ int tree_load_to_bin_file_sorted(tree_t *t, const char *path, unsigned tamInfo)
 	return code;
 }
 
-void tree_walk_in_order(tree_t *a, t_Accion accion, void *param)
+int tree_load_to_bin_file_sorted_abstract(tree_t *t, const char *path,
+					  unsigned tamInfo, accion_t accion)
+{
+	if (*t) {
+		return TREE_ERR_INVAL;
+	}
+	FILE *f = fopen(path, "rb");
+	int cant = 0, code = EXIT_SUCCESS;
+	if (!f) {
+		return TREE_ERR_INVAL;
+	}
+	fseek(f, 0, SEEK_END);
+	cant = ftell(f) / tamInfo;
+	code = tree_load_order(t, f, read_bin_file, 0, cant - 1, &tamInfo);
+	fclose(f);
+	return code;
+}
+
+void tree_walk_in_order(tree_t *a, accion_t accion, void *param)
 {
 	if (*a == NULL || a == NULL) {
 		return;
@@ -94,7 +111,7 @@ void tree_walk_in_order(tree_t *a, t_Accion accion, void *param)
 	tree_walk_in_order(&(*a)->der, accion, param);
 }
 
-void tree_walk_pre_order(tree_t *a, t_Accion accion, void *param)
+void tree_walk_pre_order(tree_t *a, accion_t accion, void *param)
 {
 	if (*a == NULL) {
 		return;
@@ -104,7 +121,7 @@ void tree_walk_pre_order(tree_t *a, t_Accion accion, void *param)
 	tree_walk_pre_order(&(*a)->der, accion, param);
 }
 
-void tree_walk_post_order(tree_t *a, t_Accion accion, void *param)
+void tree_walk_post_order(tree_t *a, accion_t accion, void *param)
 {
 	if (*a == NULL) {
 		return;
@@ -114,7 +131,7 @@ void tree_walk_post_order(tree_t *a, t_Accion accion, void *param)
 	accion(param, (*a)->dato);
 }
 
-int tree_insert(tree_t *a, const void *d, const size_t tam, const t_Cmp cmp)
+int tree_insert(tree_t *a, const void *d, const size_t tam, const cmp_t cmp)
 {
 	if (*a != NULL) {
 		int comp = cmp((*a)->dato, d);
@@ -144,7 +161,7 @@ int tree_insert(tree_t *a, const void *d, const size_t tam, const t_Cmp cmp)
 }
 
 int tree_insert_iter(tree_t *a, const void *d, const size_t tam,
-		     const t_Cmp cmp)
+		     const cmp_t cmp)
 {
 	tree_node_t **current = a;
 	while (*current) {
@@ -221,7 +238,7 @@ int tree_node_wr_count(const tree_t *a)
 	return 0;
 }
 
-int tree_node_w_cond_count(const tree_t *a, t_Cmp cmp, void *d)
+int tree_node_w_cond_count(const tree_t *a, cmp_t cmp, void *d)
 {
 	if (*a != NULL) {
 		if (cmp((*a)->dato, d) == 0) {
@@ -331,39 +348,51 @@ int tree_destroy(tree_t *tree)
 	return TREE_SUCCESS;
 }
 
-int tree_delete_node(tree_t *t, void *buff, const unsigned tam, t_Cmp cmp)
+static int tree_delete_node_raiz(tree_t *t)
 {
+	tree_node_t **remp, *elim;
 	if (*t == NULL) {
-		return -1;
+		return TREE_ERR_EMPTY;
 	}
-	int comp = cmp((*t)->dato, buff);
-	if (comp < 0) {
-		return tree_delete_node(&(*t)->der, buff, tam, cmp);
-	} else if (comp > 0) {
-		return tree_delete_node(&(*t)->izq, buff, tam, cmp);
-	}
-	tree_node_t *aux = *t;
-	if ((*t)->izq == NULL) {
-		*t = (*t)->der; // Si es hoja, pasa NULL. Si tiene hijo der, hace el puente.
-		free(aux->dato);
-		free(aux);
-	} else if ((*t)->der == NULL) {
-		*t = (*t)->izq; // Tiene solo hijo izq, hace el puente.
-		free(aux->dato);
-		free(aux);
+	free((*t)->dato);
+	if ((*t)->izq == NULL && (*t)->der == NULL) {
+		free(*t);
+		*t = NULL;
 	} else {
-		tree_node_t **remp = tree_height(&aux->izq) >
-						     tree_height(&aux->der) ?
-					     tree_node_max(&aux->izq) :
-					     tree_node_min(&aux->der),
-			    *elim;
+		remp = tree_height(&(*t)->izq) > tree_height(&(*t)->der) ?
+			       tree_node_max_key(&(*t)->izq) :
+			       tree_node_min(&(*t)->der);
+
 		elim = *remp;
 
-		free(aux->dato);
 		(*t)->dato = elim->dato; //Cambia puntero del dato
 		(*t)->tam = elim->tam; //Cambia valor entero
 		*remp = elim->izq ? elim->izq : elim->der;
 		free(elim);
 	}
 	return TREE_SUCCESS;
+}
+
+tree_node_t **tree_search(tree_t *t, void *buff, const unsigned tam, cmp_t cmp)
+{
+	if (*t != NULL) {
+		int comp = cmp((*t)->dato, buff);
+		if (comp < 0) {
+			return tree_search(&((*t)->der), buff, tam, cmp);
+		} else if (comp > 0) {
+			return tree_search(&((*t)->izq), buff, tam, cmp);
+		} else if (comp == 0) {
+			return t;
+		}
+	}
+	return NULL;
+}
+
+int tree_delete_node(tree_t *t, void *buff, const unsigned tam, cmp_t cmp)
+{
+	if ((t = tree_search(t, buff, tam, cmp)) == NULL) {
+		return TREE_ERR_EMPTY;
+	}
+	memcpy(buff, (*t)->dato, MIN((*t)->tam, tam));
+	return tree_delete_node_raiz(t);
 }

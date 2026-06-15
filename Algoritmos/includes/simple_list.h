@@ -9,9 +9,9 @@
 #include "types.h"
 #include <stdbool.h>
 
-typedef int (*t_Cmp)(const void *a, const void *b);
-typedef void (*t_Accion)(void *param, const void *dato);
-typedef void (*t_Prnt)(const void *dato);
+typedef int (*cmp_t)(const void *a, const void *b);
+typedef void (*accion_t)(void *param, const void *dato);
+typedef void (*prnt_t)(const void *dato);
 
 /**
  * @def ERR_LISTA_VACIA
@@ -157,8 +157,8 @@ int list_see_last(list_t *l, void *buff, const unsigned tam);
  * @return int OK (`200`) si se realizo exitosamente, ERR_MEM_LLENA (`101`) si
  * no hay espacio.
  */
-int list_push_orderer(list_t *l, const void *d, const unsigned tam, t_Cmp cmp,
-                      const int conDup, t_Accion accion);
+int list_push_orderer(list_t *l, const void *d, const unsigned tam, cmp_t cmp,
+                      const int conDup, accion_t accion);
 
 /**
  * @brief Obtiene el primer elemento de la lista sin eliminarlo.
@@ -179,7 +179,7 @@ int list_see_first(list_t *l, void *buff, const unsigned tam);
  * @return int OK (`200`) si se realizo exitosamente, ERR_LISTA_NO_ENCONTRADO si
  * no existe.
  */
-int list_delete_by_key(list_t *l, void *buff, const unsigned tam, t_Cmp cmp);
+int list_delete_by_key(list_t *l, void *buff, const unsigned tam, cmp_t cmp);
 
 /**
  * @brief Obtiene el elemento de una posicion.
@@ -207,7 +207,7 @@ int list_len(list_t *l);
  * @param cmp Funcion de comparacion.
  * @return int OK (`200`) si se encuentra, ERR_LISTA_NO_ENCONTRADO si no.
  */
-int list_search(list_t *l, void *buff, const unsigned tam, t_Cmp cmp);
+int list_search(list_t *l, void *buff, const unsigned tam, cmp_t cmp);
 
 /**
  * @brief Copia una lista en otra.
@@ -238,7 +238,7 @@ int list_push_at_position(list_t *l, const void *buff, const unsigned tam,
  * @return int OK (`200`) si se realizo exitosamente.
  */
 int list_insert_after_key(list_t *l, const void *d, const unsigned tam,
-                          const void *clave, const t_Cmp cmp);
+                          const void *clave, const cmp_t cmp);
 
 /**
  * @brief Inserta un elemento antes de una clave.
@@ -250,7 +250,7 @@ int list_insert_after_key(list_t *l, const void *d, const unsigned tam,
  * @return int OK (`200`) si se realizo exitosamente.
  */
 int list_insert_before_key(list_t *l, const void *d, const unsigned tam,
-                           const void *clave, const t_Cmp cmp);
+                           const void *clave, const cmp_t cmp);
 
 /**
  * @brief Elimina un elemento por posicion.
@@ -273,7 +273,7 @@ int list_delete_at_position(list_t *l, void *buff, const unsigned int size,
  * @return int OK (`200`) si se realizo exitosamente.
  */
 int list_delete_before_key(list_t *l, void *buff, const unsigned int size,
-                           const void *clave, const t_Cmp cmp);
+                           const void *clave, const cmp_t cmp);
 
 /**
  * @brief Elimina el elemento posterior a una clave.
@@ -285,7 +285,7 @@ int list_delete_before_key(list_t *l, void *buff, const unsigned int size,
  * @return int OK (`200`) si se realizo exitosamente.
  */
 int list_delete_after_key(list_t *l, void *buff, const unsigned int size,
-                          const void *clave, const t_Cmp cmp);
+                          const void *clave, const cmp_t cmp);
 
 /**
  * @brief Obtiene el primer elemento de la lista sin eliminarlo.
@@ -302,7 +302,7 @@ int list_peek_first(list_t *l, void *buff, const unsigned tam);
  * @param l Puntero a la lista.
  * @param prnt Funcion de impresion.
  */
-void list_show(const list_t *l, const t_Prnt prnt);
+void list_show(const list_t *l, const prnt_t prnt);
 
 /**
  * @brief Invierte el orden de los elementos de la lista.
@@ -327,7 +327,7 @@ int list_concat(list_t *l1, list_t *l2);
  * @param cmp Funcion de comparacion.
  * @return int OK (`200`) si se realizo exitosamente.
  */
-int list_count_appear(list_t *l, const void *d, int *res, const t_Cmp cmp);
+int list_count_appear(list_t *l, const void *d, int *res, const cmp_t cmp);
 
 /**
  * @brief Indica si la lista contiene un dato.
@@ -336,7 +336,7 @@ int list_count_appear(list_t *l, const void *d, int *res, const t_Cmp cmp);
  * @param cmp Funcion de comparacion.
  * @return int OK (`200`) si lo contiene, ERR_LISTA_NO_ENCONTRADO si no.
  */
-int list_contain(list_t *l, const void *d, const t_Cmp cmp);
+int list_contain(list_t *l, const void *d, const cmp_t cmp);
 
 /**
  * @brief Ordena la lista con el algoritmo indicado.
@@ -345,8 +345,8 @@ int list_contain(list_t *l, const void *d, const t_Cmp cmp);
  * @param cmp Funcion de comparacion.
  * @return int OK (`200`) si se realizo exitosamente.
  */
-int list_order(list_t *l, const int ordenamiento, const t_Cmp cmp);
+int list_order(list_t *l, const int ordenamiento, const cmp_t cmp);
 
-void list_show_invert(list_t *l, const t_Prnt mostrar);
+void list_show_invert(list_t *l, const prnt_t mostrar);
 
 #endif // LISTA_SIMPLE_H

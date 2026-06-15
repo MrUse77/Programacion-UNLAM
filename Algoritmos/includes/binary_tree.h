@@ -37,14 +37,14 @@ typedef tree_node_t *tree_t;
 /**
  * @brief Funcion de impresion para recorrer y mostrar los nodos del arbol.
  */
-typedef void (*t_Prnt)(const void *dato);
+typedef void (*prnt_t)(const void *dato);
 
 /**
  * @brief Funcion de comparacion entre dos elementos.
  * Devuelve negativo si menor es menor que mayor, cero si son iguales, positivo
  * si menor es mayor.
  */
-typedef int (*t_Cmp)(const void *menor, const void *mayor);
+typedef int (*cmp_t)(const void *menor, const void *mayor);
 
 /**
  * @brief Inicializa un arbol vacio.
@@ -58,7 +58,7 @@ void tree_init(tree_t *a);
  * @param accion Funcion a ejecutar por cada nodo (recibe contexto + dato).
  * @param param Puntero opaco que se pasa como contexto a la funcion.
  */
-void tree_walk_in_order(tree_t *a, t_Accion accion, void *param);
+void tree_walk_in_order(tree_t *a, accion_t accion, void *param);
 
 /**
  * @brief Recorre el arbol en orden post-orden (post-order): izquierda, derecha,
@@ -67,7 +67,7 @@ void tree_walk_in_order(tree_t *a, t_Accion accion, void *param);
  * @param accion Funcion a ejecutar por cada nodo (recibe contexto + dato).
  * @param param Puntero opaco que se pasa como contexto a la funcion.
  */
-void tree_walk_post_order(tree_t *a, t_Accion accion, void *param);
+void tree_walk_post_order(tree_t *a, accion_t accion, void *param);
 
 /**
  * @brief Recorre el arbol en orden pre-orden (pre-order): raiz, izquierda,
@@ -76,7 +76,7 @@ void tree_walk_post_order(tree_t *a, t_Accion accion, void *param);
  * @param accion Funcion a ejecutar por cada nodo (recibe contexto + dato).
  * @param param Puntero opaco que se pasa como contexto a la funcion.
  */
-void tree_walk_pre_order(tree_t *a, t_Accion accion, void *param);
+void tree_walk_pre_order(tree_t *a, accion_t accion, void *param);
 
 /**
  * @brief Inserta un elemento en el arbol de forma recursiva con control de
@@ -88,7 +88,7 @@ void tree_walk_pre_order(tree_t *a, t_Accion accion, void *param);
  * @return int OK (`200`) si se inserto exitosamente, MISMO_VALOR si el valor ya
  * existe, ERR o ERR_MEM_LLENA si no hay memoria.
  */
-int tree_insert(tree_t *a, const void *d, const size_t tam, const t_Cmp cmp);
+int tree_insert(tree_t *a, const void *d, const size_t tam, const cmp_t cmp);
 
 int tree_load_to_bin_file_sorted(tree_t *t, const char *path, unsigned tamInfo);
 
@@ -103,7 +103,7 @@ int tree_load_to_bin_file_sorted(tree_t *t, const char *path, unsigned tamInfo);
  * valor ya existe, ERR o ERR_MEM_LLENA si no hay memoria.
  */
 int tree_insert_iter(tree_t *a, const void *d, const size_t tam,
-                     const t_Cmp cmp);
+                     const cmp_t cmp);
 
 /**
  * @brief Devuelve la cantidad total de nodos del arbol.
@@ -141,7 +141,7 @@ int tree_node_wr_count(const tree_t *a);
  * @param d Dato de referencia para la busqueda.
  * @return int Cantidad de nodos que coinciden con el dato.
  */
-int tree_node_w_cond_count(const tree_t *a, t_Cmp cmp, void *d);
+int tree_node_w_cond_count(const tree_t *a, cmp_t cmp, void *d);
 
 /**
  * @brief Devuelve la altura del arbol (cantidad de niveles).
@@ -223,6 +223,6 @@ int tree_is_empty(tree_t *t);
  * @param cmp Funcion de comparacion.
  * @return int TREE_SUCCESS si se elimino, TREE_ERR_EMPTY si no se encontro.
  */
-int tree_delete_node(tree_t *t, void *buff, const unsigned tam, t_Cmp cmp);
+int tree_delete_node(tree_t *t, void *buff, const unsigned tam, cmp_t cmp);
 
 #endif // ARBOL_H

@@ -16,6 +16,8 @@ typedef struct {
 	int idx;
 } personaIDX_t;
 
+int dniABUscar = 0;
+
 /* ---------- Nombres para generar datos aleatorios ---------- */
 static const char *NOMBRES[] = {
 	"Juan",	 "Maria",   "Carlos", "Ana",	  "Pedro",
@@ -66,6 +68,9 @@ static int generar_archivo_personas(const char *path, int cantidad)
 
 		/* DNI aleatorio entre 1.000.000 y 50.000.000 */
 		p.dni = 1000000 + rand() % 49000000;
+		if (i == 27) {
+			dniABUscar = p.dni;
+		}
 
 		fwrite(&p, sizeof(persona_t), 1, f);
 	}
@@ -157,6 +162,57 @@ TEST(indice_arbol_por_dni)
 	//	remove(archivo_entrada);
 	//	remove(archivo_salida);
 
+	TEST_PASSED("Indice de arbol por DNI con recorrido inorden a archivo");
+}
+
+TEST(menu_indice)
+{
+	const char *archivo_entrada = "personas.dat";
+	const char *archivo_salida = "dnis_ordenados.idx";
+	const int CANT_PERSONAS = 100;
+	int state = 0;
+
+	/* Paso 1: Generar archivo con personas aleatorias */
+	ASSERT_TRUE(generar_archivo_personas(archivo_entrada, CANT_PERSONAS) ==
+			    0,
+		    "Archivo de personas generado");
+
+	/* Paso 2: Crear arbol y cargar personas */
+	tree_t arbol;
+	tree_init(&arbol);
+	ASSERT_TRUE(cargar_personas_en_arbol(&arbol, archivo_entrada) == 0,
+		    "Personas cargadas en el arbol");
+
+	tree_walk_in_order(&arbol, print, NULL);
+
+	/* Paso 3: Recorrer inorden y escribir DNIs en archivo de salida */
+
+	printf("seleccione opcion: \n");
+	printf("1 Eliminar persona: \n");
+	printf("2 Ingresar persona: \n");
+	printf("3 Mostrar personas: \n");
+	printf("0 Salir: \n");
+	scanf("%d", &state);
+	while (state != 0) {
+		switch (state) {
+		case 2: {
+			printf("Ingrese DNI: ");
+
+			persona_t pIdx = { dniABUscar, 0 };
+			tree_delete_node(&arbol, &pIdx, sizeof(personaIDX_t),
+					 cmp_dni);
+			fwrite();
+			break;
+		}
+		}
+	}
+
+	FILE *out = fopen(archivo_salida, "wb");
+	ASSERT_TRUE(out != NULL, "Archivo de salida abierto");
+
+	tree_walk_in_order(&arbol, escribir_dni_en_archivo, out);
+
+	fclose(out);
 	TEST_PASSED("Indice de arbol por DNI con recorrido inorden a archivo");
 }
 

@@ -142,8 +142,8 @@ int list_see_last(list_t *l, void *buff, const unsigned tam);
  * @return int OK si se realizo exitosamente, LIST_ERR_MEM_FULL si
  * no hay espacio.
  */
-int list_push_orderer(list_t *l, const void *d, const unsigned tam, t_Cmp cmp,
-                      t_Accion accion);
+int list_push_orderer(list_t *l, const void *d, const unsigned tam, cmp_t cmp,
+                      accion_t accion);
 
 /**
  * @brief Obtiene el primer elemento de la lista sin eliminarlo.
@@ -164,7 +164,7 @@ int list_see_first(list_t *l, void *buff, const unsigned tam);
  * @return int OK si se realizo exitosamente, LIST_ERR_NOT_FOUND si
  * no existe.
  */
-int list_delete_by_key(list_t *l, void *buff, const unsigned tam, t_Cmp cmp);
+int list_delete_by_key(list_t *l, void *buff, const unsigned tam, cmp_t cmp);
 
 /**
  * @brief Obtiene el elemento de una posicion.
@@ -191,7 +191,7 @@ int list_len(list_t *l);
  * @param cmp Funcion de comparacion.
  * @return int OK si se encuentra, LIST_ERR_NOT_FOUND si no.
  */
-int list_search(list_t *l, void *buff, const unsigned tam, t_Cmp cmp);
+int list_search(list_t *l, void *buff, const unsigned tam, cmp_t cmp);
 
 /**
  * @brief Copia una lista en otra (deep copy).
@@ -222,7 +222,7 @@ int list_push_in_pos(list_t *l, const void *buff, const unsigned tam,
  * @return int OK si se realizo exitosamente.
  */
 int list_push_after_key(list_t *l, const void *d, const unsigned tam,
-                        const void *clave, const t_Cmp cmp);
+                        const void *clave, const cmp_t cmp);
 
 /**
  * @brief Inserta un elemento antes de una clave.
@@ -234,7 +234,7 @@ int list_push_after_key(list_t *l, const void *d, const unsigned tam,
  * @return int OK si se realizo exitosamente.
  */
 int list_push_before_key(list_t *l, const void *d, const unsigned tam,
-                         const void *clave, const t_Cmp cmp);
+                         const void *clave, const cmp_t cmp);
 
 /**
  * @brief Elimina un elemento por posicion.
@@ -257,7 +257,7 @@ int list_delete_pos(list_t *l, void *buff, const unsigned int tam,
  * @return int OK si se realizo exitosamente.
  */
 int list_delete_before_key(list_t *l, void *buff, const unsigned int tam,
-                           const void *clave, const t_Cmp cmp);
+                           const void *clave, const cmp_t cmp);
 
 /**
  * @brief Elimina el elemento posterior a una clave.
@@ -269,28 +269,28 @@ int list_delete_before_key(list_t *l, void *buff, const unsigned int tam,
  * @return int OK si se realizo exitosamente.
  */
 int list_delete_after_key(list_t *l, void *buff, const unsigned int tam,
-                          const void *clave, const t_Cmp cmp);
+                          const void *clave, const cmp_t cmp);
 
 /**
  * @brief Muestra todos los elementos de la lista, de derecha a izquierda.
  * @param l Puntero a la lista.
  * @param print Funcion de impresion.
  */
-int list_show_lr(const list_t *l, const t_Prnt print);
+int list_show_lr(const list_t *l, const prnt_t print);
 
 /**
  * @brief Muestra todos los elementos de la lista, de izquierda a derecha.
  * @param l Puntero a la lista.
  * @param print Funcion de impresion.
  */
-int list_show_rl(const list_t *l, const t_Prnt print);
+int list_show_rl(const list_t *l, const prnt_t print);
 
 /**
  * @brief Muestra todos los elementos de la lista en orden inverso.
  * @param l Puntero a la lista.
  * @param mostrar Funcion de impresion.
  */
-void list_show_invert(list_t *l, const t_Prnt mostrar);
+void list_show_invert(list_t *l, const prnt_t mostrar);
 
 /**
  * @brief Invierte el orden de los elementos de la lista.
@@ -314,7 +314,7 @@ int list_concat(list_t *l1, list_t *l2);
  * @param cmp Funcion de comparacion.
  * @return int Cantidad de apariciones.
  */
-int list_count_appear(list_t *l, const void *d, const t_Cmp cmp);
+int list_count_appear(list_t *l, const void *d, const cmp_t cmp);
 
 /**
  * @brief Indica si la lista contiene un dato.
@@ -323,7 +323,7 @@ int list_count_appear(list_t *l, const void *d, const t_Cmp cmp);
  * @param cmp Funcion de comparacion.
  * @return int OK si lo contiene, LIST_ERR_NOT_FOUND si no.
  */
-int list_contain(list_t *l, const void *d, const t_Cmp cmp);
+int list_contain(list_t *l, const void *d, const cmp_t cmp);
 
 /**
  * @brief Ordena la lista con el algoritmo indicado.
@@ -332,7 +332,7 @@ int list_contain(list_t *l, const void *d, const t_Cmp cmp);
  * @param cmp Funcion de comparacion.
  * @return int LIST_ERR_EMPTY si lista vacia, OK en caso contrario.
  */
-int list_order(list_t *l, const int ordenamiento, const t_Cmp cmp);
+int list_order(list_t *l, const int ordenamiento, const cmp_t cmp);
 
 /**
  * @brief Actualiza un elemento por posicion mediante una accion.
@@ -342,7 +342,7 @@ int list_order(list_t *l, const int ordenamiento, const t_Cmp cmp);
  * @param accion Funcion de actualizacion.
  * @return int OK si se realizo exitosamente.
  */
-int list_update_by_pos(list_t *l, const void *d, int pos, t_Accion accion);
+int list_update_by_pos(list_t *l, const void *d, int pos, accion_t accion);
 
 /**
  * @brief Actualiza un elemento por clave mediante una accion.
@@ -352,7 +352,7 @@ int list_update_by_pos(list_t *l, const void *d, int pos, t_Accion accion);
  * @param accion Funcion de actualizacion.
  * @return int OK si se realizo exitosamente.
  */
-int list_update_by_key(list_t *l, const void *d, t_Cmp cmp, t_Accion accion);
+int list_update_by_key(list_t *l, const void *d, cmp_t cmp, accion_t accion);
 
 /**
  * @brief Busca la posicion de un elemento en la lista.
@@ -361,6 +361,6 @@ int list_update_by_key(list_t *l, const void *d, t_Cmp cmp, t_Accion accion);
  * @param cmp Funcion de comparacion.
  * @return int Posicion (0-indexada) si se encuentra, LIST_ERR_NOT_FOUND si no.
  */
-int list_search_pos(list_t *l, const void *d, t_Cmp cmp);
+int list_search_pos(list_t *l, const void *d, cmp_t cmp);
 
 #endif

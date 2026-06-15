@@ -20,10 +20,10 @@
  */
 #define FALSE 0
 
-typedef int (*t_Cmp)(const void *ctx, const void *d);
-typedef void (*t_Accion)(void *param, const void *dato);
-typedef void (*t_Prnt)(const void *dato);
-typedef int (*t_Acum)(void **, unsigned *, const void *, unsigned);
+typedef int (*cmp_t)(const void *ctx, const void *d);
+typedef void (*accion_t)(void *param, const void *dato);
+typedef void (*prnt_t)(const void *dato);
+typedef int (*acum_t)(void **, unsigned *, const void *, unsigned);
 typedef unsigned (*read_t)(void **, void *, unsigned, void *params);
 
 #endif

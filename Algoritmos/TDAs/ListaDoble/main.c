@@ -108,8 +108,8 @@ int list_push_first(list_t *l, const void *d, const unsigned tam)
 	return OK;
 }
 
-int list_push_orderer(list_t *l, const void *d, const unsigned tam, t_Cmp cmp,
-		      t_Acum acumulador)
+int list_push_orderer(list_t *l, const void *d, const unsigned tam, cmp_t cmp,
+		      acum_t acumulador)
 {
 	list_node_t *act = *l, *sig, *ant, *nue;
 	if (act == NULL) {
@@ -161,7 +161,7 @@ int list_push_orderer(list_t *l, const void *d, const unsigned tam, t_Cmp cmp,
 	return OK;
 }
 
-int list_show_lr(const list_t *l, t_Prnt print)
+int list_show_lr(const list_t *l, prnt_t print)
 {
 	list_node_t *act = *l;
 	int cant = 0;
@@ -178,7 +178,7 @@ int list_show_lr(const list_t *l, t_Prnt print)
 	return cant;
 }
 
-int list_show_rl(const list_t *l, t_Prnt print)
+int list_show_rl(const list_t *l, prnt_t print)
 {
 	list_node_t *act = *l;
 	int cant = 0;
@@ -195,7 +195,7 @@ int list_show_rl(const list_t *l, t_Prnt print)
 	return cant;
 }
 
-void list_order(list_t *l, const t_Cmp cmp)
+void list_order(list_t *l, const cmp_t cmp)
 {
 	list_node_t *act = *l, *sup = NULL, *inf = NULL;
 	int marca = 1;
@@ -236,7 +236,7 @@ void list_order(list_t *l, const t_Cmp cmp)
 	}
 }
 
-int list_delete_by_key(list_t *l, void *buff, const unsigned int tam, t_Cmp cmp)
+int list_delete_by_key(list_t *l, void *buff, const unsigned int tam, cmp_t cmp)
 {
 	list_node_t *act = *l;
 	int aux;
@@ -369,7 +369,7 @@ int list_len(list_t *l)
 	return cont;
 }
 
-int list_search(list_t *l, void *buff, const unsigned tam, t_Cmp cmp)
+int list_search(list_t *l, void *buff, const unsigned tam, cmp_t cmp)
 {
 	list_node_t *act;
 	if (l == NULL || *l == NULL) {
@@ -465,7 +465,7 @@ int list_push_in_pos(list_t *l, const void *buff, const unsigned tam,
 }
 
 int list_push_after_key(list_t *l, const void *d, const unsigned tam,
-			const void *clave, const t_Cmp cmp)
+			const void *clave, const cmp_t cmp)
 {
 	list_node_t *act;
 	list_node_t *nue;
@@ -497,7 +497,7 @@ int list_push_after_key(list_t *l, const void *d, const unsigned tam,
 }
 
 int list_push_before_key(list_t *l, const void *d, const unsigned tam,
-			 const void *clave, const t_Cmp cmp)
+			 const void *clave, const cmp_t cmp)
 {
 	list_node_t *act;
 	list_node_t *nue;
@@ -560,7 +560,7 @@ int list_delete_pos(list_t *l, void *buff, const unsigned int tam,
 }
 
 int list_delete_before_key(list_t *l, void *buff, const unsigned int tam,
-			   const void *clave, const t_Cmp cmp)
+			   const void *clave, const cmp_t cmp)
 {
 	list_node_t *act;
 	if (l == NULL || *l == NULL) {
@@ -590,7 +590,7 @@ int list_delete_before_key(list_t *l, void *buff, const unsigned int tam,
 }
 
 int list_delete_after_key(list_t *l, void *buff, const unsigned int tam,
-			  const void *clave, const t_Cmp cmp)
+			  const void *clave, const cmp_t cmp)
 {
 	list_node_t *act;
 	if (l == NULL || *l == NULL) {
@@ -663,7 +663,7 @@ int list_concat(list_t *l1, list_t *l2)
 	return OK;
 }
 
-int list_count_appear(list_t *l, const void *d, const t_Cmp cmp)
+int list_count_appear(list_t *l, const void *d, const cmp_t cmp)
 {
 	int res;
 	list_node_t *act;
@@ -681,7 +681,7 @@ int list_count_appear(list_t *l, const void *d, const t_Cmp cmp)
 	return res;
 }
 
-int list_contain(list_t *l, const void *d, const t_Cmp cmp)
+int list_contain(list_t *l, const void *d, const cmp_t cmp)
 {
 	list_node_t *act;
 	if (l == NULL || *l == NULL) {
@@ -697,7 +697,7 @@ int list_contain(list_t *l, const void *d, const t_Cmp cmp)
 	return LIST_ERR_NOT_FOUND;
 }
 
-int list_update_by_pos(list_t *l, const void *d, int pos, t_Accion accion)
+int list_update_by_pos(list_t *l, const void *d, int pos, accion_t accion)
 {
 	list_node_t *act;
 	int i = 0;
@@ -717,7 +717,7 @@ int list_update_by_pos(list_t *l, const void *d, int pos, t_Accion accion)
 	return OK;
 }
 
-int list_update_by_key(list_t *l, const void *d, t_Cmp cmp, t_Accion accion)
+int list_update_by_key(list_t *l, const void *d, cmp_t cmp, accion_t accion)
 {
 	list_node_t *act;
 	if (l == NULL || *l == NULL || accion == NULL || cmp == NULL) {
@@ -735,7 +735,7 @@ int list_update_by_key(list_t *l, const void *d, t_Cmp cmp, t_Accion accion)
 	return OK;
 }
 
-int list_search_pos(list_t *l, const void *d, t_Cmp cmp)
+int list_search_pos(list_t *l, const void *d, cmp_t cmp)
 {
 	list_node_t *act;
 	int pos = 0;

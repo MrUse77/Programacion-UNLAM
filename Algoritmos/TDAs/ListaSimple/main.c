@@ -35,7 +35,7 @@ static int list_divide(list_t *orig, list_t *left, list_t *right)
 	return OK;
 }
 
-static list_t list_merge_lists(list_t left, list_t right, t_Cmp cmp)
+static list_t list_merge_lists(list_t left, list_t right, cmp_t cmp)
 {
 	if (left == NULL)
 		return right;
@@ -50,7 +50,7 @@ static list_t list_merge_lists(list_t left, list_t right, t_Cmp cmp)
 	}
 }
 
-static int list_merge_sort(list_t *l, t_Cmp cmp)
+static int list_merge_sort(list_t *l, cmp_t cmp)
 {
 	list_t left, right;
 	if (*l == NULL || (*l)->sig == NULL)
@@ -70,7 +70,7 @@ static list_node_t *list_last(list_node_t *l)
 	return l;
 }
 
-static int list_quick_sort(list_t *l, t_Cmp cmp)
+static int list_quick_sort(list_t *l, cmp_t cmp)
 {
 	list_t smaller = NULL, larger = NULL, equal = NULL;
 	list_node_t *pivot = *l, *current = pivot, *next = NULL;
@@ -251,8 +251,8 @@ int list_see_first(list_t *l, void *buff, const unsigned tam)
 	return OK;
 }
 
-int list_push_orderer(list_t *l, const void *d, const unsigned tam, t_Cmp cmp,
-		      const int conDup, t_Accion accion)
+int list_push_orderer(list_t *l, const void *d, const unsigned tam, cmp_t cmp,
+		      const int conDup, accion_t accion)
 {
 	list_node_t *n = (list_node_t *)malloc(sizeof(list_node_t));
 	n->dato = malloc(tam);
@@ -281,7 +281,7 @@ int list_push_orderer(list_t *l, const void *d, const unsigned tam, t_Cmp cmp,
 	return OK;
 }
 
-int list_delete_by_key(list_t *l, void *buff, const unsigned tam, t_Cmp cmp)
+int list_delete_by_key(list_t *l, void *buff, const unsigned tam, cmp_t cmp)
 {
 	if (*l == NULL) {
 		return ERR_LISTA_VACIA;
@@ -328,7 +328,7 @@ int list_len(list_t *l)
 	return count;
 }
 
-int list_search(list_t *l, void *buff, const unsigned tam, t_Cmp cmp)
+int list_search(list_t *l, void *buff, const unsigned tam, cmp_t cmp)
 {
 	if (*l == NULL) {
 		return ERR_LISTA_VACIA;
@@ -389,7 +389,7 @@ int list_push_at_position(list_t *l, const void *d, const unsigned tam,
 }
 
 int list_push_after_key(list_t *l, const void *d, const unsigned tam,
-			const void *clave, const t_Cmp cmp)
+			const void *clave, const cmp_t cmp)
 {
 	list_node_t *n = (list_node_t *)malloc(sizeof(list_node_t));
 	n->dato = malloc(tam);
@@ -410,7 +410,7 @@ int list_push_after_key(list_t *l, const void *d, const unsigned tam,
 }
 
 int list_insert_before_key(list_t *l, const void *d, const unsigned tam,
-			   const void *clave, const t_Cmp cmp)
+			   const void *clave, const cmp_t cmp)
 {
 	list_node_t *n = (list_node_t *)malloc(sizeof(list_node_t));
 	list_node_t **aux = l;
@@ -465,7 +465,7 @@ int list_delete_at_position(list_t *l, void *buff, const unsigned int tam,
 }
 
 int list_delete_before_key(list_t *l, void *buff, const unsigned int tam,
-			   const void *clave, const t_Cmp cmp)
+			   const void *clave, const cmp_t cmp)
 {
 	if (l == NULL) {
 		return ERR_LISTA_VACIA;
@@ -485,7 +485,7 @@ int list_delete_before_key(list_t *l, void *buff, const unsigned int tam,
 }
 
 int list_delete_after_key(list_t *l, void *buff, const unsigned int tam,
-			  const void *clave, const t_Cmp cmp)
+			  const void *clave, const cmp_t cmp)
 {
 	if (l == NULL) {
 		return ERR_LISTA_VACIA;
@@ -505,7 +505,7 @@ int list_delete_after_key(list_t *l, void *buff, const unsigned int tam,
 	return OK;
 }
 
-void list_show(const list_t *l, const t_Prnt prnt)
+void list_show(const list_t *l, const prnt_t prnt)
 {
 	while (*l) {
 		prnt((*l)->dato);
@@ -553,7 +553,7 @@ int list_concat(list_t *l1, list_t *l2)
 	return OK;
 }
 
-int list_count_appear(list_t *l, const void *d, int *res, const t_Cmp cmp)
+int list_count_appear(list_t *l, const void *d, int *res, const cmp_t cmp)
 {
 	if (l == NULL) {
 		return ERR_LISTA_VACIA;
@@ -567,7 +567,7 @@ int list_count_appear(list_t *l, const void *d, int *res, const t_Cmp cmp)
 	return OK;
 }
 
-int list_contain(list_t *l, const void *d, const t_Cmp cmp)
+int list_contain(list_t *l, const void *d, const cmp_t cmp)
 {
 	if (l == NULL) {
 		return ERR_LISTA_VACIA;
@@ -581,7 +581,7 @@ int list_contain(list_t *l, const void *d, const t_Cmp cmp)
 	return ERR_LISTA_NO_ENCONTRADO;
 }
 
-int list_order(list_t *l, const int ordenamiento, const t_Cmp cmp)
+int list_order(list_t *l, const int ordenamiento, const cmp_t cmp)
 {
 	int code = LIST_ERR_INVAL;
 	switch (ordenamiento) {
@@ -598,7 +598,7 @@ int list_order(list_t *l, const int ordenamiento, const t_Cmp cmp)
 	return code;
 }
 
-void list_show_invert(list_t *l, const t_Prnt mostrar)
+void list_show_invert(list_t *l, const prnt_t mostrar)
 {
 	list_t lAux = NULL;
 	list_node_t *aux = NULL;

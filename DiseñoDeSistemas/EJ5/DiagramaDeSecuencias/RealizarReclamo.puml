@@ -1,0 +1,59 @@
+@startuml
+skinparam BoxPadding 10
+
+box "Capa Controlador" #LightBlue
+participant ContollerReclamos
+end box
+
+box "Capa de Aplicación" #LightYellow
+participant GestorUbicacion
+end box
+
+box "Capa de Dominio (Core)" #LightGreen
+participant "u: Ubicacion" as Ubicacion
+participant "uGPS: UbicacionGPS" as UbicacionGPS
+participant "uManual: UbicacionManual" as UbicacionManual
+end box
+
+' El controlador manda los datos. Si es GPS, calle y numero vienen null. Si es manual, lat y long vienen null.
+ContollerReclamos -> GestorUbicacion : procesarDatosUbicacion(calle, numero, lat, long)
+activate GestorUbicacion
+
+alt lat != null && long != null [Caso: Ubicación por GPS]
+    
+    ' Aplicamos CREADOR: Nace la especialización por GPS
+    create UbicacionGPS
+    GestorUbicacion -> UbicacionGPS : <<create>> (lat, long)
+    
+    ' Guardamos la referencia en la variable polimófica 'u'
+    note over GestorUbicacion: u = uGPS
+
+else calle != null && numero != null [Caso: Carga Manual]
+    
+    ' Aplicamos CREADOR: Nace la especialización Manual
+    create UbicacionManual
+    GestorUbicacion -> UbicacionManual : <<create>> (calle, numero)
+    
+    note over GestorUbicacion: u = uManual
+
+end
+
+' --- EL PODER DEL POLIMORFISMO Y LAS VARIACIONES PROTEGIDAS ---
+' Al GestorUbicacion no le importa cuál de las dos se creó. 
+' Invoca al método abstracto/interfaz y el Polimorfismo hace su magia.
+GestorUbicacion -> Ubicacion : estaDentroDeCABA()
+activate Ubicacion
+
+alt Si 'u' es UbicacionGPS
+    UbicacionGPS -> UbicacionGPS : calcularPorPoligonoMatematico()
+    Ubicacion --> GestorUbicacion : esValido
+else Si 'u' es UbicacionManual
+    UbicacionManual -> UbicacionManual : validarContraNomencladorCalles()
+    Ubicacion --> GestorUbicacion : esValido
+end
+deactivate Ubicacion
+
+GestorUbicacion --> ContollerReclamos : u
+deactivate GestorUbicacion
+
+@enduml

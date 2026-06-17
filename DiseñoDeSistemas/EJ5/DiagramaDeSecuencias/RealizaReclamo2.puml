@@ -1,0 +1,75 @@
+@startuml
+skinparam BoxPadding 10
+skinparam ParticipantPadding 10
+
+box "Capa Controlador (Adaptadores de Entrada)" #LightBlue
+participant ContollerReclamos
+end box
+
+box "Capa de Aplicación / Coordinación" #LightYellow
+participant GestorUbicacion
+participant GestorReclamos
+end box
+
+box "Capa de Dominio (Core)" #LightGreen
+collections "todosLosTemas: Tema" as Temas
+participant "elTema: Tema" as Tema
+participant "u: Ubicacion" as Ubicacion
+participant "r: Reclamo" as Reclamo
+participant "f: Foto" as Foto
+end box
+
+' --- FASE 1: COORDINACIÓN Y VALIDACIÓN GEOGRÁFICA ---
+ContollerReclamos -> GestorUbicacion : procesarDatosUbicacion(calle, numero, lat, long)
+activate GestorUbicacion
+
+' El GestorUbicacion es el Creador porque tiene los datos de inicialización
+create Ubicacion
+GestorUbicacion -> Ubicacion : <<create>> (calle, numero, lat, long)
+
+' Regla de negocio: Validamos geografía antes de tocar el dominio del reclamo
+GestorUbicacion -> Ubicacion : estaDentroDeCABA()
+activate Ubicacion
+Ubicacion --> GestorUbicacion : esValido (true/false)
+deactivate Ubicacion
+
+note over GestorUbicacion
+	Si esValido == false, acá se corta el flujo 
+	y se lanza una excepción al controlador.
+	Asumimos el camino feliz (true).
+end note
+
+GestorUbicacion --> ContollerReclamos : u
+deactivate GestorUbicacion
+
+' --- FASE 2: REGISTRO DEL RECLAMO CON ENTIDADES PURAS ---
+' El controlador ahora pasa el objeto Ubicacion real, evitando tipos primitivos sueltos
+ContollerReclamos -> GestorReclamos : registrarReclamo(desc, nombreTema, fotoBlob, u)
+activate GestorReclamos
+
+' Patrón EXPERTO EN INFORMACIÓN: La colección busca y provee la instancia real de Tema
+GestorReclamos -> Temas : buscarTemaPorNombre(nombreTema)
+activate Temas
+Temas --> GestorReclamos : elTema
+deactivate Temas
+
+' Patrón CREADOR: El GestorReclamos tiene el contexto para instanciar el Reclamo
+create Reclamo
+GestorReclamos -> Reclamo : <<create>> (generarCodigo(), desc, elTema, u)
+activate Reclamo
+
+' El Reclamo, como Experto y Creador de su composición, maneja sus fotos internamente
+opt fotoBlob != null
+    create  Foto
+    Reclamo -> Foto : <<create>> (fotoBlob)
+    Reclamo -> Reclamo : agregarFoto(f)
+end opt
+
+Reclamo --> GestorReclamos : codigoSeguimiento
+deactivate Reclamo
+
+' Fin del ciclo de vida del caso de uso
+GestorReclamos --> ContollerReclamos : codigoSeguimiento
+deactivate GestorReclamos
+
+@enduml

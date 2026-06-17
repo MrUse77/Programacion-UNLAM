@@ -1,0 +1,109 @@
+'El Gobierno de la Ciudad de Buenos Aires desea desarrollar una aplicación móvil, cuyo
+'objetivo es brindar al ciudadano una herramienta que le permita realizar reclamos por 
+'problemas en los servicios bajo su dependencia. Se puede reclamar por temas referidos
+'a las áreas: transporte, alumbrado, espacios verdes, salud y seguridad.
+'Para realizar un reclamo, el ciudadano ingresa con su cuenta personal, elije el área y el
+'tema por el cual va a reclamar, y además, deberá informar la ubicación del problema,
+'adjuntar una descripción y fotos que respalden el reclamo. Para informar la ubicación,
+'la aplicación obtiene las coordenadas por geolocalización utilizando el GPS del teléfono,
+'opcionalmente el ciudadano podrá ingresar una dirección distinta manualmente.
+'Una vez que se registra el reclamo, se deriva al área de gobierno correspondiente para
+'su evaluación y el ciudadano recibe por email un código de seguimiento de trámite que
+'le permitirá consultar su estado, y la información de contacto de la dependencia del área
+'de gobierno interviniente.
+'Los reclamos que no puedan verificarse por falta de información, que indiquen una
+'ubicación fuera del ámbito de la Ciudad Autónoma de Buenos Aires, o que evidencien
+'falsedad de los datos informados serán desestimados dando por finalizado el trámite.
+'Solo se puede reclamar un problema a la vez. Tenga en cuenta que esta plataforma
+'estará conectada directamente con las distintas áreas del Gobierno de la Cuidad de
+'Buenos Aires y se derivará el reclamo a la sede correspondiente según el tema del que
+'se trate.
+@startuml
+skinparam classAttributeIconSize 0
+
+class Ciudadano{
+	- int dni
+	- string nombre
+	- string apellido
+	- string email
+}
+
+class Area{
+	- string tipo	
+}
+
+
+class Tema{
+	- string descripcion
+}
+
+class Reclamo{
+	- int codigo
+	- string descripcion
+	- date fecha_y_hora
+}
+
+class Ubicacion{
+	- string calle
+	- int numero
+	- float latitud
+	- float longitud
+}
+
+'class UbicacionGPS{
+	'- int latitud
+	'- int longitud
+'}
+'
+'class UbicacionManual{
+	'- int calle
+	'- string nombre
+'}
+
+
+'string o BLOB?'
+class Foto{
+	- string ruta
+}
+
+'Telefono string? +54 .....'
+class ContactoDependencia{
+	- string email
+	- int teléfono
+	- time hora_desde
+	- time hora_hasta
+}
+
+class EstadoReclamo{
+	- string estado
+}
+
+
+class Sede{
+	- int num_sede
+	- string email
+	- int teléfono
+	- time hora_desde
+	- time hora_hasta
+}
+
+
+
+
+Ciudadano "1" -- "1...*" Reclamo
+Reclamo "1" -- "1" Tema
+Reclamo "1" -- "1" Ubicacion
+Reclamo "1" -- "0...*" Foto
+Reclamo "1" -- "1...*" EstadoReclamo
+'1 o varios temas?'
+Tema "1" -- "1" Sede
+Reclamo "1" -- "1" ContactoDependencia
+Area "1" -- "1...*" Tema
+Sede "1" -- "1" Ubicacion
+
+
+
+
+@enduml
+
+

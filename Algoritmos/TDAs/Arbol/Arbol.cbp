@@ -67,6 +67,12 @@
 		</VirtualTargets>
 		<Unit filename="Test/test_arbol.c">
 			<Option compilerVar="CC" />
+			<Option target="TestLinux" />
+			<Option target="Linux" />
+			<Option target="Windows" />
+		</Unit>
+		<Unit filename="Test/test_arbol_indice_dni.c">
+			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />

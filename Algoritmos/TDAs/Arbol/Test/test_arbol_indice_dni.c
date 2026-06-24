@@ -9,6 +9,7 @@
 typedef struct {
 	char nombre[50];
 	int dni;
+	int rem;
 } persona_t;
 
 typedef struct {
@@ -195,13 +196,17 @@ TEST(menu_indice)
 	scanf("%d", &state);
 	while (state != 0) {
 		switch (state) {
-		case 2: {
+		case 1: {
 			printf("Ingrese DNI: ");
 
-			persona_t pIdx = { dniABUscar, 0 };
-			tree_delete_node(&arbol, &pIdx, sizeof(personaIDX_t),
-					 cmp_dni);
-			fwrite();
+			personaIDX_t pIdx = { 0 };
+			scanf("%d", &pIdx.dni);
+			if (tree_delete_node(&arbol, &pIdx,
+					     sizeof(personaIDX_t),
+					     cmp_dni) == TREE_ERR_EMPTY) {
+				printf("Persona no encontrada");
+			}
+			fwrite(&pIdx, sizeof(personaIDX_t), 1, f);
 			break;
 		}
 		}

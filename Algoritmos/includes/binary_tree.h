@@ -225,4 +225,7 @@ int tree_is_empty(tree_t *t);
  */
 int tree_delete_node(tree_t *t, void *buff, const unsigned tam, cmp_t cmp);
 
+int binarysearchtree_search_r(const tree_t *tree, const void *key, void *buf,
+                              size_t n, cmp_t cmp);
+
 #endif // ARBOL_H

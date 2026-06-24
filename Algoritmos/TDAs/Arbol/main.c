@@ -396,3 +396,25 @@ int tree_delete_node(tree_t *t, void *buff, const unsigned tam, cmp_t cmp)
 	memcpy(buff, (*t)->dato, MIN((*t)->tam, tam));
 	return tree_delete_node_raiz(t);
 }
+int binarysearchtree_search_r(const tree_t *tree, const void *key, void *buf,
+			      size_t n, cmp_t cmp)
+{
+	int compar;
+
+	if (*tree) {
+		compar = cmp((*tree)->dato, key);
+
+		if (compar > 0) {
+			return binarysearchtree_search_r(&(*tree)->izq, key,
+							 buf, n, cmp);
+		} else if (compar < 0) {
+			return binarysearchtree_search_r(&(*tree)->der, key,
+							 buf, n, cmp);
+		} else {
+			memcpy(buf, (*tree)->dato, MIN((*tree)->tam, n));
+			return EXIT_SUCCESS;
+		}
+	}
+
+	return EXIT_FAILURE;
+}

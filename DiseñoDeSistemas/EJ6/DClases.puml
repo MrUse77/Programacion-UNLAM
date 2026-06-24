@@ -1,0 +1,150 @@
+@startuml
+class EntradaController <<Controller>>{
+	+ seleccionarObra(idObra: UUID): Funcion[]
+	+ procesarSeleccionAsientos(funcion: Funcion, asientos: Asientos[]): resumenCompra
+	+ procesarPago(compra: Compra, entradas: Entrada[]): HTTP_REQUEST
+}
+note top of EntradaController : "resumenCompra es un objeto que contiene Compra y Entrada[]"
+
+class GestorEntrada{
+	+ seleccionarObra(idObra: UUID): Funcion[]
+	+ procesarSeleccionAsientos(funcion: Funcion, asientos: Asientos[]): resumenCompra
+}
+
+class GestorPago{
+	+ procesarPago(compra: Compra, entradas: Entrada[]): String
+}
+
+class IPagoService <<Interface>>{
+	+ procesarPago(total: int): String
+}
+
+class PagoTIC{
+}
+
+class IEmailService <<Interface>>{
+	+ enviarEmail(email: String, entradas: Entrada[]): String
+}
+
+class EmailService{
+}
+
+class Usuario{
+	- email: String
+	- nombre: String
+	- apellido: String
+	- username: String
+	- contraseña: String
+	- dni: String
+	- fechaNac: Date
+	+ getEmail(): String
+}
+
+class NoDocente{
+	- descuento: int
+}
+
+class Docente{
+	- descuento: int
+}
+
+class Alumno{
+	- descuento: int
+}
+
+class Obra{
+	- id: UUID
+	- nombre: String
+	- descripcion: String
+	- autor: String
+	- estreno: Date
+	+ verificarFunciones(): Funcion[]
+}
+
+class Funcion{
+	- fecha: Date
+	- hora: Time
+	- precio: Double
+	+ estaLlena(): Bool
+}
+
+class Entrada{
+	- codigo: UUID
+	- codigoQR: String
+	# generarCodigo(): String
+	+ generarQR(): void
+}
+
+class Asiento{
+	- fila: int
+	- num: int
+}
+
+class Compra{
+	- codigo: UUID
+	- subtotal: double
+	- descuentoAplicado: double
+	- total: double
+	+ estado: String
+	+ nuevaCompra(usuario: Usuario): void
+	+ agregarEntrada(entrada: Entrada): void
+	+ calcularTotales(): void
+	+ setPago(pago: Pago): void
+	+ confirmar(): void
+}
+
+class Pago{
+	- codigo: UUID 
+	- importe: double
+	- estado: String
+	- fechaPago: DateTime
+	+ nuevoPago(codigo: UUID, total: double, estado: String)
+}
+
+class Sala{
+	- numero: int
+	- capacidad: int
+	+ getCapacidad(): int
+}
+
+EntradaController -- GestorPago
+EntradaController -- GestorEntrada
+GestorEntrada -- Obra
+GestorEntrada -- Compra
+GestorEntrada -- Entrada
+
+GestorPago -- Compra
+GestorPago -- Pago
+GestorPago -- IPagoService
+GestorPago -- IEmailService
+GestorPago -- Entrada
+
+IPagoService <-- PagoTIC
+IEmailService <-- EmailService
+
+
+' === Herencia de Usuario ===
+Usuario <|-- Alumno
+Usuario <|-- Docente
+Usuario <|-- NoDocente
+
+' === Relaciones ===
+Usuario "1" -- "0..*" Entrada : compra
+
+Entrada "1" -- "1" Funcion : corresponde a
+Entrada "1" -- "1" Asiento : ocupa
+
+Funcion "1..*" --* "1" Obra : presenta
+Funcion "1" -- "1" Sala : se realiza en
+
+Sala "1" *-- "1..*" Asiento : contiene
+
+Pago "1" -- "1" Usuario : realizado por
+
+Compra "1" *-- "1..*" Entrada
+ 
+Compra "1" -- "0..1" Pago
+
+
+
+@enduml

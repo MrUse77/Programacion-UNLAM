@@ -1,0 +1,184 @@
+@startuml
+
+' ===== Controladores =====
+participant ":EntradaController" as Ctrl 
+participant ":GestorEntrada" as GE 
+participant ":GestorPago" as GP 
+
+' ===== Multiobjetos (solo búsqueda y persistencia) =====
+collections "Obra" as ColObra 
+collections "Entrada" as ColEntrada 
+collections "Pago" as ColPago 
+
+' ===== Objetos de dominio =====
+participant ":Obra" as Obra 
+participant ":Funcion" as Funcion 
+participant ":Sala" as Sala 
+participant ":Compra" as Compra 
+participant ":Entrada" as Entrada 
+participant ":Pago" as Pago 
+
+' ===== Servicios externos =====
+participant ":PagoTic" as PagoTic
+participant ":EmailService" as Email 
+' ============================================
+' Paso 1: Seleccionar obra
+' ============================================
+
+Ctrl -> GE : seleccionarObra(idObra)
+activate GE
+
+GE -> ColObra : buscarObra(idObra)
+'note on link : Information Expert\nLa colección busca y retorna el objeto
+activate ColObra
+GE <-- ColObra : obra
+deactivate ColObra
+
+GE -> Obra : verificarFunciones()
+'note on link : Information Expert\nLa obra conoce sus funciones
+activate Obra
+
+loop por cada funcion
+    Obra -> Funcion : estaLlena()
+    'note on link : Information Expert\nLa función conoce su estado
+    activate Funcion
+
+    Funcion -> ColEntrada : contarEntradas(funcion)
+    'note on link : Information Expert\nLa colección conoce todas las entradas
+    activate ColEntrada
+    Funcion <-- ColEntrada : cantidad
+    deactivate ColEntrada
+
+    Funcion -> Sala : getCapacidad()
+    'note on link : Information Expert\nLa sala conoce su capacidad
+    activate Sala
+    Funcion <-- Sala : capacidad
+    deactivate Sala
+
+    Obra <-- Funcion : resultado
+    deactivate Funcion
+end
+
+GE <-- Obra : funcionesDisponibles[]
+deactivate Obra
+
+Ctrl <-- GE : funcionesDisponibles[]
+deactivate GE
+
+' ============================================
+' Paso 2: Seleccionar asientos y armar compra
+' ============================================
+
+Ctrl -> GE : procesarSeleccionAsientos(funcion, asientos[])
+activate GE
+
+' Validar en el multiobjeto
+loop por cada asiento
+    GE -> ColEntrada : existeEntrada(funcion, asiento)
+    'note on link : Information Expert\nLa colección verifica existencia
+    activate ColEntrada
+    GE <-- ColEntrada : false
+    deactivate ColEntrada
+end
+
+' Crear compra en memoria
+create Compra
+GE -> Compra : nuevaCompra(usuario)
+'note on link : Creator\nGE tiene los datos\ninicializadores
+
+' Crear entradas en memoria (NO desde colección)
+loop por cada asiento
+    create Entrada
+    GE -> Entrada : nuevaEntrada(funcion, asiento, precio)
+    'note on link : Creator\nGE tiene los datos\ninicializadores
+    activate Entrada
+    GE <-- Entrada : entrada
+    deactivate Entrada
+
+    GE -> Compra : agregarEntrada(entrada)
+end
+
+' Lógica sobre el objeto
+GE -> Compra : calcularTotales()
+'note on link : Information Expert\nCompra conoce sus entradas\ny al usuario
+activate Compra
+Compra -> Compra : subtotal = sum(entradas.precio)
+Compra -> Compra : descuento = subtotal × usuario.descuento
+'note on link : Polymorphism\nAlumno=5%, Docente=7%\nNoDocente=3%
+Compra -> Compra : total = subtotal - descuento
+GE <-- Compra : subtotal, descuento, total
+deactivate Compra
+
+Ctrl <-- GE : resumenCompra  (contiene compra y entradas[])
+deactivate GE
+
+' ============================================
+' Paso 3: Confirmar y pagar
+' ============================================
+
+Ctrl -> GP : procesarPago(compra, entradas[])
+activate GP
+
+GP -> Compra : getTotal()
+'note on link : Information Expert
+activate Compra
+GP <-- Compra : total
+deactivate Compra
+
+GP -> PagoTic : procesarPago(total)
+'note on link : Indirection\nGP desacopla al sistema\nde la pasarela externa
+activate PagoTic
+'note right : Protected Variations\nSi cambia PagoTic\nsolo se modifica GP
+GP <-- PagoTic : confirmacionOk
+deactivate PagoTic
+
+' Crear pago en memoria (NO desde colección)
+create Pago
+GP -> Pago : nuevoPago(codigoTransaccion, total, APROBADO)
+'note on link : Creator\nGP tiene los datos\nde la confirmación
+activate Pago
+GP <-- Pago : pago
+deactivate Pago
+
+' Persistir el pago en el multiobjeto
+GP -> ColPago : guardar(pago)
+'note on link : La colección persiste\nel objeto ya creado
+activate ColPago
+GP <-- ColPago : ok
+deactivate ColPago
+
+GP -> Compra : setPago(pago)
+activate Compra
+deactivate Compra
+
+GP -> Compra : confirmar()
+'note on link : Information Expert\nCompra cambia su propio estado
+activate Compra
+Compra -> Compra : estado = CONFIRMADA
+deactivate Compra
+
+' Generar QR y recién después persistir cada entrada
+loop por cada entrada
+    GP -> Entrada : generarQR()
+    'note on link : Information Expert\nEntrada conoce cómo\ngenerar su QR
+    activate Entrada
+    Entrada -> Entrada : codigoQR = generarCodigo()
+    deactivate Entrada
+
+    GP -> ColEntrada : guardar(entrada)
+    'note on link : La colección persiste\nel objeto ya completo
+    activate ColEntrada
+    GP <-- ColEntrada : ok
+    deactivate ColEntrada
+end
+
+GP -> Email : enviarEmail(usuario.email, entradas[])
+'note on link : Pure Fabrication
+activate Email
+GP <-- Email : enviado
+deactivate Email
+
+Ctrl <-- GP : exito
+deactivate GP
+
+@enduml

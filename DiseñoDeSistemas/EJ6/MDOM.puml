@@ -1,0 +1,91 @@
+@startuml
+class Usuario{
+	- email: String
+	- nombre: String
+	- apellido: String
+	- username: String
+	- contraseña: String
+	- dni: String
+	- fechaNac: Date
+}
+
+class NoDocente{
+	- descuento: int
+}
+
+class Docente{
+	- descuento: int
+}
+
+class Alumno{
+	- descuento: int
+}
+
+class Obra{
+	- nombre: String
+	- descripcion: String
+	- autor: String
+	- estreno: Date
+}
+
+class Funcion{
+	- fecha: Date
+	- hora: Time
+	- precio: Double
+}
+
+class Entrada{
+	- codigo: UUID
+	- codigoQR: String
+}
+
+class Asiento{
+	- fila: int
+	- num: int
+	- ocupado: Bool
+}
+
+class Compra{
+	- codigo: UUID
+	- subtotal: double
+	- descuentoAplicado: double
+	- total: double
+}
+
+class Pago{
+	- codigo: UUID 
+	- importe: double
+	- estado: String
+	- fechaPago: DateTime
+}
+
+class Sala{
+	- numero: int
+	- llena: Bool
+}
+
+' === Herencia de Usuario ===
+Usuario <|-- Alumno
+Usuario <|-- Docente
+Usuario <|-- NoDocente
+
+' === Relaciones ===
+Usuario "1" -- "0..*" Entrada : compra
+
+Entrada "1" -- "1" Funcion : corresponde a
+Entrada "1" -- "1" Asiento : ocupa
+
+Funcion "1..*" --* "1" Obra : presenta
+Funcion "1" -- "1" Sala : se realiza en
+
+Sala "1" *-- "1..*" Asiento : contiene
+
+Pago "1" -- "1" Usuario : realizado por
+
+Compra "1" *-- "1..*" Entrada
+ 
+Compra "1" -- "0..1" Pago
+
+
+
+@enduml

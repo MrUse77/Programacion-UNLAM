@@ -1,0 +1,14 @@
+# depslib dependency file v1.0
+1782830092 source:/home/agustin/Documentos/unlam/Algoritmos/Parciales/FinalMar2026/cola.c
+	"cola.h"
+	<stdlib.h>
+	<string.h>
+
+1782828760 /home/agustin/Documentos/unlam/Algoritmos/Parciales/FinalMar2026/cola.h
+
+1782829553 source:/home/agustin/Documentos/unlam/Algoritmos/Parciales/FinalMar2026/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"cola.h"
+

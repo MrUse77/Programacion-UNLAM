@@ -31,3 +31,28 @@ Algoritmos/html/
 
 Algoritmos/latex/
 Algoritmos/TP/
+# ===== Artefactos de build (Code::Blocks) =====
+bin/
+obj/
+.objs/
+*.o
+*.exe
+*.depend
+*.layout
+
+# ===== Core dumps de Valgrind =====
+vgcore.*
+
+# ===== Backups de Visual Paradigm / editores =====
+*.bak
+*.bak_*
+
+# ===== Generados / caches =====
+compile_commands.json
+.atl/
+
+# ===== Tooling personal — descomentá si no lo querés versionado =====
+# .clangd
+# .envrc
+# flake.nix
+# flake.lock

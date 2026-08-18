@@ -8,7 +8,7 @@ cat > "$SCRIPT_DIR/compile_commands.json" << EOF
 [
   {
     "directory": "$SCRIPT_DIR",
-    "command": "/usr/bin/gcc -ITDAs/inlcudes/ -Wall -Wextra -std=c11 -c dummy.c",
+    "command": "/usr/bin/gcc -Iinlcudes/ -Wall -Wextra -std=c11 -c dummy.c",
     "file": "dummy.c"
   }
 ]

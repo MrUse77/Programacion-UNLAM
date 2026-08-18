@@ -1,103 +1,96 @@
-#include "static_queue.h"
+#include <cola_estatica.h>
 #include <string.h>
 
-/* =============================================================================
-   Implementación Estática - Cola con Array Fijo en Heap (TAM_COLA elementos)
-   Cada elemento es un puntero a datos almacenados externamente
-   ============================================================================= */
-
-#define TAM_COLA 100000
-
-void queue_create(queue_t *c)
+void queue_init(queue_t *q)
 {
-	/* Inicializar cola estática vacía */
-	c->prim = 0; /* Índice del primer elemento = 0 (vacío) */
-	c->ult = -1; /* Índice del último elemento = -1 (vacío) */
-	c->tamDisp = TAM_COLA; /* Espacio disponible inicial */
+	q->pri = TAM_COLA / 2;
+	q->ult = q->pri;
+	q->tamDisp = TAM_COLA;
 }
 
-int queue_push(queue_t *c, const void *d, unsigned tamDato)
+queue_status_t queue_push(queue_t *q, void *d, unsigned tam)
 {
-	if (c->tamDisp == 0) {
-		return QUEUE_ERR_FULL; /* No hay espacio para el elemento */
+	int ini, fin;
+	if (q->tamDisp < tam + sizeof(tam)) {
+		return QUEUE_ERR_MEM_FULL;
 	}
-
-	unsigned pos = c->ult + 1;
-
-	/* Ajuste circular cuando llegamos al final del array */
-	if (pos >= TAM_COLA) {
-		pos = 0;
+	q->tamDisp -= tam + sizeof(tam);
+	if ((ini = MIN(sizeof(tam), TAM_COLA - q->ult)) != 0) {
+		memcpy(q->dato + q->ult, &tam, ini);
 	}
-
-	c->ult = pos;
-	memcpy(c->Vector[pos], d, tamDato);
-	c->tamDisp -= tamDato;
-
+	if ((fin = sizeof(tam) - ini) != 0) {
+		memcpy(q->dato, ((char *)&tam) + ini, fin);
+	}
+	q->ult = fin ? fin : q->ult + ini;
+	if ((ini = MIN(tam, TAM_COLA - q->ult)) != 0) {
+		memcpy(q->dato + q->ult, d, ini);
+	}
+	if ((fin = tam - ini) != 0) {
+		memcpy(q->dato, ((char *)d) + ini, fin);
+	}
+	q->ult = fin ? fin : q->ult + ini;
 	return QUEUE_SUCCESS;
 }
 
-int queue_is_full(queue_t *c, unsigned tam)
+queue_status_t queue_pull(queue_t *q, void *b, unsigned tam)
 {
-	/* Para estática: cola llena cuando no hay espacio disponible */
-	return (c->tamDisp < tam) ? TRUE : FALSE;
-}
-
-int queue_see_first(queue_t *c, void *buff, unsigned tamDato)
-{
-	if (c->tamDisp == TAM_COLA) {
+	int ini, fin;
+	unsigned tamInfo;
+	if (q->tamDisp == TAM_COLA) {
 		return QUEUE_ERR_EMPTY;
 	}
-
-	/* El primer elemento está en c->prim */
-	unsigned pos = c->prim;
-
-	/* Ajuste circular */
-	while (pos >= TAM_COLA) {
-		pos -= TAM_COLA;
+	if ((ini = MIN(sizeof(tam), TAM_COLA - q->pri)) != 0) {
+		memcpy(&tamInfo, q->dato + q->pri, ini);
 	}
-
-	memcpy(buff, c->Vector[pos], MIN(tamDato, tamDato));
+	if ((fin = sizeof(tam) - ini) != 0) {
+		memcpy(((char *)&tamInfo) + ini, q->dato, fin);
+	}
+	q->pri = fin ? fin : q->pri + ini;
+	tamInfo = MIN(tamInfo, tam);
+	q->tamDisp += tamInfo + sizeof(unsigned);
+	if ((ini = MIN(tamInfo, TAM_COLA - q->pri)) != 0) {
+		memcpy(b, q->dato + q->pri, ini);
+	}
+	if ((fin = tamInfo - ini) != 0) {
+		memcpy(((char *)b) + ini, q->dato, fin);
+	}
+	q->pri = fin ? fin : q->pri + ini;
 	return QUEUE_SUCCESS;
 }
 
-int queue_pull(queue_t *c, void *buff, unsigned tamDato)
+queue_status_t queue_see_first(queue_t *q, void *b, unsigned tam)
 {
-	if (c->tamDisp == TAM_COLA) {
+	int ini, fin;
+	unsigned tamInfo, pri;
+	if (q->tamDisp == TAM_COLA) {
 		return QUEUE_ERR_EMPTY;
 	}
-
-	/* Obtener datos del primer elemento */
-	unsigned pos = c->prim;
-
-	/* Ajuste circular */
-	while (pos >= TAM_COLA) {
-		pos -= TAM_COLA;
+	if ((ini = MIN(sizeof(tam), TAM_COLA - q->pri)) != 0) {
+		memcpy(&tamInfo, q->dato + q->pri, ini);
 	}
-
-	memcpy(buff, c->Vector[pos], MIN(tamDato, tamDato));
-
-	/* Avanzar el primer índice */
-	c->prim++;
-
-	/* Ajuste circular */
-	if (c->prim >= TAM_COLA) {
-		c->prim = 0;
+	if ((fin = sizeof(tam) - ini) != 0) {
+		memcpy(((char *)&tamInfo) + ini, q->dato, fin);
 	}
-
-	c->tamDisp += tamDato;
-
+	pri = fin ? fin : q->ult + ini;
+	tamInfo = MIN(tamInfo, tam);
+	if ((ini = MIN(tamInfo, TAM_COLA - pri)) != 0) {
+		memcpy(b, q->dato + pri, ini);
+	}
+	if ((fin = tamInfo - ini) != 0) {
+		memcpy(((char *)b) + ini, q->dato, fin);
+	}
 	return QUEUE_SUCCESS;
 }
-
-int queue_is_empty(queue_t *c)
+bool_t queue_is_full(queue_t *q, unsigned tam)
 {
-	return (c->tamDisp == TAM_COLA) ? TRUE : FALSE;
+	return q->tamDisp < tam + sizeof(tam) ? TRUE : FALSE;
 }
-
-void queue_clear(queue_t *c)
+bool_t queue_is_empty(queue_t *q)
 {
-	/* Reiniciar cola a estado vacío */
-	c->prim = 0;
-	c->ult = -1;
-	c->tamDisp = TAM_COLA;
+	return q->tamDisp == TAM_COLA ? TRUE : FALSE;
+}
+void queue_clear(queue_t *q)
+{
+	q->ult = q->pri;
+	q->tamDisp = TAM_COLA;
 }

@@ -8,17 +8,7 @@
 #define MIN(a, b) (a > b ? b : a)
 #define MAX(a, b) (a < b ? b : a)
 
-/**
- * @def TRUE
- * @brief Valor verdadero.
- */
-#define TRUE 1
-
-/**
- * @def FALSE
- * @brief Valor falso.
- */
-#define FALSE 0
+typedef enum { TRUE = 1, FALSE = 0 } bool_t;
 
 typedef int (*cmp_t)(const void *ctx, const void *d);
 typedef void (*accion_t)(void *param, const void *dato);

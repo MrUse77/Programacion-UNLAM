@@ -38,7 +38,7 @@
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-lListaSimple" />
-					<Add directory="../../libs" />
+					<Add directory="../../libs/Linux" />
 				</Linker>
 			</Target>
 			<Target title="Windows">
@@ -80,7 +80,7 @@
 		<VirtualTargets>
 			<Add alias="WyL" targets="Linux;Windows;" />
 		</VirtualTargets>
-		<Unit filename="Test/test.c">
+		<Unit filename="Test/test_lista_simple.c">
 			<Option compilerVar="CC" />
 			<Option target="TestLinux" />
 			<Option target="TestWindows" />

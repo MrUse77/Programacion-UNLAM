@@ -40,7 +40,7 @@
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-lColaDinamica" />
-					<Add directory="../../libs" />
+					<Add directory="../../libs/Linux" />
 				</Linker>
 			</Target>
 			<Target title="Windows">
@@ -88,7 +88,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="Test/test_cola.c">
+		<Unit filename="Test/test_cola_dinamica.c">
 			<Option compilerVar="CC" />
 			<Option target="TestLinux" />
 			<Option target="TestWindows" />

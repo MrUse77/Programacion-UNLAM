@@ -31,7 +31,7 @@ queue_status_t queue_push(queue_t *q, void *d, unsigned tam)
 
 	return QUEUE_SUCCESS;
 }
-queue_status_t queue_pull(queue_t *q, void *b, unsigned tam)
+queue_status_t queue_pop(queue_t *q, void *b, unsigned tam)
 {
 	if (q->pri == NULL) {
 		return QUEUE_ERR_EMPTY;

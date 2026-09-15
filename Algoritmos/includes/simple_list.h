@@ -114,7 +114,7 @@ int list_push_first(list_t *l, const void *d, const unsigned tam);
  * @return int OK (`200`) si se realizo exitosamente, ERR_LISTA_VACIA si la
  * lista esta vacia.
  */
-int list_pull_first(list_t *l, void *buff, const unsigned tam);
+int list_pop_first(list_t *l, void *buff, const unsigned tam);
 
 /**
  * @brief Inserta un elemento al final de la lista.
@@ -134,7 +134,7 @@ int list_push_last(list_t *l, const void *d, const unsigned tam);
  * @return int OK (`200`) si se realizo exitosamente, ERR_LISTA_VACIA si la
  * lista esta vacia.
  */
-int list_pull_last(list_t *l, void *buff, const unsigned tam);
+int list_pop_last(list_t *l, void *buff, const unsigned tam);
 
 /**
  * @brief Obtiene el ultimo elemento de la lista sin eliminarlo.

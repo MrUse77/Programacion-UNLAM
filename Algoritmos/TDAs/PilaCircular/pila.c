@@ -51,7 +51,7 @@ void stack_clear(stack_t *p)
 	*p = NULL;
 }
 
-int stack_pull(stack_t *p, void *buffer, unsigned tam)
+int stack_pop(stack_t *p, void *buffer, unsigned tam)
 {
 	if (*p == NULL) {
 		return ERR_PILA_VACIA;

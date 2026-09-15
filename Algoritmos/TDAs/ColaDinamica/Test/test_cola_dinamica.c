@@ -30,7 +30,7 @@ TEST(sacar_elemento_en_cola)
 	int num = 7, aux;
 	ASSERT_EQUAL(QUEUE_SUCCESS, queue_push(&q, &num, sizeof(int)),
 		     "No se encolo correctamente el elemento");
-	ASSERT_EQUAL(QUEUE_SUCCESS, queue_pull(&q, &aux, sizeof(int)),
+	ASSERT_EQUAL(QUEUE_SUCCESS, queue_pop(&q, &aux, sizeof(int)),
 		     "No se desencolo correctamente el elemento");
 	ASSERT_EQUAL(num, aux, "No se desencolo correctamente el elemento");
 	TEST_PASSED("Elemento desencolocado de la cola");
@@ -43,7 +43,7 @@ TEST(desencolar_unico_elemento_deja_cola_vacia)
 	int num = 7, aux;
 	ASSERT_EQUAL(QUEUE_SUCCESS, queue_push(&q, &num, sizeof(int)),
 		     "No se encolo correctamente el elemento");
-	ASSERT_EQUAL(QUEUE_SUCCESS, queue_pull(&q, &aux, sizeof(int)),
+	ASSERT_EQUAL(QUEUE_SUCCESS, queue_pop(&q, &aux, sizeof(int)),
 		     "No se desencolo correctamente el elemento");
 	ASSERT_EQUAL(num, aux, "No se desencolo correctamente el elemento");
 	ASSERT_EQUAL(TRUE, queue_is_empty(&q), "La cola debe estar vacia");
@@ -55,7 +55,7 @@ TEST(desencolar_sin_elemento_devuelve_error)
 	queue_t q;
 	int aux;
 	queue_init(&q);
-	ASSERT_EQUAL(QUEUE_ERR_EMPTY, queue_pull(&q, &aux, sizeof(int)),
+	ASSERT_EQUAL(QUEUE_ERR_EMPTY, queue_pop(&q, &aux, sizeof(int)),
 		     "Desencolar debe retornar error");
 	TEST_PASSED("Desencolar devuelve error de vacio");
 }
@@ -73,15 +73,15 @@ TEST(desencolar_varios_elementos)
 	c = 'C';
 	ASSERT_EQUAL(QUEUE_SUCCESS, queue_push(&q, &c, sizeof(char)),
 		     "No se encolo correctamente el elemento");
-	ASSERT_EQUAL(QUEUE_SUCCESS, queue_pull(&q, &aux, sizeof(char)),
+	ASSERT_EQUAL(QUEUE_SUCCESS, queue_pop(&q, &aux, sizeof(char)),
 		     "No se desencolo correctamente el elemento");
 	c = 'A';
 	ASSERT_EQUAL(c, aux, "No se desencolo correctamente el elemento");
-	ASSERT_EQUAL(QUEUE_SUCCESS, queue_pull(&q, &aux, sizeof(char)),
+	ASSERT_EQUAL(QUEUE_SUCCESS, queue_pop(&q, &aux, sizeof(char)),
 		     "No se desencolo correctamente el elemento");
 	c = 'B';
 	ASSERT_EQUAL(c, aux, "No se desencolo correctamente el elemento");
-	ASSERT_EQUAL(QUEUE_SUCCESS, queue_pull(&q, &aux, sizeof(char)),
+	ASSERT_EQUAL(QUEUE_SUCCESS, queue_pop(&q, &aux, sizeof(char)),
 		     "No se desencolo correctamente el elemento");
 	c = 'C';
 	ASSERT_EQUAL(c, aux, "No se desencolo correctamente el elemento");

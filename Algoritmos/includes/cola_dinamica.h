@@ -22,7 +22,7 @@ typedef struct {
 
 void queue_init(queue_t *q);
 queue_status_t queue_push(queue_t *q, void *d, unsigned tam);
-queue_status_t queue_pull(queue_t *q, void *b, unsigned tam);
+queue_status_t queue_pop(queue_t *q, void *b, unsigned tam);
 queue_status_t queue_see_first(queue_t *q, void *b, unsigned tam);
 bool_t queue_is_full(queue_t *q, unsigned tam);
 bool_t queue_is_empty(queue_t *q);

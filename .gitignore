@@ -56,3 +56,5 @@ compile_commands.json
 # .envrc
 # flake.nix
 # flake.lock
+/Algoritmos/compile_commands.json
+/Algoritmos/.atl

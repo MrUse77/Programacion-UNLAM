@@ -1,10 +1,75 @@
 #include <lista_simple.h>
 #include <stdlib.h>
 #include <string.h>
+
+void radix_sort(list_t *l, cmp_t cmp)
+{
+}
+
+static void divide(list_t *l, list_t *izq, list_t *der)
+{
+	list_d_node_t *prev, *slow, *fast;
+	if (l == NULL || *l == NULL) {
+		return;
+	}
+	if ((*l)->sig == NULL) {
+		*izq = *l;
+		*l = NULL;
+		*der = NULL;
+	}
+	prev = NULL;
+	slow = (*l)->sig;
+	fast = (*l)->sig->sig;
+	while (fast->sig != NULL && slow->sig != NULL) {
+		prev = slow;
+		slow = slow->sig;
+		fast = fast->sig->sig;
+	}
+
+	prev->sig = NULL;
+	*der = slow;
+	*izq = *l;
+	*l = NULL;
+}
+
+static list_t merge(list_t izq, list_t der, cmp_t cmp)
+{
+	if (izq == NULL) {
+		return der;
+	}
+	if (der == NULL) {
+		return izq;
+	}
+	if (cmp(izq->dato, der->dato) <= 0) {
+		izq->sig = merge(izq->sig, der, cmp);
+		return izq;
+	} else {
+		der->sig = merge(izq, der->sig, cmp);
+		return der;
+	}
+}
+
+static void merge_sort(list_t *l, cmp_t cmp)
+{
+	list_t izq, der;
+	if (*l == NULL || (*l)->sig == NULL) {
+		return;
+	}
+	divide(l, &izq, &der);
+	merge_sort(&izq, cmp);
+	merge_sort(&der, cmp);
+	*l = merge(izq, der, cmp);
+}
+
+void quick_sort(list_t *l, cmp_t cmp)
+{
+}
+
 void list_init(list_t *l)
 {
 	*l = NULL;
 }
+
 list_status_t list_push_last(list_t *l, void *d, unsigned tam)
 {
 	list_d_node_t *nodo = (list_d_node_t *)malloc(sizeof(list_d_node_t)),
@@ -31,7 +96,8 @@ list_status_t list_push_last(list_t *l, void *d, unsigned tam)
 	}
 	return LIST_SUCCESS;
 }
-list_status_t list_pull_last(list_t *l, void *b, unsigned tam)
+
+list_status_t list_pop_last(list_t *l, void *b, unsigned tam)
 {
 	list_d_node_t *aux = *l;
 	if (*l == NULL) {
@@ -46,6 +112,7 @@ list_status_t list_pull_last(list_t *l, void *b, unsigned tam)
 	aux = NULL;
 	return LIST_SUCCESS;
 }
+
 list_status_t list_push_first(list_t *l, void *d, unsigned tam)
 {
 	list_d_node_t *nodo = (list_d_node_t *)malloc(sizeof(list_d_node_t)),
@@ -70,7 +137,8 @@ list_status_t list_push_first(list_t *l, void *d, unsigned tam)
 	}
 	return LIST_SUCCESS;
 }
-list_status_t list_pull_first(list_t *l, void *b, unsigned tam)
+
+list_status_t list_pop_first(list_t *l, void *b, unsigned tam)
 {
 	list_d_node_t *aux = *l;
 	if (*l == NULL) {
@@ -82,6 +150,7 @@ list_status_t list_pull_first(list_t *l, void *b, unsigned tam)
 	free(aux);
 	return LIST_SUCCESS;
 }
+
 list_status_t list_push_in_pos(list_t *l, void *d, unsigned tam, int pos)
 {
 	list_d_node_t *nodo = NULL, *aux = *l;
@@ -112,7 +181,8 @@ list_status_t list_push_in_pos(list_t *l, void *d, unsigned tam, int pos)
 	aux->sig = nodo;
 	return LIST_SUCCESS;
 }
-list_status_t list_pull_in_pos(list_t *l, void *b, unsigned tam, int pos)
+
+list_status_t list_pop_in_pos(list_t *l, void *b, unsigned tam, int pos)
 {
 	list_d_node_t *aux = *l, *ant = NULL;
 	if (*l == NULL) {
@@ -132,6 +202,7 @@ list_status_t list_pull_in_pos(list_t *l, void *b, unsigned tam, int pos)
 	free(aux->sig);
 	return LIST_SUCCESS;
 }
+
 list_status_t list_see_first(list_t *l, void *b, unsigned tam)
 {
 	list_d_node_t *aux = *l;
@@ -141,6 +212,7 @@ list_status_t list_see_first(list_t *l, void *b, unsigned tam)
 	memcpy(b, aux->dato, MIN(tam, aux->tam));
 	return LIST_SUCCESS;
 }
+
 list_status_t list_see_last(list_t *l, void *b, unsigned tam)
 {
 	list_d_node_t *aux = *l;
@@ -153,10 +225,12 @@ list_status_t list_see_last(list_t *l, void *b, unsigned tam)
 	memcpy(b, aux->dato, MIN(tam, aux->tam));
 	return LIST_SUCCESS;
 }
+
 list_status_t list_reduce(list_t *l, void *param, accion_t accion)
 {
 	return LIST_SUCCESS;
 }
+
 void list_show(list_t *l, prnt_t prnt)
 {
 	list_d_node_t *aux = *l;
@@ -165,6 +239,7 @@ void list_show(list_t *l, prnt_t prnt)
 		aux = aux->sig;
 	}
 }
+
 void list_walk(list_t *l, void *b, accion_t accion)
 {
 	list_d_node_t *aux = *l;
@@ -173,6 +248,7 @@ void list_walk(list_t *l, void *b, accion_t accion)
 		aux = aux->sig;
 	}
 }
+
 bool_t list_is_full(list_t *l, unsigned tam)
 {
 	list_d_node_t *nodo = (list_d_node_t *)malloc(sizeof(list_d_node_t));
@@ -188,10 +264,12 @@ bool_t list_is_full(list_t *l, unsigned tam)
 	free(dato);
 	return FALSE;
 }
+
 bool_t list_is_empty(list_t *l)
 {
 	return *l == NULL ? TRUE : FALSE;
 }
+
 void list_clear(list_t *l)
 {
 	list_d_node_t *aux;
@@ -202,4 +280,31 @@ void list_clear(list_t *l)
 		*l = aux;
 	}
 	*l = NULL;
+}
+
+list_status_t list_order(list_t *l, const order_t ordenamiento, cmp_t cmp)
+{
+	switch (ordenamiento) {
+	case BURBUJEO:
+		bubble_sort(l, cmp);
+		break;
+	case SELECCION:
+		selection_sort(l, cmp);
+		break;
+	case INSERCION:
+		insertion_sort(l, cmp);
+		break;
+	case RADIX:
+		radix_sort(l, cmp);
+		break;
+	case MERGE:
+		merge_sort(l, cmp);
+		break;
+	case QUICK:
+		quick_sort(l, cmp);
+		break;
+	default:
+		return LIST_ERR_INVAL;
+	}
+	return LIST_SUCCESS;
 }

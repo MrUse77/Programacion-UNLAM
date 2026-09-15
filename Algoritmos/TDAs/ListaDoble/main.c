@@ -269,7 +269,7 @@ int list_delete_by_key(list_t *l, void *buff, const unsigned int tam, cmp_t cmp)
 	return LIST_ERR_INVAL;
 }
 
-int list_pull_first(list_t *l, void *buff, const unsigned tam)
+int list_pop_first(list_t *l, void *buff, const unsigned tam)
 {
 	list_node_t *act;
 	if (l == NULL || *l == NULL) {
@@ -288,7 +288,7 @@ int list_pull_first(list_t *l, void *buff, const unsigned tam)
 	return OK;
 }
 
-int list_pull_last(list_t *l, void *buff, const unsigned tam)
+int list_pop_last(list_t *l, void *buff, const unsigned tam)
 {
 	list_node_t *act;
 	if (l == NULL || *l == NULL) {

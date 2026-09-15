@@ -238,7 +238,7 @@ int list_push_last(list_t *l, const void *d, const unsigned tam)
 }
 
 /* Removes and returns the first element (head). */
-int list_pull_first(list_t *l, void *buff, const unsigned tam)
+int list_pop_first(list_t *l, void *buff, const unsigned tam)
 {
 	if (!l || !*l)
 		return LIST_ERR_EMPTY;
@@ -260,7 +260,7 @@ int list_pull_first(list_t *l, void *buff, const unsigned tam)
 	return OK;
 }
 
-int list_pull_last(list_t *l, void *buff, const unsigned tam)
+int list_pop_last(list_t *l, void *buff, const unsigned tam)
 {
 	if (!l || !*l)
 		return LIST_ERR_EMPTY;

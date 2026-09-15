@@ -20,7 +20,7 @@ typedef struct {
 
 void stack_init(stack_t *s);
 stack_status_t stack_push(stack_t *s, void *d, unsigned tam);
-stack_status_t stack_pull(stack_t *s, void *b, unsigned tam);
+stack_status_t stack_pop(stack_t *s, void *b, unsigned tam);
 stack_status_t stack_see_first(stack_t *s, void *b, unsigned tam);
 bool_t stack_is_full(stack_t *s, unsigned tam);
 bool_t stack_is_empty(stack_t *s);

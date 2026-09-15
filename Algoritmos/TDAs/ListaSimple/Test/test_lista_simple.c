@@ -35,7 +35,7 @@ TEST(sacar_primer_elemento_en_lista)
 	int num = 7, aux;
 	ASSERT_EQUAL(LIST_SUCCESS, list_push_first(&l, &num, sizeof(int)),
 		     "No se encolo correctamente el elemento");
-	ASSERT_EQUAL(LIST_SUCCESS, list_pull_first(&l, &aux, sizeof(int)),
+	ASSERT_EQUAL(LIST_SUCCESS, list_pop_first(&l, &aux, sizeof(int)),
 		     "No se desencolo correctamente el elemento");
 	ASSERT_EQUAL(num, aux, "No se desencolo correctamente el elemento");
 	TEST_PASSED("Elemento desencolocado de la lista");
@@ -47,7 +47,7 @@ TEST(sacar_ultimo_elemento_en_lista)
 	int num = 7, aux;
 	ASSERT_EQUAL(LIST_SUCCESS, list_push_last(&l, &num, sizeof(int)),
 		     "No se encolo correctamente el elemento");
-	ASSERT_EQUAL(LIST_SUCCESS, list_pull_last(&l, &aux, sizeof(int)),
+	ASSERT_EQUAL(LIST_SUCCESS, list_pop_last(&l, &aux, sizeof(int)),
 		     "No se desencolo correctamente el elemento");
 	ASSERT_EQUAL(num, aux, "No se desencolo correctamente el elemento");
 	TEST_PASSED("Elemento desencolocado de la lista");
@@ -82,7 +82,7 @@ TEST(sacar_elemento_de_pos_en_lista)
 	list_push_last(&l, &num, sizeof(int));
 	ASSERT_EQUAL(LIST_SUCCESS, list_push_in_pos(&l, &num, sizeof(int), 3),
 		     "No se encolo correctamente el elemento");
-	ASSERT_EQUAL(LIST_SUCCESS, list_pull_in_pos(&l, &aux, sizeof(int), 3),
+	ASSERT_EQUAL(LIST_SUCCESS, list_pop_in_pos(&l, &aux, sizeof(int), 3),
 		     "No se desencolo correctamente el elemento");
 	ASSERT_EQUAL(num, aux, "No se desencolo correctamente el elemento");
 	TEST_PASSED("Elemento desencolocado de la lista");
@@ -105,7 +105,7 @@ TEST(sacar_elemento_de_pos_fuera_devuelve_error)
 	int num = 7, aux;
 	list_push_last(&l, &num, sizeof(int));
 	ASSERT_EQUAL(LIST_ERR_NOT_FOUND,
-		     list_pull_in_pos(&l, &aux, sizeof(int), 3),
+		     list_pop_in_pos(&l, &aux, sizeof(int), 3),
 		     "Func debe tirar Error");
 	TEST_PASSED("Falla correctamente");
 }
@@ -117,7 +117,7 @@ TEST(desenlistar_unico_elemento_deja_lista_vacia)
 	int num = 7, aux;
 	ASSERT_EQUAL(LIST_SUCCESS, list_push_first(&l, &num, sizeof(int)),
 		     "No se encolo correctamente el elemento");
-	ASSERT_EQUAL(LIST_SUCCESS, list_pull_first(&l, &aux, sizeof(int)),
+	ASSERT_EQUAL(LIST_SUCCESS, list_pop_first(&l, &aux, sizeof(int)),
 		     "No se desencolo correctamente el elemento");
 	ASSERT_EQUAL(num, aux, "No se desencolo correctamente el elemento");
 	ASSERT_EQUAL(TRUE, list_is_empty(&l), "La lista debe estar vacia");
@@ -129,7 +129,7 @@ TEST(desenlistar_sin_elemento_devuelve_error)
 	list_t l;
 	int aux;
 	list_init(&l);
-	ASSERT_EQUAL(LIST_ERR_EMPTY, list_pull_first(&l, &aux, sizeof(int)),
+	ASSERT_EQUAL(LIST_ERR_EMPTY, list_pop_first(&l, &aux, sizeof(int)),
 		     "Desenlistar debe retornar error");
 	TEST_PASSED("Desenlistar devuelve error de vacio");
 }
@@ -147,15 +147,15 @@ TEST(desenlistar_varios_elementos)
 	c = 'C';
 	ASSERT_EQUAL(LIST_SUCCESS, list_push_first(&l, &c, sizeof(char)),
 		     "No se encolo correctamente el elemento");
-	ASSERT_EQUAL(LIST_SUCCESS, list_pull_first(&l, &aux, sizeof(char)),
+	ASSERT_EQUAL(LIST_SUCCESS, list_pop_first(&l, &aux, sizeof(char)),
 		     "No se desencolo correctamente el elemento");
 	c = 'C';
 	ASSERT_EQUAL(c, aux, "No se desencolo correctamente el elemento");
-	ASSERT_EQUAL(LIST_SUCCESS, list_pull_first(&l, &aux, sizeof(char)),
+	ASSERT_EQUAL(LIST_SUCCESS, list_pop_first(&l, &aux, sizeof(char)),
 		     "No se desencolo correctamente el elemento");
 	c = 'B';
 	ASSERT_EQUAL(c, aux, "No se desencolo correctamente el elemento");
-	ASSERT_EQUAL(LIST_SUCCESS, list_pull_first(&l, &aux, sizeof(char)),
+	ASSERT_EQUAL(LIST_SUCCESS, list_pop_first(&l, &aux, sizeof(char)),
 		     "No se desencolo correctamente el elemento");
 	c = 'A';
 	ASSERT_EQUAL(c, aux, "No se desencolo correctamente el elemento");

@@ -27,7 +27,7 @@ stack_status_t stack_push(stack_t *s, void *d, unsigned tam)
 	*s = nodo;
 	return STACK_SUCCESS;
 }
-stack_status_t stack_pull(stack_t *s, void *b, unsigned tam)
+stack_status_t stack_pop(stack_t *s, void *b, unsigned tam)
 {
 	stack_d_node_t *nodo_aux = *s;
 	if (*s == NULL) {

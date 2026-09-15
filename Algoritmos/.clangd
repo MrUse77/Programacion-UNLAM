@@ -1,7 +1,6 @@
 CompileFlags:
   Add:
-    - "-I../includes"
-    - "-I./TDAs/Vector/include"
+    - "-I./includes"
     - "-std=c11"
     - "-Wall"
     - "-Wextra"

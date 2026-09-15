@@ -78,7 +78,7 @@ int queue_see_first(queue_t *c, void *buff, unsigned tamDato);
  * @param tamDato Tamaño del buffer
  * @return OK si se realizó con éxito, ERR_COLA_VACIA si la cola está vacía
  */
-int queue_pull(queue_t *c, void *buff, unsigned tamDato);
+int queue_pop(queue_t *c, void *buff, unsigned tamDato);
 
 /**
  * @brief Comproba si la cola está vacía (no hay nodos)

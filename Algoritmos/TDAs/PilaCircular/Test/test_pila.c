@@ -45,7 +45,7 @@ TEST(pop_de_stack_vacia_retorna_error)
 
 	// ACT
 	stack_init(&s);
-	int resultado = stack_pull(&s, &valor, sizeof(valor));
+	int resultado = stack_pop(&s, &valor, sizeof(valor));
 
 	// ASSERT
 	ASSERT_EQUAL(ERR_PILA_VACIA, resultado,
@@ -65,7 +65,7 @@ TEST(push_y_pop_mismo_valor)
 	stack_init(&s);
 	stack_push(&s, &valor_original, sizeof(valor_original));
 	int resultado =
-		stack_pull(&s, &valor_recuperado, sizeof(valor_recuperado));
+		stack_pop(&s, &valor_recuperado, sizeof(valor_recuperado));
 
 	// ASSERT
 	ASSERT_EQUAL(OK, resultado, "pop() debe retornar OK");
@@ -91,7 +91,7 @@ TEST(push_multiples_elementos_orden_LIFO)
 
 	// ASSERT - Pop en orden inverso (LIFO: Last In, First Out)
 	for (int i = 4; i >= 0; i--) {
-		int resultado = stack_pull(&s, &recuperado, sizeof(recuperado));
+		int resultado = stack_pop(&s, &recuperado, sizeof(recuperado));
 		ASSERT_EQUAL(OK, resultado, "pop() debe retornar OK");
 		ASSERT_EQUAL(valores[i], recuperado, "El orden debe ser LIFO");
 	}
@@ -117,7 +117,7 @@ TEST(push_estructuras_complejas)
 	// ACT
 	stack_init(&s);
 	int resultado_push = stack_push(&s, &original, sizeof(original));
-	int resultado_pop = stack_pull(&s, &recuperado, sizeof(recuperado));
+	int resultado_pop = stack_pop(&s, &recuperado, sizeof(recuperado));
 
 	// ASSERT
 	ASSERT_EQUAL(OK, resultado_push, "push() debe retornar OK");

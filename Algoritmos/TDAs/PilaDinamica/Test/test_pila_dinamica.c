@@ -27,7 +27,7 @@ TEST(sacar_elemento_en_pila)
 	int num = 7, aux;
 	ASSERT_EQUAL(STACK_SUCCESS, stack_push(&q, &num, sizeof(int)),
 		     "No se encolo correctamente el elemento");
-	ASSERT_EQUAL(STACK_SUCCESS, stack_pull(&q, &aux, sizeof(int)),
+	ASSERT_EQUAL(STACK_SUCCESS, stack_pop(&q, &aux, sizeof(int)),
 		     "No se desencolo correctamente el elemento");
 	ASSERT_EQUAL(num, aux, "No se desencolo correctamente el elemento");
 	TEST_PASSED("Elemento desencolocado de la pila");
@@ -40,7 +40,7 @@ TEST(desapilar_unico_elemento_deja_pila_vacia)
 	int num = 7, aux;
 	ASSERT_EQUAL(STACK_SUCCESS, stack_push(&q, &num, sizeof(int)),
 		     "No se encolo correctamente el elemento");
-	ASSERT_EQUAL(STACK_SUCCESS, stack_pull(&q, &aux, sizeof(int)),
+	ASSERT_EQUAL(STACK_SUCCESS, stack_pop(&q, &aux, sizeof(int)),
 		     "No se desencolo correctamente el elemento");
 	ASSERT_EQUAL(num, aux, "No se desencolo correctamente el elemento");
 	ASSERT_EQUAL(TRUE, stack_is_empty(&q), "La pila debe estar vacia");
@@ -52,7 +52,7 @@ TEST(desapilar_sin_elemento_devuelve_error)
 	stack_t q;
 	int aux;
 	stack_init(&q);
-	ASSERT_EQUAL(STACK_ERR_EMPTY, stack_pull(&q, &aux, sizeof(int)),
+	ASSERT_EQUAL(STACK_ERR_EMPTY, stack_pop(&q, &aux, sizeof(int)),
 		     "Desenpilar debe retornar error");
 	TEST_PASSED("Desenpilar devuelve error de vacio");
 }
@@ -70,15 +70,15 @@ TEST(desenpilar_varios_elementos)
 	c = 'C';
 	ASSERT_EQUAL(STACK_SUCCESS, stack_push(&q, &c, sizeof(char)),
 		     "No se encolo correctamente el elemento");
-	ASSERT_EQUAL(STACK_SUCCESS, stack_pull(&q, &aux, sizeof(char)),
+	ASSERT_EQUAL(STACK_SUCCESS, stack_pop(&q, &aux, sizeof(char)),
 		     "No se desencolo correctamente el elemento");
 	c = 'C';
 	ASSERT_EQUAL(c, aux, "No se desencolo correctamente el elemento");
-	ASSERT_EQUAL(STACK_SUCCESS, stack_pull(&q, &aux, sizeof(char)),
+	ASSERT_EQUAL(STACK_SUCCESS, stack_pop(&q, &aux, sizeof(char)),
 		     "No se desencolo correctamente el elemento");
 	c = 'B';
 	ASSERT_EQUAL(c, aux, "No se desencolo correctamente el elemento");
-	ASSERT_EQUAL(STACK_SUCCESS, stack_pull(&q, &aux, sizeof(char)),
+	ASSERT_EQUAL(STACK_SUCCESS, stack_pop(&q, &aux, sizeof(char)),
 		     "No se desencolo correctamente el elemento");
 	c = 'A';
 	ASSERT_EQUAL(c, aux, "No se desencolo correctamente el elemento");

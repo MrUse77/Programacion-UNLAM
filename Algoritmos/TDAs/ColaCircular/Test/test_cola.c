@@ -41,7 +41,7 @@ TEST(eliminar_elemento_en_cola)
 	//insertamos elemento
 	int res = queue_push(&c, &num, sizeof(int));
 	int aux;
-	res = queue_pull(&c, &aux, sizeof(int));
+	res = queue_pop(&c, &aux, sizeof(int));
 
 	ASSERT_EQUAL(OK, res, "dequeue debe retornar OK");
 	ASSERT_EQUAL(num, aux, "aux debe ser igual al elemento puesto en cola");
@@ -64,7 +64,7 @@ TEST(ver_elemento_sin_quitar)
 
 	ASSERT_EQUAL(OK, res, "verPrimero debe retornar OK");
 	ASSERT_EQUAL(num, aux, "aux debe ser igual al elemento puesto en cola");
-	queue_pull(&c, &num, sizeof(int));
+	queue_pop(&c, &num, sizeof(int));
 	ASSERT_EQUAL(num, aux, "aux debe ser igual al primer elemento");
 	TEST_PASSED("verPrimero funciona correctamente");
 }
@@ -107,7 +107,7 @@ TEST(eliminar_varios_elementos_en_cola)
 	for (int i = 0; i < 10; i++) {
 		aux = num[i];
 		int resNum;
-		int res = queue_pull(&c, &resNum, sizeof(int));
+		int res = queue_pop(&c, &resNum, sizeof(int));
 		ASSERT_EQUAL(OK, res, "dequeue debe retornar OK");
 		ASSERT_EQUAL(resNum, aux,
 			     "aux debe ser igual al elemento puesto en cola");

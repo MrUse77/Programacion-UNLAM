@@ -69,7 +69,7 @@ int queue_see_first(queue_t *c, void *buff, unsigned tamDato)
 	return EXIT_SUCCESS;
 }
 
-int queue_pull(queue_t *c, void *buff, unsigned tamDato)
+int queue_pop(queue_t *c, void *buff, unsigned tamDato)
 {
 	if (*c == NULL) {
 		return QUEUE_ERR_EMPTY;

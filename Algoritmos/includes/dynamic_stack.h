@@ -71,7 +71,7 @@ int stack_see_top(stack_t *p, void *buff, unsigned tamDato);
  * @param tamDato Tamaño del buffer
  * @return OK si se realizó con éxito, ERR_PILA_VACIA si la pila está vacía
  */
-int stack_pull(stack_t *p, void *buff, unsigned tamDato);
+int stack_pop(stack_t *p, void *buff, unsigned tamDato);
 
 /**
  * @brief Comproba si la pila está vacía (no hay nodos)

@@ -1,5 +1,44 @@
 #include <lista_simple.h>
 #include <test_framework.h>
+
+int Comp(const void *a, const void *b)
+{
+	return *(int *)a - *(int *)b;
+}
+void sumarAExistente(void *param, const void *dato)
+{
+	*(int *)param += *(int *)dato;
+}
+void cargarEnterosEnLista(list_t *l, int *vec, int cant)
+{
+	int i;
+	for (i = 0; i < cant; i++) {
+		int aux = vec[i];
+		ASSERT_EQUAL(LIST_SUCCESS, list_push_last(l, &aux, sizeof(int)),
+			     "list_push_last debe retornar LIST_SUCCESS");
+	}
+}
+void printLista(const void *dato)
+{
+	int datoInt = *(int *)dato;
+	printf("%d\n", datoInt);
+}
+void verificarSecuenciaEnteros(list_t *l, int *vec, int cant)
+{
+	int i;
+	int aux;
+	int res;
+
+	for (i = 0; i < cant; i++) {
+		res = list_pop_first(l, &aux, sizeof(int));
+		printf("%d \n", aux);
+		ASSERT_EQUAL(LIST_SUCCESS, res,
+			     "list_pop_first debe retornar LIST_SUCCESS");
+		ASSERT_EQUAL(vec[i], aux,
+			     "La secuencia de la lista es incorrecta");
+	}
+}
+
 TEST(lista_esta_vacia_al_iniciar)
 {
 	list_t l;
@@ -183,7 +222,7 @@ TEST(vaciar_lista)
 	TEST_PASSED("Cola vaciada correctamente");
 }
 
-void contar(void *param, const void *dato)
+void contar(void *dato, void *param)
 {
 	(*(int *)param)++;
 }
@@ -201,7 +240,7 @@ TEST(caminar_por_lista)
 	c = 'C';
 	ASSERT_EQUAL(LIST_SUCCESS, list_push_first(&l, &c, sizeof(char)),
 		     "No se encolo correctamente el elemento");
-	list_walk(&l, &cont, contar);
+	list_foreach(&l, &cont, contar);
 	ASSERT_EQUAL(cont, 3, "La lista no camino bien");
 
 	TEST_PASSED("Cola vaciada correctamente");
@@ -230,7 +269,7 @@ TEST(mostrar_lista)
 	TEST_PASSED("Cola vaciada correctamente");
 }
 
-void sumar(void *param, const void *dato)
+void sumar(void *dato, void *param)
 {
 	int *aux = (int *)param, *data = (int *)dato;
 	*aux += *data;
@@ -241,13 +280,13 @@ TEST(reducir_lista)
 	list_t l;
 	int c = 1, aux = 0;
 	list_init(&l);
-	ASSERT_EQUAL(LIST_SUCCESS, list_push_last(&l, &c, sizeof(char)),
+	ASSERT_EQUAL(LIST_SUCCESS, list_push_last(&l, &c, sizeof(int)),
 		     "No se encolo correctamente el elemento");
 	c++;
-	ASSERT_EQUAL(LIST_SUCCESS, list_push_last(&l, &c, sizeof(char)),
+	ASSERT_EQUAL(LIST_SUCCESS, list_push_last(&l, &c, sizeof(int)),
 		     "No se encolo correctamente el elemento");
 	c++;
-	ASSERT_EQUAL(LIST_SUCCESS, list_push_last(&l, &c, sizeof(char)),
+	ASSERT_EQUAL(LIST_SUCCESS, list_push_last(&l, &c, sizeof(int)),
 		     "No se encolo correctamente el elemento");
 
 	list_reduce(&l, &aux, sumar);
@@ -255,6 +294,113 @@ TEST(reducir_lista)
 	TEST_PASSED("lista reducida correctamente");
 }
 
+TEST(merge_sort_lista_vacia)
+{
+	list_t l;
+	list_init(&l);
+	ASSERT_EQUAL(LIST_SUCCESS, list_order(&l, MERGE, Comp),
+		     "Merge sort sobre lista vacia debe andar");
+	ASSERT_TRUE(list_is_empty(&l), "Debe seguir vacia");
+	TEST_PASSED("merge sort lista vacia");
+}
+TEST(merge_sort_par)
+{
+	list_t l;
+	int v[] = { 4, 1, 3, 2 };
+	int esperado[] = { 1, 2, 3, 4 };
+	list_init(&l);
+	cargarEnterosEnLista(&l, v, 4);
+	ASSERT_EQUAL(LIST_SUCCESS, list_order(&l, MERGE, Comp),
+		     "Merge sort debe retornar LIST_SUCESS");
+	verificarSecuenciaEnteros(&l, esperado, 4);
+	TEST_PASSED("merge sort par");
+}
+TEST(merge_sort_impar)
+{
+	list_t l;
+	int v[] = { 5, 1, 4, 2, 3 };
+	int esperado[] = { 1, 2, 3, 4, 5 };
+	list_init(&l);
+	cargarEnterosEnLista(&l, v, 5);
+	ASSERT_EQUAL(LIST_SUCCESS, list_order(&l, MERGE, Comp),
+		     "Merge sort debe retornar LIST_SUCESS");
+	verificarSecuenciaEnteros(&l, esperado, 5);
+	TEST_PASSED("merge sort impar");
+}
+
+void sumar_map(void *dato, void *param)
+{
+	int *aux = (int *)param, *data = (int *)dato;
+	*data += *aux;
+}
+TEST(map_lista)
+{
+	list_t l, l2;
+	int c = 1, aux = 1;
+	list_init(&l);
+	list_init(&l2);
+	ASSERT_EQUAL(LIST_SUCCESS, list_push_last(&l, &c, sizeof(int)),
+		     "No se encolo correctamente el elemento");
+	c++;
+	ASSERT_EQUAL(LIST_SUCCESS, list_push_last(&l, &c, sizeof(int)),
+		     "No se encolo correctamente el elemento");
+	c++;
+	ASSERT_EQUAL(LIST_SUCCESS, list_push_last(&l, &c, sizeof(int)),
+		     "No se encolo correctamente el elemento");
+
+	list_show(&l, printLista);
+	list_map(&l, &l2, &aux, sumar_map);
+	list_show(&l2, printLista);
+	ASSERT_EQUAL(LIST_SUCCESS, list_pop_last(&l2, &c, sizeof(int)),
+		     "No se encolo correctamente el elemento");
+
+	ASSERT_EQUAL(4, c, "No se mapeo correctamente");
+	ASSERT_EQUAL(LIST_SUCCESS, list_pop_last(&l2, &c, sizeof(int)),
+		     "No se encolo correctamente el elemento");
+
+	ASSERT_EQUAL(3, c, "No se mapeo correctamente");
+	ASSERT_EQUAL(LIST_SUCCESS, list_pop_last(&l2, &c, sizeof(int)),
+		     "No se encolo correctamente el elemento");
+
+	ASSERT_EQUAL(2, c, "No se mapeo correctamente");
+	TEST_PASSED("lista mapeada correctamente");
+}
+
+int cmp_list(const void *a, const void *b)
+{
+	if (*(int *)a == 2 || *(int *)a == 1) {
+		return 0;
+	}
+	return -1;
+}
+TEST(filtrar_lista)
+{
+	list_t l, l2;
+	int c = 1, aux = 1;
+	list_init(&l);
+	list_init(&l2);
+	ASSERT_EQUAL(LIST_SUCCESS, list_push_last(&l, &c, sizeof(int)),
+		     "No se encolo correctamente el elemento");
+	c++;
+	ASSERT_EQUAL(LIST_SUCCESS, list_push_last(&l, &c, sizeof(int)),
+		     "No se encolo correctamente el elemento");
+	c++;
+	ASSERT_EQUAL(LIST_SUCCESS, list_push_last(&l, &c, sizeof(int)),
+		     "No se encolo correctamente el elemento");
+
+	list_show(&l, printLista);
+	list_filter(&l, &l2, &aux, cmp_list);
+	list_show(&l2, printLista);
+	ASSERT_EQUAL(LIST_SUCCESS, list_pop_last(&l2, &c, sizeof(int)),
+		     "No se encolo correctamente el elemento");
+
+	ASSERT_EQUAL(2, c, "No se filtro correctamente");
+	ASSERT_EQUAL(LIST_SUCCESS, list_pop_last(&l2, &c, sizeof(int)),
+		     "No se encolo correctamente el elemento");
+
+	ASSERT_EQUAL(1, c, "No se filtro correctamente");
+	TEST_PASSED("lista filtrada correctamente");
+}
 int main()
 {
 	RUN_TEST(lista_esta_vacia_al_iniciar);
@@ -273,6 +419,11 @@ int main()
 	RUN_TEST(desenlistar_sin_elemento_devuelve_error);
 	RUN_TEST(desenlistar_varios_elementos);
 	RUN_TEST(vaciar_lista);
+	RUN_TEST(merge_sort_lista_vacia);
+	RUN_TEST(merge_sort_par);
+	RUN_TEST(merge_sort_impar);
+	RUN_TEST(map_lista);
+	RUN_TEST(filtrar_lista);
 	TEST_SUMMARY();
 	return 0;
 }

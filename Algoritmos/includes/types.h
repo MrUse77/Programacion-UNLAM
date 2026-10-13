@@ -19,7 +19,7 @@ typedef enum {
 } order_t;
 
 typedef int (*cmp_t)(const void *ctx, const void *d);
-typedef void (*accion_t)(const void *param, void *dato);
+typedef void (*accion_t)(void *dato, void *param);
 typedef void (*reduce_t)(const void *param, void *dato, void *user);
 typedef void (*map_t)(const void *from, void *to, void *user);
 typedef void (*filter_t)(const void *param, void *dato, void *user);

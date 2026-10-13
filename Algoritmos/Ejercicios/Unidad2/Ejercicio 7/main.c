@@ -1,13 +1,14 @@
 #include <stdio.h>
-#include "Pila.h"
+#include "pila_estatica.h"
 #include <string.h>
 #define FILE_URL_TXT "prod.txt"
 #define TAM_LINEA 65
 #define ERR_LLENO -1
 #define ERR_FILE -2
+#define OK 0
 
-int sumar(t_Pila *p1, t_Pila *p2, t_Pila *pRes);
-int cargarArchivoEnPila(const char *nombreArchivo, t_Pila *p)
+int sumar(stack_t *p1, stack_t *p2, stack_t *pRes);
+int cargarArchivoEnPila(const char *nombreArchivo, stack_t *p)
 {
 	FILE *f = fopen(nombreArchivo, "rt");
 	if (!f) {
@@ -19,8 +20,8 @@ int cargarArchivoEnPila(const char *nombreArchivo, t_Pila *p)
 	while ((c = fgetc(f)) != EOF) {
 		if (c >= '0' && c <= '9') {
 			int num = c - '0';
-			code = apilar(p, &num, sizeof(int));
-			if (code != OK) {
+			code = stack_push(p, &num, sizeof(int));
+			if (code != STACK_SUCCESS) {
 				return code;
 			}
 		}
@@ -31,9 +32,9 @@ int cargarArchivoEnPila(const char *nombreArchivo, t_Pila *p)
 
 int main()
 {
-	t_Pila p1, p2, pRes;
-	crearPila(&p2);
-	crearPila(&p1);
+	stack_t p1, p2, pRes;
+	stack_init(&p2);
+	stack_init(&p1);
 	int code;
 	code = cargarArchivoEnPila("nro1.txt", &p1);
 	if (code != OK) {
@@ -43,24 +44,24 @@ int main()
 	if (code != OK) {
 		return code;
 	}
-	crearPila(&pRes);
+	stack_init(&pRes);
 	sumar(&p1, &p2, &pRes);
 	return 0;
 }
 
-int sumar(t_Pila *p1, t_Pila *p2, t_Pila *pRes)
+int sumar(stack_t *p1, stack_t *p2, stack_t *pRes)
 {
 	// 2. Proceso de suma (Lógica de arquitectura de sistemas)
 	int acarreo = 0;
-	while (!pilaVacia(p1) || !pilaVacia(p2) || acarreo > 0) {
-		int d1=0;
-		desapilar(p1, &d1, sizeof(int));
-		int d2=0;
-		desapilar(p2, &d2, sizeof(int));
+	while (!stack_is_empty(p1) || !stack_is_empty(p2) || acarreo > 0) {
+		int d1 = 0;
+		stack_pop(p1, &d1, sizeof(int));
+		int d2 = 0;
+		stack_pop(p2, &d2, sizeof(int));
 
 		int suma = d1 + d2 + acarreo;
 		int digito = suma % 10;
-		apilar(pRes, &digito, sizeof(int));
+		stack_push(pRes, &digito, sizeof(int));
 		acarreo = suma / 10;
 	}
 
@@ -71,9 +72,9 @@ int sumar(t_Pila *p1, t_Pila *p2, t_Pila *pRes)
 		return 1;
 	}
 
-	while (!pilaVacia(pRes)) {
+	while (!stack_is_empty(pRes)) {
 		int res;
-		desapilar(pRes, &res, sizeof(int));
+		stack_pop(pRes, &res, sizeof(int));
 
 		fprintf(resF, "%d", res);
 	}

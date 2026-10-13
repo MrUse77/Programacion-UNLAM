@@ -2,32 +2,49 @@
 #include <stdlib.h>
 #include <string.h>
 
+static list_d_node_t *node_create(const void *d, const unsigned tam)
+{
+	list_d_node_t *nodo = (list_d_node_t *)malloc(sizeof(list_d_node_t));
+	if (!nodo) {
+		return NULL;
+	}
+	void *dato = malloc(tam);
+	if (!dato) {
+		free(nodo);
+		return NULL;
+	}
+	memcpy(dato, d, tam);
+	nodo->tam = tam;
+	nodo->dato = dato;
+	nodo->sig = NULL;
+	return nodo;
+}
+
 void radix_sort(list_t *l, cmp_t cmp)
 {
 }
 
 static void divide(list_t *l, list_t *izq, list_t *der)
+
 {
-	list_d_node_t *prev, *slow, *fast;
+	list_d_node_t *slow, *fast;
+
 	if (l == NULL || *l == NULL) {
+		*izq = NULL;
+		*der = NULL;
 		return;
 	}
-	if ((*l)->sig == NULL) {
-		*izq = *l;
-		*l = NULL;
-		*der = NULL;
-	}
-	prev = NULL;
-	slow = (*l)->sig;
-	fast = (*l)->sig->sig;
-	while (fast->sig != NULL && slow->sig != NULL) {
-		prev = slow;
+
+	slow = *l;
+	fast = (*l)->sig;
+
+	while (fast != NULL && fast->sig != NULL) {
 		slow = slow->sig;
 		fast = fast->sig->sig;
 	}
 
-	prev->sig = NULL;
-	*der = slow;
+	*der = slow->sig;
+	slow->sig = NULL;
 	*izq = *l;
 	*l = NULL;
 }
@@ -61,7 +78,19 @@ static void merge_sort(list_t *l, cmp_t cmp)
 	*l = merge(izq, der, cmp);
 }
 
-void quick_sort(list_t *l, cmp_t cmp)
+static void quick_sort(list_t *l, cmp_t cmp)
+{
+}
+
+static void insertion_sort(list_t *l, cmp_t cmp)
+{
+}
+
+static void bubble_sort(list_t *l, cmp_t cmp)
+{
+}
+
+static void selection_sort(list_t *l, cmp_t cmp)
 {
 }
 
@@ -72,68 +101,54 @@ void list_init(list_t *l)
 
 list_status_t list_push_last(list_t *l, void *d, unsigned tam)
 {
-	list_d_node_t *nodo = (list_d_node_t *)malloc(sizeof(list_d_node_t)),
-		      *aux = *l;
-	if (!nodo) {
+	list_d_node_t *aux = *l, *node = node_create(d, tam);
+	if (node == NULL) {
 		return LIST_ERR_MEM_FULL;
 	}
-	void *dato = malloc(tam);
-	if (!dato) {
-		free(nodo);
-		return LIST_ERR_MEM_FULL;
-	}
-	memcpy(dato, d, tam);
-	nodo->tam = tam;
-	nodo->dato = dato;
-	nodo->sig = NULL;
 	if (*l == NULL) {
-		*l = nodo;
+		*l = node;
 	} else {
 		while (aux->sig) {
 			aux = aux->sig;
 		}
-		aux->sig = nodo;
+		aux->sig = node;
 	}
 	return LIST_SUCCESS;
 }
 
 list_status_t list_pop_last(list_t *l, void *b, unsigned tam)
 {
-	list_d_node_t *aux = *l;
+	list_d_node_t *aux = *l, *ant = NULL;
 	if (*l == NULL) {
 		return LIST_ERR_EMPTY;
 	}
 	while (aux->sig) {
+		ant = aux;
 		aux = aux->sig;
+	}
+	if (ant == NULL) {
+		*l = NULL;
+	} else {
+		ant->sig = NULL;
 	}
 	memcpy(b, aux->dato, MIN(tam, aux->tam));
 	free(aux->dato);
 	free(aux);
-	aux = NULL;
 	return LIST_SUCCESS;
 }
 
 list_status_t list_push_first(list_t *l, void *d, unsigned tam)
 {
-	list_d_node_t *nodo = (list_d_node_t *)malloc(sizeof(list_d_node_t)),
-		      *aux = *l;
-	if (!nodo) {
+	list_d_node_t *aux = *l, *node = node_create(d, tam);
+	if (node == NULL) {
 		return LIST_ERR_MEM_FULL;
 	}
-	void *dato = malloc(tam);
-	if (!dato) {
-		free(nodo);
-		return LIST_ERR_MEM_FULL;
-	}
-	memcpy(dato, d, tam);
-	nodo->tam = tam;
-	nodo->dato = dato;
 	if (*l == NULL) {
-		*l = nodo;
-		nodo->sig = NULL;
+		*l = node;
+		node->sig = NULL;
 	} else {
-		nodo->sig = aux;
-		*l = nodo;
+		node->sig = aux;
+		*l = node;
 	}
 	return LIST_SUCCESS;
 }
@@ -153,32 +168,24 @@ list_status_t list_pop_first(list_t *l, void *b, unsigned tam)
 
 list_status_t list_push_in_pos(list_t *l, void *d, unsigned tam, int pos)
 {
-	list_d_node_t *nodo = NULL, *aux = *l;
-	void *dato = NULL;
-	if (*l == NULL) {
-		return LIST_ERR_EMPTY;
-	}
-	while (aux->sig && pos - 1 != 0) {
-		aux = aux->sig;
-		pos--;
-	}
-	if (pos - 1 != 0) {
+	list_d_node_t **pp = l, *node = NULL;
+	if (pos < 0) {
 		return LIST_ERR_INVAL;
 	}
-	nodo = (list_d_node_t *)malloc(sizeof(list_d_node_t));
-	if (!nodo) {
+	/* pos es el indice final (0-based) */
+	while (*pp && pos > 0) {
+		pp = &(*pp)->sig;
+		pos--;
+	}
+	if (pos != 0) {
+		return LIST_ERR_INVAL;
+	}
+	node = node_create(d, tam);
+	if (node == NULL) {
 		return LIST_ERR_MEM_FULL;
 	}
-	dato = malloc(tam);
-	if (!dato) {
-		free(nodo);
-		return LIST_ERR_MEM_FULL;
-	}
-	memcpy(dato, d, tam);
-	nodo->tam = tam;
-	nodo->dato = dato;
-	nodo->sig = aux->sig;
-	aux->sig = nodo;
+	node->sig = *pp;
+	*pp = node;
 	return LIST_SUCCESS;
 }
 
@@ -200,6 +207,47 @@ list_status_t list_pop_in_pos(list_t *l, void *b, unsigned tam, int pos)
 	ant->sig = aux->sig->sig;
 	free(aux->sig->dato);
 	free(aux->sig);
+	return LIST_SUCCESS;
+}
+
+list_status_t list_push_in_order(list_t *l, void *d, unsigned tam, cmp_t cmp)
+{
+	list_d_node_t **pp = l, *node = NULL;
+	if (l == NULL) {
+		return LIST_ERR_INVAL;
+	}
+	/* orden ascendente: cmp(a, b) < 0 significa que a va antes que b */
+	while (*pp && cmp((*pp)->dato, d) <= 0) {
+		pp = &(*pp)->sig;
+	}
+	node = node_create(d, tam);
+	if (node == NULL) {
+		return LIST_ERR_MEM_FULL;
+	}
+	node->sig = *pp;
+	*pp = node;
+	return LIST_SUCCESS;
+}
+
+list_status_t list_pop_in_order(list_t *l, void *b, unsigned tam, cmp_t cmp)
+{
+	list_d_node_t **pp = l, *aux = NULL;
+	if (*l == NULL) {
+		return LIST_ERR_EMPTY;
+	}
+	/* b entra como clave de busqueda y sale con el dato extraido: se copia
+	   recien despues de encontrar el nodo, nunca dentro del recorrido. */
+	while (*pp && cmp((*pp)->dato, b) != 0) {
+		pp = &(*pp)->sig;
+	}
+	if (*pp == NULL) {
+		return LIST_ERR_NOT_FOUND;
+	}
+	aux = *pp;
+	*pp = aux->sig;
+	memcpy(b, aux->dato, MIN(tam, aux->tam));
+	free(aux->dato);
+	free(aux);
 	return LIST_SUCCESS;
 }
 
@@ -228,6 +276,57 @@ list_status_t list_see_last(list_t *l, void *b, unsigned tam)
 
 list_status_t list_reduce(list_t *l, void *param, accion_t accion)
 {
+	list_d_node_t *aux = *l;
+	while (aux) {
+		accion(aux->dato, param);
+		aux = aux->sig;
+	}
+	return LIST_SUCCESS;
+}
+
+list_status_t list_map(const list_t *l, list_t *new_l, const void *param,
+		       accion_t accion)
+{
+	list_d_node_t *aux = *l, *aux_new = NULL;
+	while (aux) {
+		list_d_node_t *new_node = node_create(aux->dato, aux->tam);
+		if (new_node == NULL) {
+			return LIST_ERR_MEM_FULL;
+		}
+		accion(new_node->dato, (void *)param);
+		if (*new_l == NULL) {
+			*new_l = new_node;
+			aux_new = *new_l;
+		} else {
+			aux_new->sig = new_node;
+			aux_new = aux_new->sig;
+		}
+		aux = aux->sig;
+	}
+	return LIST_SUCCESS;
+}
+
+list_status_t list_filter(const list_t *l, list_t *new_l, const void *param,
+			  cmp_t cmp)
+{
+	list_d_node_t *aux = *l, *aux_new = NULL;
+	while (aux) {
+		if (cmp(aux->dato, param) == 0) {
+			list_d_node_t *new_node =
+				node_create(aux->dato, aux->tam);
+			if (new_node == NULL) {
+				return LIST_ERR_MEM_FULL;
+			}
+			if (*new_l == NULL) {
+				*new_l = new_node;
+				aux_new = *new_l;
+			} else {
+				aux_new->sig = new_node;
+				aux_new = aux_new->sig;
+			}
+		}
+		aux = aux->sig;
+	}
 	return LIST_SUCCESS;
 }
 
@@ -240,11 +339,11 @@ void list_show(list_t *l, prnt_t prnt)
 	}
 }
 
-void list_walk(list_t *l, void *b, accion_t accion)
+void list_foreach(list_t *l, void *b, accion_t accion)
 {
 	list_d_node_t *aux = *l;
 	while (aux) {
-		accion(b, aux->dato);
+		accion(aux->dato, b);
 		aux = aux->sig;
 	}
 }
@@ -305,6 +404,77 @@ list_status_t list_order(list_t *l, const order_t ordenamiento, cmp_t cmp)
 		break;
 	default:
 		return LIST_ERR_INVAL;
+	}
+	return LIST_SUCCESS;
+}
+
+list_status_t list_find(list_t *l, void *param, unsigned tam, cmp_t cmp,
+			bool_t elim)
+{
+	list_d_node_t **pp = l, *aux = *pp;
+	while (aux) {
+		if (cmp(aux->dato, param) == 0) {
+			memcpy(param, (aux)->dato, MIN((aux)->tam, tam));
+			if (elim == TRUE) {
+				list_d_node_t *elimin = aux;
+				*pp = aux->sig;
+				free(elimin->dato);
+				free(elimin);
+			}
+			return LIST_FOUND;
+		}
+		pp = &aux->sig;
+		aux = *pp;
+	}
+	return LIST_ERR_NOT_FOUND;
+}
+
+int list_count_by_key(list_t *l, void *param, cmp_t cmp, bool_t elim)
+{
+	list_d_node_t **pp = l, *aux = *pp;
+	int count = 0;
+	while (aux) {
+		if (cmp(aux->dato, param) == 0) {
+			count++;
+			if (elim == TRUE) {
+				list_d_node_t *elimin = aux;
+				*pp = aux->sig;
+				free(elimin->dato);
+				free(elimin);
+			}
+		}
+		pp = &aux->sig;
+		aux = *pp;
+	}
+	return count;
+}
+
+list_status_t list_find_nth_match(list_t *l, unsigned n, void *param,
+				  unsigned tam, cmp_t cmp)
+{
+	list_d_node_t **pp = l, *aux = *pp;
+	while (aux) {
+		if (cmp(aux->dato, param) == 0) {
+			n--;
+			if (n == 0) {
+				memcpy(param, (aux)->dato,
+				       MIN((aux)->tam, tam));
+				return LIST_FOUND;
+			}
+		}
+		pp = &aux->sig;
+		aux = *pp;
+	}
+	return LIST_ERR_NOT_FOUND;
+}
+list_status_t list_top(list_t *l, list_t *l_top, int top)
+{
+	list_d_node_t *aux = *l, **aux_top = l_top;
+	for (int i = 0; i < top; i++) {
+		list_d_node_t *new_node = node_create(aux->dato, aux->tam);
+		*aux_top = new_node;
+		aux_top = &(*aux_top)->sig;
+		aux = aux->sig;
 	}
 	return LIST_SUCCESS;
 }

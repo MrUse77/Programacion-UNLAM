@@ -1,0 +1,142 @@
+@startuml
+' Layout: Graphviz apila los CU en una linea si no hay relaciones entre ellos.
+' Los edges -[hidden]- fuerzan filas/columnas sin dibujarse.
+left to right direction
+skinparam nodesep 10
+skinparam ranksep 25
+skinparam usecase {
+  BackgroundColor White
+  BorderColor #333333
+  FontSize 12
+}
+skinparam rectangle {
+  BackgroundColor #FAFAFA
+  BorderColor #888888
+  FontSize 13
+}
+
+actor Admin
+actor Cliente
+
+rectangle Parafarma {
+
+  rectangle "Acceso y Compra" {
+    usecase IniciarSesion
+    usecase CerrarSesion
+    usecase RegistrarCliente
+    usecase RegistrarDireccion
+    usecase RegistrarCompra
+    usecase AgregarProducto
+
+    IniciarSesion -[hidden]- RegistrarCliente
+    RegistrarCliente -[hidden]- RegistrarCompra
+    CerrarSesion -[hidden]- RegistrarDireccion
+    RegistrarDireccion -[hidden]- AgregarProducto
+  }
+
+  rectangle "Administracion" {
+    ' Fila 1: Registrar
+    usecase RegistrarProducto
+    usecase RegistrarSucursal
+    usecase RegistrarResCompraMin
+    usecase RegistrarEstadoEntrega
+    usecase RegistrarEstadoVenta
+    usecase RegistrarRubro
+    usecase RegistrarZonaEntrega
+
+    ' Fila 2: Actualizar
+    usecase ActualizarProducto
+    usecase ActualizarSucursal
+    usecase ActualizarResCompraMin
+    usecase ActualizarEstadoEntrega
+    usecase ActualizarEstadoVenta
+    usecase ActualizarRubro
+    usecase ActualizarZonaEntrega
+
+    ' Fila 3: Consultar
+    usecase ConsultarProducto
+    usecase ConsultarSucursal
+    usecase ConsultarResCompraMin
+    usecase ConsultarEstadoEntrega
+    usecase ConsultarEstadoVenta
+    usecase ConsultarRubro
+    usecase ConsultarZonaEntrega
+
+    ' Fila 4: Eliminar
+    usecase EliminarProducto
+    usecase EliminarSucursal
+    usecase EliminarResCompraMin
+    usecase EliminarEstadoEntrega
+    usecase EliminarEstadoVenta
+    usecase EliminarRubro
+    usecase EliminarZonaEntrega
+
+    ' Cadenas horizontales con edges ocultos (una por operacion CRUD)
+    RegistrarProducto -[hidden]- RegistrarSucursal
+    RegistrarSucursal -[hidden]- RegistrarResCompraMin
+    RegistrarResCompraMin -[hidden]- RegistrarEstadoEntrega
+    RegistrarEstadoEntrega -[hidden]- RegistrarEstadoVenta
+    RegistrarEstadoVenta -[hidden]- RegistrarRubro
+    RegistrarRubro -[hidden]- RegistrarZonaEntrega
+
+    ActualizarProducto -[hidden]- ActualizarSucursal
+    ActualizarSucursal -[hidden]- ActualizarResCompraMin
+    ActualizarResCompraMin -[hidden]- ActualizarEstadoEntrega
+    ActualizarEstadoEntrega -[hidden]- ActualizarEstadoVenta
+    ActualizarEstadoVenta -[hidden]- ActualizarRubro
+    ActualizarRubro -[hidden]- ActualizarZonaEntrega
+
+    ConsultarProducto -[hidden]- ConsultarSucursal
+    ConsultarSucursal -[hidden]- ConsultarResCompraMin
+    ConsultarResCompraMin -[hidden]- ConsultarEstadoEntrega
+    ConsultarEstadoEntrega -[hidden]- ConsultarEstadoVenta
+    ConsultarEstadoVenta -[hidden]- ConsultarRubro
+    ConsultarRubro -[hidden]- ConsultarZonaEntrega
+
+    EliminarProducto -[hidden]- EliminarSucursal
+    EliminarSucursal -[hidden]- EliminarResCompraMin
+    EliminarResCompraMin -[hidden]- EliminarEstadoEntrega
+    EliminarEstadoEntrega -[hidden]- EliminarEstadoVenta
+    EliminarEstadoVenta -[hidden]- EliminarRubro
+    EliminarRubro -[hidden]- EliminarZonaEntrega
+  }
+}
+
+Admin --> IniciarSesion
+Admin --> CerrarSesion
+Admin --> RegistrarProducto
+Admin --> ActualizarProducto
+Admin --> ConsultarProducto
+Admin --> EliminarProducto
+Admin --> RegistrarSucursal
+Admin --> ActualizarSucursal
+Admin --> ConsultarSucursal
+Admin --> EliminarSucursal
+Admin --> RegistrarResCompraMin
+Admin --> ActualizarResCompraMin
+Admin --> ConsultarResCompraMin
+Admin --> EliminarResCompraMin
+Admin --> RegistrarEstadoEntrega
+Admin --> ActualizarEstadoEntrega
+Admin --> ConsultarEstadoEntrega
+Admin --> EliminarEstadoEntrega
+Admin --> RegistrarEstadoVenta
+Admin --> ActualizarEstadoVenta
+Admin --> ConsultarEstadoVenta
+Admin --> EliminarEstadoVenta
+Admin --> RegistrarRubro
+Admin --> ActualizarRubro
+Admin --> ConsultarRubro
+Admin --> EliminarRubro
+Admin --> RegistrarZonaEntrega
+Admin --> ActualizarZonaEntrega
+Admin --> ConsultarZonaEntrega
+Admin --> EliminarZonaEntrega
+
+Cliente --> AgregarProducto
+Cliente --> RegistrarCliente
+Cliente --> RegistrarCompra
+Cliente --> RegistrarDireccion
+Cliente --> CerrarSesion
+
+@enduml

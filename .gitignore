@@ -40,6 +40,18 @@ obj/
 *.depend
 *.layout
 
+# ===== Binarios y libs de Algoritmos (se regeneran con make; no son portables) =====
+Algoritmos/libs/
+Algoritmos/**/*.a
+Algoritmos/**/*.so
+Algoritmos/Ejercicios/Repaso/EJ1/EJ1_test
+Algoritmos/Ejercicios/Repaso/EJ7/main
+Algoritmos/TDAs/Arbol/Test/test_arbol
+Algoritmos/TDAs/Arbol/Test/test_arbol_indice_dni
+Algoritmos/TDAs/ColaEstatica/Cola
+Algoritmos/TDAs/ListaSimple/ListaSimple
+Algoritmos/TDAs/PilaEstatica/Test/TestPila
+
 # ===== Core dumps de Valgrind =====
 vgcore.*
 

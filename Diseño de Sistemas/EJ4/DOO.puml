@@ -30,6 +30,8 @@ skinparam dpi 192
 class Sucursal {
 	- Id : UUID
 	- NumSucursal :  int
+	- HoraApertura : Date
+	- HoraCierre : Date
 }
 
 class Pago {
@@ -46,30 +48,25 @@ class Cliente {
 	- Contraseña : String
 }
 
-class Venta {
+class Compra {
 	- Id : UUID
-	- Total : int
+	- Total : float
 	- FechaYHora : date
-	+ getTotal() : int
-
 }
 
-class EstadoVenta {
+class EstadoCompra {
 	- Estado : String
 }
 
-class LineaProducto {
+class LineaCompra {
 	- Cantidad : int
-	- MontoFinal :	int 
-	+ getMontoFinal() : int
-	+ getCantidad() : int
+	- MontoFinal :	float
 }
 
 class Producto {
 	- Id : UUID
 	- Descripcion : String
 	- PrecioUnitario : int 
-	+ getPrecioUnitario() : int
 }
 
 class Rubro {
@@ -78,12 +75,6 @@ class Rubro {
 
 class ResCompraMin {
 	- Minimo : int
-}
-
-class Envio {
-	- id : UUID
-	- PrecioEnvio : int
-	- FechaYHoraEntrega : Date
 }
 
 class ZonaEntrega {
@@ -96,9 +87,8 @@ class Direccion {
 	- Numero : int
 }
 
-class EstadoEnvio {
+class EstadoEntrega {
 	- Estado : int
-	+ setEstado(estado: int) : int
 }
 
 class Localidad {
@@ -107,94 +97,65 @@ class Localidad {
 }
 
 class EntregaDom{
-	# rangoHorario : Date
-	- calcularCostoEnvio(subtotal: Float) : Float
-	+ realizarEntrega() : int
+	- PrecioEntregaDom : int
+	- FechaYHoraEntrega : Date
 }
 
 class EntregaPresencial{
-	+ realizarEntrega() : int
+	- codigoRetiro : int
 }
 
-class ControladorVenta <<Controller>>{
-	+ iniciarVenta(): Venta
-	+ introducirProducto(Cod: int, Cant: int) : Float
-	+ finalizarVenta() : Pago
+class TipoEntrega{
+	- descripcion : String 
 }
 
-class GestorVenta{
-	+ iniciarVenta(): Venta
-	+ introducirProducto(Cod: int, Cant: int) : Float
-	+ finalizarVenta() : Pago
+class Carrito{
+	- id : UUID
+	- Total : float
 }
 
-class ControladorEntrega <<Controller>>{ 
-	+ cargarEntrega()
-	+ realizarEntrega()
-	+ confirmarEntrega()
+class LineaCarrito{
+	- cantidad : int
+	- montoFinal :	float
+	- seleccionado : bool
 }
 
-class GestorEntrega{
-	+ cargarEntrega()
-	+ realizarEntrega()
-	+ confirmarEntrega()
-}
 
-class GestorPago{
-
-}
-
-class ControladorCliente <<Controller>>{
-	+ registrarCliente() : void
-	+ verDatos() : Cliente
-}
-
-class GestorCliente{
-	+ registrarCliente() : void
-	+ verDatos() : Cliente
-}
 
 '----- INTERFACES -----'
-interface IEntrega <<Interface>>{
-	+ realizarEntrega() : int
+
+interface IEntrega {
+
 }
 
 '----- RELACIONES -----'
-Cliente -- Venta
-Cliente -- Direccion
+Cliente "1"--"1...*" Compra
+Cliente "1"--"1...*" Direccion
 
-Pago -- Venta
-
-ControladorEntrega -- GestorEntrega
-GestorEntrega -- IEntrega
-IEntrega <|.. EntregaDom
-IEntrega <|.. EntregaPresencial
+Pago "1"--"1" Compra
 
 
-EntregaDom -- Envio
-EntregaPresencial -- Sucursal
+EntregaPresencial "1...*" -- "1" Sucursal
 
-ControladorCliente -- GestorCliente
-GestorCliente -- Cliente
 
-ControladorVenta -- GestorVenta
-GestorVenta -- Venta
-GestorVenta -- GestorPago
-GestorPago -- Pago
-Venta -- EstadoVenta
-Venta --* LineaProducto
-Venta -- GestorEntrega : "Tiene una"
-LineaProducto -- Producto
-Producto -- Rubro
+Compra "1...*"--"1" EstadoCompra
+Compra "1"--"1" IEntrega
+Compra -- LineaProducto
+LineaProducto "1"--"1...*" Producto
+Producto "1...*"--"1" Rubro
 
-Venta -- ResCompraMin
-Envio -- Direccion
-EntregaDom -- EstadoEnvio
-EntregaPresencial -- EstadoEnvio
-Envio -- ZonaEntrega
+Compra "1...*"--"1" TipoEntrega 
+Compra "1...*"--"1" ResCompraMin
+EntregaDom "1...*"--"1" Direccion
+EntregaDom "1...*"--"1" EstadoEntrega
+EntregaDom "1...*" -- "1" ZonaEntrega
 
-Direccion -- Localidad
-ZonaEntrega -- Localidad
+EntregaPresencial --|> IEntrega
+EntregaDom --|> IEntrega
+
+Direccion "1"--"1" Localidad
+ZonaEntrega "1"--"1...*" Localidad
 
 
 @enduml
+enduml

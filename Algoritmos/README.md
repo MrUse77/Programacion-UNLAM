@@ -55,49 +55,54 @@ Este proyecto está configurado para trabajar con **Code::Blocks** (requerido po
 
 ### Primera vez (después de clonar)
 
-1. **Generar `compile_commands.json`** (necesario para que clangd encuentre los headers):
+No hace falta configurar nada: **`compile_flags.txt` está versionado** y es el fallback que clangd usa cuando no hay `compile_commands.json`. Con eso alcanza para que encuentre los headers.
 
-   ```bash
-   cd Algoritmos/
-   ./gen_compile_commands.sh
-   ```
+Opcionalmente, podés generar `compile_commands.json` (tiene prioridad sobre `compile_flags.txt` y es el camino recomendado si querés flags distintas por archivo):
 
-   Esto crea un archivo `compile_commands.json` con **paths absolutos** adaptados a tu máquina.
+```bash
+cd Algoritmos/
+./gen_compile_commands.sh
+```
 
-2. **Verificar que funciona**:
+Esto crea un archivo `compile_commands.json` con **paths absolutos** adaptados a tu máquina.
 
-   ```bash
-   nvim Ejercicios/Repaso/EJ\ 7/main.c
-   ```
+**Verificar que funciona**:
 
-   El LSP (clangd) debería reconocer los `#include "Pila.h"` sin errores.
+```bash
+clangd --check=TDAs/Arbol/main.c
+```
 
-### ¿Por qué este script?
+Debe terminar con `All checks completed, 0 errors`. En Neovim, abrí `TDAs/Arbol/main.c`: el LSP (clangd) no debería marcar el `#include <binary_search_tree.h>`.
 
-- **Problema**: Los TDAs están en `TDAs/Pila/`, `TDAs/Vector/`, etc., pero cada ejercicio está en subcarpetas profundas como `Ejercicios/Repaso/EJ1/`.
-- **Sin configuración**: clangd no encuentra los headers (`'Pila.h' file not found`).
-- **Solución**: `compile_commands.json` le dice a clangd **desde dónde** buscar los includes.
-- **Portable**: El script genera paths absolutos basados en **tu** ubicación del repo, funciona en desktop y notebook.
+### ¿Por qué hay dos archivos de configuración?
+
+- **Problema**: los headers viven en `includes/`, pero los `.c` están en subcarpetas profundas como `Ejercicios/Repaso/EJ1/`. Sin `-I`, clangd no los encuentra (`'binary_search_tree.h' file not found`).
+- **Solución**: `-I` con la ruta de `includes/`.
+- **`compile_flags.txt`**: versionado, portable, y clangd resuelve sus rutas relativas contra el directorio del propio archivo. Es el fallback y funciona desde cualquier cwd.
+- **`compile_commands.json`**: opcional, lo genera `gen_compile_commands.sh` con paths absolutos. Si existe, clangd lo usa en lugar de `compile_flags.txt`.
+
+> Ojo: los paths relativos de un `compile_commands.json` se resuelven contra su campo `directory`, no contra el cwd de Neovim. Por eso el script los emite absolutos.
 
 ### Archivos importantes
 
-- **`.clangd`**: Configuración de clangd (versionada en Git).
-- **`compile_commands.json`**: Generado localmente, **NO versionado** (cada máquina genera el suyo).
-- **`gen_compile_commands.sh`**: Script para generar `compile_commands.json` portable.
+- **`.clangd`**: flags generales de clangd (versionado en Git).
+- **`compile_flags.txt`**: fallback con el `-I` de `includes/` (versionado en Git).
+- **`compile_commands.json`**: generado localmente, **NO versionado** (cada máquina genera el suyo).
+- **`gen_compile_commands.sh`**: script para generar `compile_commands.json` portable.
 
 ### Uso de TDAs en tus ejercicios
 
 En tus archivos `.c`:
 
 ```c
-#include "Pila.h"      // ✅ Correcto
-#include "vector.h"    // ✅ Correcto
+#include <binary_search_tree.h>  // ✅ Correcto
+#include <types.h>               // ✅ Correcto
 ```
 
 **NO** uses:
 ```c
-#include "../../TDAs/Pila/Pila.h"  // ❌ Paths relativos feos
-#include "include/Pila.h"           // ❌ Subcarpeta inexistente
+#include "../../includes/binary_search_tree.h"  // ❌ Paths relativos feos
+#include "includes/types.h"                     // ❌ Subcarpeta inexistente
 ```
 
 ### Code::Blocks
@@ -135,9 +140,12 @@ En tus archivos `.c`:
    mkdir -p TDAs/NuevoTDA
    ```
 
-2. Agregar el path en `gen_compile_commands.sh`:
+2. Si el TDA deja headers en `TDAs/NuevoTDA/`, agregá el directorio al array `INCLUDE_DIRS` de `gen_compile_commands.sh` y sumá el `-I` correspondiente en `compile_flags.txt`:
    ```bash
-   -ITDAs/NuevoTDA
+   INCLUDE_DIRS=(
+     "$SCRIPT_DIR/includes"
+     "$SCRIPT_DIR/TDAs/NuevoTDA"
+   )
    ```
 
 3. Regenerar `compile_commands.json`:

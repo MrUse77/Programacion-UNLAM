@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "binary_tree.h"
+#include "binary_search_tree.h"
 #include "test_framework.h"
 
 /* ---------- Estructura de datos ---------- */

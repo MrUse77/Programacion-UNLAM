@@ -1,420 +1,337 @@
-#include <binary_tree.h>
+#include <binary_search_tree.h>
 #include <string.h>
 #include <stdio.h>
-#include <types.h>
 
-/**
- * @def MIN
- * @brief verifica cual es el menor entre 2 elementos
- */
-
-static tree_node_t **tree_node_max_key(tree_t *t)
+static binary_search_tree_node_t **buscar_mayor(binary_search_tree_t *b)
 {
-	if (!*t) {
+	if (*b) {
 		return NULL;
 	}
-	while ((*t)->der) {
-		*t = (*t)->der;
+	if ((*b)->der == NULL) {
+		return b;
 	}
-	return t;
+	return buscar_mayor(&(*b)->der);
 }
-
-static tree_node_t **tree_node_min(tree_t *t)
+static binary_search_tree_node_t **buscar_menor(binary_search_tree_t *b)
 {
-	if (!*t) {
+	if (*b) {
 		return NULL;
 	}
-	while ((*t)->izq) {
-		*t = (*t)->izq;
+	if ((*b)->izq == NULL) {
+		return b;
 	}
-	return t;
+	return buscar_mayor(&(*b)->izq);
 }
 
-static unsigned read_bin_file(void **d, void *f, unsigned pos, void *params)
+static binary_search_tree_node_t **buscar_nodo(binary_search_tree_t *b, void *d,
+					       cmp_t cmp)
 {
-	unsigned tam = *(int *)params;
-	*d = malloc(tam);
-	if (!*d) {
-		return TREE_ERR_MEM_FULL;
+	if (*b == NULL) {
+		return NULL;
 	}
-	fseek((FILE *)f, pos * tam, SEEK_SET);
-	return fread(*d, tam, 1, (FILE *)f);
+	int cmpInt = cmp((*b)->dato, d);
+	if (cmpInt > 0) {
+		buscar_nodo(&(*b)->izq, d, cmp);
+	} else if (cmpInt < 0) {
+		buscar_nodo(&(*b)->der, d, cmp);
+	}
+	return b;
 }
 
-static int tree_load_order(tree_t *t, void *d, read_t read, int li, int ls,
-			   void *params)
+static binary_search_tree_status_t eliminar_raiz(binary_search_tree_t *b)
 {
-	int med = (li + ls) / 2, code;
-	if (li > ls) {
-		return EXIT_SUCCESS;
+	binary_search_tree_node_t **remp, *elim;
+	if (*b == NULL) {
+		return TREE_ERR_EMPTY;
 	}
-	*t = (tree_node_t *)malloc(sizeof(tree_node_t));
-	if (!(*t) || !((*t)->tam = read(&(*t)->dato, d, med, params))) {
-		free(*t);
-		return TREE_ERR_MEM_FULL;
+	free((*b)->dato);
+	if (!(*b)->der && !(*b)->izq) {
+		free(*b);
+		*b = NULL;
+		return TREE_SUCCESS;
 	}
-	(*t)->izq = (*t)->der = NULL;
-	if ((code = tree_load_order(&(*t)->izq, d, read, li, med - 1, params) !=
-		    EXIT_SUCCESS)) {
-		return code;
-	}
-	return tree_load_order(&(*t)->der, d, read, med + 1, ls, params);
-}
-
-void tree_init(tree_t *a)
-{
-	*a = NULL;
-}
-
-int tree_load_to_bin_file_sorted(tree_t *t, const char *path, unsigned tamInfo)
-{
-	if (*t) {
-		return TREE_ERR_INVAL;
-	}
-	FILE *f = fopen(path, "rb");
-	int cant = 0, code = EXIT_SUCCESS;
-	if (!f) {
-		return TREE_ERR_INVAL;
-	}
-	fseek(f, 0, SEEK_END);
-	cant = ftell(f) / tamInfo;
-	code = tree_load_order(t, f, read_bin_file, 0, cant - 1, &tamInfo);
-	fclose(f);
-	return code;
-}
-
-int tree_load_to_bin_file_sorted_abstract(tree_t *t, const char *path,
-					  unsigned tamInfo, accion_t accion)
-{
-	if (*t) {
-		return TREE_ERR_INVAL;
-	}
-	FILE *f = fopen(path, "rb");
-	int cant = 0, code = EXIT_SUCCESS;
-	if (!f) {
-		return TREE_ERR_INVAL;
-	}
-	fseek(f, 0, SEEK_END);
-	cant = ftell(f) / tamInfo;
-	code = tree_load_order(t, f, read_bin_file, 0, cant - 1, &tamInfo);
-	fclose(f);
-	return code;
-}
-
-void tree_walk_in_order(tree_t *a, accion_t accion, void *param)
-{
-	if (*a == NULL || a == NULL) {
-		return;
-	}
-	tree_walk_in_order(&(*a)->izq, accion, param);
-	accion(param, (*a)->dato);
-	tree_walk_in_order(&(*a)->der, accion, param);
-}
-
-void tree_walk_pre_order(tree_t *a, accion_t accion, void *param)
-{
-	if (*a == NULL) {
-		return;
-	}
-	accion(param, (*a)->dato);
-	tree_walk_pre_order(&(*a)->izq, accion, param);
-	tree_walk_pre_order(&(*a)->der, accion, param);
-}
-
-void tree_walk_post_order(tree_t *a, accion_t accion, void *param)
-{
-	if (*a == NULL) {
-		return;
-	}
-	tree_walk_post_order(&(*a)->izq, accion, param);
-	tree_walk_post_order(&(*a)->der, accion, param);
-	accion(param, (*a)->dato);
-}
-
-int tree_insert(tree_t *a, const void *d, const size_t tam, const cmp_t cmp)
-{
-	if (*a != NULL) {
-		int comp = cmp((*a)->dato, d);
-		if (comp < 0) {
-			return tree_insert(&((*a)->der), d, tam, cmp);
-		} else if (comp > 0) {
-			return tree_insert(&((*a)->izq), d, tam, cmp);
-		} else if (comp == 0) {
-			return TREE_EQUAL_VALUE;
-		}
-	}
-	tree_node_t *aux = (tree_node_t *)malloc(sizeof(tree_node_t));
-	if (!aux) {
-		return -1;
-	}
-	aux->dato = malloc(tam);
-	if (!aux->dato) {
-		free(aux);
-		return -2;
-	}
-	memcpy(aux->dato, d, tam);
-	aux->izq = NULL;
-	aux->der = NULL;
-	aux->tam = tam;
-	*a = aux;
+	remp = binary_search_tree_height(&(*b)->izq) >
+			       binary_search_tree_height(&(*b)->der) ?
+		       buscar_menor(&(*b)->der) :
+		       buscar_mayor(&(*b)->izq);
+	elim = *remp;
+	(*b)->dato = elim->dato;
+	(*b)->tam = elim->tam;
+	*remp = elim->izq ? elim->izq : elim->der;
+	free(elim);
 	return TREE_SUCCESS;
 }
 
-int tree_insert_iter(tree_t *a, const void *d, const size_t tam,
-		     const cmp_t cmp)
+void binary_search_tree_init(binary_search_tree_t *b)
 {
-	tree_node_t **current = a;
-	while (*current) {
-		int comp = cmp((*current)->dato, d);
-		if (comp < 0) {
-			current = &(*current)->der;
-		} else if (comp > 0) {
-			current = &(*current)->izq;
-		} else {
-			return TREE_EQUAL_VALUE;
+	*b = NULL;
+}
+
+void binary_search_tree_walk_in_order(binary_search_tree_t *b, accion_t accion,
+				      void *param)
+{
+	if (*b == NULL) {
+		return;
+	}
+	binary_search_tree_walk_in_order(&(*b)->izq, accion, param);
+	accion((*b)->dato, param);
+	binary_search_tree_walk_in_order(&(*b)->der, accion, param);
+}
+
+void binary_search_tree_walk_post_order(binary_search_tree_t *b,
+					accion_t accion, void *param)
+{
+	if (*b == NULL) {
+		return;
+	}
+	binary_search_tree_walk_in_order(&(*b)->izq, accion, param);
+	binary_search_tree_walk_in_order(&(*b)->der, accion, param);
+	accion((*b)->dato, param);
+}
+
+void binary_search_tree_walk_pre_order(binary_search_tree_t *b, accion_t accion,
+				       void *param)
+{
+	if (*b == NULL) {
+		return;
+	}
+	accion((*b)->dato, param);
+	binary_search_tree_walk_in_order(&(*b)->izq, accion, param);
+	binary_search_tree_walk_in_order(&(*b)->der, accion, param);
+}
+
+binary_search_tree_status_t binary_search_tree_insert(binary_search_tree_t *b,
+						      const void *d,
+						      const size_t tam,
+						      const cmp_t cmp)
+{
+	binary_search_tree_node_t *node = NULL;
+	if (*b != NULL) {
+		if (cmp((*b)->dato, d) < 0) {
+			return binary_search_tree_insert(&(*b)->izq, d, tam,
+							 cmp);
+		} else if (cmp((*b)->dato, d) > 0) {
+			return binary_search_tree_insert(&(*b)->der, d, tam,
+							 cmp);
 		}
 	}
-	*current = (tree_node_t *)malloc(sizeof(tree_node_t));
-	if (!*current) {
-		return -1;
+	node = (binary_search_tree_node_t *)malloc(
+		sizeof(binary_search_tree_node_t));
+	if (!node) {
+		return TREE_ERR_MEM_FULL;
 	}
-	(*current)->dato = malloc(tam);
-	if (!(*current)->dato) {
-		free(*current);
-		*current = NULL;
-		return -2;
+	node->dato = malloc(tam);
+	if (!node->dato) {
+		free(node);
+		return TREE_ERR_MEM_FULL;
 	}
-	memcpy((*current)->dato, d, tam);
-	(*current)->izq = NULL;
-	(*current)->der = NULL;
-	(*current)->tam = tam;
+	memcpy(node->dato, d, tam);
+	node->tam = tam;
+	node->der = NULL;
+	node->izq = NULL;
+	*b = node;
 	return TREE_SUCCESS;
 }
 
-int tree_node_count(const tree_t *a)
-{
-	if (*a != NULL) {
-		return 1 + tree_node_count(&(*a)->der) +
-		       tree_node_count(&(*a)->izq);
-	}
-	return 0;
-}
+int binary_search_tree_load_to_bin_file_sorted(binary_search_tree_t *b,
+					       const char *path,
+					       unsigned tamInfo);
 
-int tree_node_leaves_count(const tree_t *a)
-{
-	if (*a != NULL) {
-		if ((*a)->der == NULL && (*a)->izq == NULL) {
-			return 1;
-		}
-		return tree_node_leaves_count(&(*a)->der) +
-		       tree_node_leaves_count(&(*a)->izq);
-	}
-	return 0;
-}
+int binary_search_tree_insert_iter(binary_search_tree_t *b, const void *d,
+				   const size_t tam, const cmp_t cmp);
 
-int tree_node_wl_count(const tree_t *a)
+int binary_search_tree_node_count(const binary_search_tree_t *b)
 {
-	if (*a != NULL) {
-		if ((*a)->izq != NULL) {
-			return 1 + tree_node_wl_count(&(*a)->der) +
-			       tree_node_wl_count(&(*a)->izq);
-		}
-		return tree_node_wl_count(&(*a)->der) +
-		       tree_node_wl_count(&(*a)->izq);
-	}
-	return 0;
-}
-
-int tree_node_wr_count(const tree_t *a)
-{
-	if (*a != NULL) {
-		if ((*a)->der != NULL) {
-			return 1 + tree_node_wr_count(&(*a)->der) +
-			       tree_node_wr_count(&(*a)->izq);
-		}
-		return tree_node_wr_count(&(*a)->der) +
-		       tree_node_wr_count(&(*a)->izq);
-	}
-	return 0;
-}
-
-int tree_node_w_cond_count(const tree_t *a, cmp_t cmp, void *d)
-{
-	if (*a != NULL) {
-		if (cmp((*a)->dato, d) == 0) {
-			return 1 + tree_node_w_cond_count(&(*a)->der, cmp, d) +
-			       tree_node_w_cond_count(&(*a)->izq, cmp, d);
-		}
-		return tree_node_w_cond_count(&(*a)->der, cmp, d) +
-		       tree_node_w_cond_count(&(*a)->izq, cmp, d);
-	}
-	return 0;
-}
-
-int tree_height(const tree_t *a)
-{
-	if (*a != NULL) {
-		int i = tree_height(&(*a)->izq), d = tree_height(&(*a)->der);
-		return i >= d ? i + 1 : d + 1;
-	}
-	return 0;
-}
-
-int tree_node_count_in_level(const tree_t *a, int height)
-{
-	if (*a != NULL) {
-		if (height == 0) {
-			return 1;
-		}
-		return tree_node_count_in_level(&(*a)->der, height - 1) +
-		       tree_node_count_in_level(&(*a)->izq, height - 1);
-	}
-	return 0;
-}
-
-int tree_node_count_below_level(const tree_t *a, int height)
-{
-	if (*a != NULL) {
-		if (height < 0) {
-			return 1 +
-			       tree_node_count_below_level(&(*a)->der,
-							   height - 1) +
-			       tree_node_count_below_level(&(*a)->izq,
-							   height - 1);
-		}
-		return tree_node_count_below_level(&(*a)->der, height - 1) +
-		       tree_node_count_below_level(&(*a)->izq, height - 1);
-	}
-	return 0;
-}
-
-int tree_node_count_beyond_level(const tree_t *a, int height)
-{
-	if (*a != NULL) {
-		if (height >= 0) {
-			return 1 +
-			       tree_node_count_beyond_level(&(*a)->der,
-							    height - 1) +
-			       tree_node_count_beyond_level(&(*a)->izq,
-							    height - 1);
-		}
+	if (*b == NULL) {
 		return 0;
 	}
-	return 0;
+	return 1 + binary_search_tree_node_count(&(*b)->izq) +
+	       binary_search_tree_node_count(&(*b)->der);
 }
 
-int tree_node_count_from_level_inclusive(const tree_t *a, int height)
+int binary_search_tree_node_leaves_count(const binary_search_tree_t *b)
 {
-	if (*a != NULL) {
-		if (height <= 0) {
-			return 1 +
-			       tree_node_count_from_level_inclusive(
-				       &(*a)->der, height - 1) +
-			       tree_node_count_from_level_inclusive(&(*a)->izq,
-								    height - 1);
-		}
-		return tree_node_count_from_level_inclusive(&(*a)->der,
-							    height - 1) +
-		       tree_node_count_from_level_inclusive(&(*a)->izq,
-							    height - 1);
-	}
-	return 0;
-}
-
-int tree_cut_leaves(tree_t *t)
-{
-	if (*t == NULL) {
+	if (*b == NULL) {
 		return 0;
 	}
-	if ((*t)->izq == NULL && (*t)->der == NULL) {
-		free((*t)->dato);
-		free(*t);
-		*t = NULL;
+	if ((*b)->der == NULL && (*b)->izq == NULL) {
 		return 1;
 	}
-	return tree_cut_leaves(&(*t)->izq) + tree_cut_leaves(&(*t)->der);
+	return binary_search_tree_node_leaves_count(&(*b)->izq) +
+	       binary_search_tree_node_leaves_count(&(*b)->der);
 }
 
-int tree_destroy(tree_t *tree)
+int binary_search_tree_node_wl_count(const binary_search_tree_t *b)
 {
-	if (!tree || !*tree) {
+	if (*b == NULL) {
 		return 0;
 	}
-
-	tree_destroy(&(*tree)->izq);
-	tree_destroy(&(*tree)->der);
-	free((*tree)->dato);
-	free((*tree));
-	return TREE_SUCCESS;
+	if ((*b)->izq) {
+		return 1 + binary_search_tree_node_wl_count(&(*b)->izq);
+	}
+	return binary_search_tree_node_wl_count(&(*b)->der);
 }
 
-static int tree_delete_node_raiz(tree_t *t)
+int binary_search_tree_node_wr_count(const binary_search_tree_t *b)
 {
-	tree_node_t **remp, *elim;
-	if (*t == NULL) {
+	if (*b == NULL) {
+		return 0;
+	}
+	if ((*b)->der) {
+		return 1 + binary_search_tree_node_wr_count(&(*b)->der);
+	}
+	return binary_search_tree_node_wr_count(&(*b)->izq);
+}
+
+int binary_search_tree_node_w_cond_count(const binary_search_tree_t *b,
+					 cmp_t cmp, void *d)
+{
+	if (*b == NULL) {
+		return 0;
+	}
+	return cmp((*b)->dato, d) == 0 ?
+		       1 +
+			       binary_search_tree_node_w_cond_count(&(*b)->izq,
+								    cmp, d) +
+			       binary_search_tree_node_w_cond_count(&(*b)->izq,
+								    cmp, d) :
+		       binary_search_tree_node_w_cond_count(&(*b)->der, cmp,
+							    d) +
+			       binary_search_tree_node_w_cond_count(&(*b)->izq,
+								    cmp, d);
+}
+
+int binary_search_tree_height(const binary_search_tree_t *b)
+{
+	int izq, der;
+	if (*b == NULL) {
+		return 0;
+	}
+	izq = binary_search_tree_height(&(*b)->izq);
+	der = binary_search_tree_height(&(*b)->der);
+	return 1 + izq < der ? der : izq;
+}
+
+int binary_search_tree_node_count_in_level(const binary_search_tree_t *b,
+					   int height)
+{
+	int izq, der;
+	if (*b == NULL) {
+		return 0;
+	}
+	if (height == 0) {
+		return 1;
+	}
+	izq = binary_search_tree_node_count_in_level(&(*b)->izq, height - 1);
+	der = binary_search_tree_node_count_in_level(&(*b)->der, height - 1);
+	return der + izq;
+}
+
+int binary_search_tree_node_count_below_level(const binary_search_tree_t *b,
+					      int height)
+{
+	int izq, der;
+	if (*b == NULL) {
+		return 0;
+	}
+	if (height < 0) {
+		return 1;
+	}
+	izq = binary_search_tree_node_count_below_level(&(*b)->izq, height - 1);
+	der = binary_search_tree_node_count_below_level(&(*b)->der, height - 1);
+	return der + izq;
+}
+
+int binary_search_tree_node_count_within_level(const binary_search_tree_t *b,
+					       int height)
+{
+	int izq, der;
+	if (*b == NULL) {
+		return 0;
+	}
+	if (height > 0) {
+		return 1;
+	}
+	izq = binary_search_tree_node_count_below_level(&(*b)->izq, height - 1);
+	der = binary_search_tree_node_count_below_level(&(*b)->der, height - 1);
+	return der + izq;
+}
+
+int binary_search_tree_node_count_from_level_inclusive(
+	const binary_search_tree_t *b, int height)
+{
+	int izq, der;
+	if (*b == NULL) {
+		return 0;
+	}
+	if (height >= 0) {
+		return 1;
+	}
+	izq = binary_search_tree_node_count_below_level(&(*b)->izq, height - 1);
+	der = binary_search_tree_node_count_below_level(&(*b)->der, height - 1);
+	return der + izq;
+}
+
+int binary_search_tree_node_count_beyond_level(const binary_search_tree_t *b,
+					       int height)
+{
+	int izq, der;
+	if (*b == NULL) {
+		return 0;
+	}
+	if (height <= 0) {
+		return 1;
+	}
+	izq = binary_search_tree_node_count_below_level(&(*b)->izq, height - 1);
+	der = binary_search_tree_node_count_below_level(&(*b)->der, height - 1);
+	return der + izq;
+}
+
+int binary_search_tree_cut_leaves(binary_search_tree_t *b)
+{
+	if (*b == NULL) {
 		return TREE_ERR_EMPTY;
 	}
-	free((*t)->dato);
-	if ((*t)->izq == NULL && (*t)->der == NULL) {
-		free(*t);
-		*t = NULL;
+	if ((*b)->der == NULL && (*b)->izq == NULL) {
+		free((*b)->dato);
+		free(*b);
+		*b = NULL;
 	} else {
-		remp = tree_height(&(*t)->izq) > tree_height(&(*t)->der) ?
-			       tree_node_max_key(&(*t)->izq) :
-			       tree_node_min(&(*t)->der);
-
-		elim = *remp;
-
-		(*t)->dato = elim->dato; //Cambia puntero del dato
-		(*t)->tam = elim->tam; //Cambia valor entero
-		*remp = elim->izq ? elim->izq : elim->der;
-		free(elim);
+		binary_search_tree_cut_leaves(&(*b)->izq);
+		binary_search_tree_cut_leaves(&(*b)->der);
 	}
+
 	return TREE_SUCCESS;
 }
 
-tree_node_t **tree_search(tree_t *t, void *buff, const unsigned tam, cmp_t cmp)
+binary_search_tree_status_t binary_search_tree_destroy(binary_search_tree_t *b)
 {
-	if (*t != NULL) {
-		int comp = cmp((*t)->dato, buff);
-		if (comp < 0) {
-			return tree_search(&((*t)->der), buff, tam, cmp);
-		} else if (comp > 0) {
-			return tree_search(&((*t)->izq), buff, tam, cmp);
-		} else if (comp == 0) {
-			return t;
-		}
-	}
-	return NULL;
-}
-
-int tree_delete_node(tree_t *t, void *buff, const unsigned tam, cmp_t cmp)
-{
-	if ((t = tree_search(t, buff, tam, cmp)) == NULL) {
+	if (*b == NULL) {
 		return TREE_ERR_EMPTY;
 	}
-	memcpy(buff, (*t)->dato, MIN((*t)->tam, tam));
-	return tree_delete_node_raiz(t);
+	binary_search_tree_destroy(&(*b)->izq);
+	binary_search_tree_destroy(&(*b)->der);
+	free((*b)->dato);
+	free(*b);
+	*b = NULL;
+	return TREE_SUCCESS;
 }
-int binarysearchtree_search_r(const tree_t *tree, const void *key, void *buf,
-			      size_t n, cmp_t cmp)
+
+int binary_search_tree_is_empty(binary_search_tree_t *b)
 {
-	int compar;
-
-	if (*tree) {
-		compar = cmp((*tree)->dato, key);
-
-		if (compar > 0) {
-			return binarysearchtree_search_r(&(*tree)->izq, key,
-							 buf, n, cmp);
-		} else if (compar < 0) {
-			return binarysearchtree_search_r(&(*tree)->der, key,
-							 buf, n, cmp);
-		} else {
-			memcpy(buf, (*tree)->dato, MIN((*tree)->tam, n));
-			return EXIT_SUCCESS;
-		}
-	}
-
-	return EXIT_FAILURE;
+	return *b == NULL ? TRUE : FALSE;
 }
+
+int binary_search_tree_delete_node(binary_search_tree_t *b, void *buff,
+				   const unsigned tam, cmp_t cmp)
+{
+	if (!(b = buscar_nodo(b, buff, cmp))) {
+		return TREE_ERR_NOT_FOUND;
+	}
+	memcpy(buff, (*b)->dato, MIN((*b)->tam, tam));
+	return eliminar_raiz(b);
+}
+
+int binary_search_tree_search_r(const binary_search_tree_t *bree,
+				const void *key, void *buf, size_t n,
+				cmp_t cmp);

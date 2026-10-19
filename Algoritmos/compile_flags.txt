@@ -1,0 +1,4 @@
+-std=c89
+-Wall
+-Wextra
+-Iincludes
